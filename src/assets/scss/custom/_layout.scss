@@ -1,0 +1,50 @@
+.login-user  {
+    text-align: center;
+    text-transform: none;
+    margin-top: -50px;
+
+}
+
+.login-user .image {
+    height: 110px;
+  }
+  
+  .login-user .image-plain {
+    height: 0;
+    margin-top: 110px;
+  }
+  
+  .login-user .author {
+    text-align: center;
+    text-transform: none;
+    margin-top: -50px;
+  }
+  
+  .login-user .avatar {
+    width: 75px;
+    height: 75px;
+    border: 5px solid #ffffff;
+    position: relative;
+    margin-bottom: 15px;
+  }
+  .login-user .avatar.border-gray {
+    border-color: #eeeeee;
+  }
+  
+  .login-user .title {
+    line-height: 24px;
+  }
+  
+  .login-user .content {
+    min-height: 240px;
+  }
+  
+  .login-user .footer,
+  .login-price .footer {
+    padding: 5px 15px 10px;
+  }
+  
+  .login-user hr,
+  .login-price hr {
+    margin: 5px 15px;
+  }

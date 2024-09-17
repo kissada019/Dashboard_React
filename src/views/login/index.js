@@ -31,13 +31,21 @@ function LayoutPage() {
             <Container fluid>
                 <Row className="d-flex justify-content-center">
                     <Col md="4" >
-                        <Card>
-                            <Card.Header>
-                                <Card.Title as="h4" className=" text-center">
-                                    Login
-                                </Card.Title>
-                            </Card.Header>
+                        <Card className="login-user mt-4">
                             <Card.Body>
+                                <div className="author">
+                                    <img
+                                        alt="..."
+                                        className="avatar border-gray"
+                                        src={require("assets/img/faces/face-3.jpg")}
+                                    ></img>
+                                </div>
+                                <Card.Header>
+                                    <Card.Title as="h4" className=" text-center">
+                                        Login
+                                    </Card.Title>
+                                </Card.Header>
+
                                 <Form onSubmit={handleSubmit}>
                                     <Row>
                                         <Col className="px-3" md="12">
@@ -73,12 +81,16 @@ function LayoutPage() {
                                         >
                                             Login
                                         </Button>
-                                        <Button
-                                            className="btn btn-fill pull-right btn-sm m-1 mt-3"
-                                            variant="info"
-                                        >
-                                            Register
-                                        </Button>
+
+                                        <a href={`kanban`}>
+                                            <Button
+                                                className="btn btn-fill pull-right btn-sm m-1 mt-3"
+                                                variant="info"
+                                            >
+                                                Register
+                                            </Button>
+                                        </a>
+
                                     </Card.Title>
                                 </Form>
                             </Card.Body>
