@@ -16,15 +16,31 @@ import {
     OverlayTrigger,
     Tooltip,
 } from "react-bootstrap";
+import { useFormik } from "formik";
 
 
 function LayoutPage() {
 
-    const handleSubmit = (event) => {
-        event.preventDefault();
-        // alert(`The name you entered was: ${name}`)
-        console.log("event ");
+    const initialValues = {
+        username: "",
+        password: ""
+    };
+
+    const formik = useFormik({
+        initialValues: initialValues,
+        enableReinitialze: true,
+        // validationSchema: validationSchema,
+        onSubmit: (values) => handleSubmitData(values),
+    });
+
+
+
+    const handleSubmitData = (values) => {
+
+        console.log("event : ", values);
     }
+
+
 
     return (
         <>
@@ -46,7 +62,7 @@ function LayoutPage() {
                                     </Card.Title>
                                 </Card.Header>
 
-                                <Form onSubmit={handleSubmit}>
+                                <form onSubmit={formik.handleSubmit}>
                                     <Row>
                                         <Col className="px-3" md="12">
                                             <Form.Group>
@@ -56,6 +72,9 @@ function LayoutPage() {
                                                     id='username'
                                                     name='username'
                                                     type="text"
+                                                    onChange={(e) => {
+                                                        formik.handleChange(e)
+                                                    }}
                                                 ></Form.Control>
                                             </Form.Group>
                                         </Col>
@@ -66,9 +85,12 @@ function LayoutPage() {
                                                 <label>Password </label>
                                                 <Form.Control
                                                     placeholder="Password"
-                                                    id='paasword'
-                                                    name='paasword'
-                                                    type="text"
+                                                    id='password'
+                                                    name='password'
+                                                    type="password"
+                                                    onChange={(e) => {
+                                                        formik.handleChange(e)
+                                                    }}
                                                 ></Form.Control>
                                             </Form.Group>
                                         </Col>
@@ -92,7 +114,7 @@ function LayoutPage() {
                                         </a>
 
                                     </Card.Title>
-                                </Form>
+                                </form>
                             </Card.Body>
                         </Card>
                     </Col>
