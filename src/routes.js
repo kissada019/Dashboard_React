@@ -24,6 +24,7 @@ import Maps from "views/Maps.js";
 import Notifications from "views/Notifications.js";
 import Kanban from "views/Kanban";
 import Login from "views/login"
+import Register from "views/register"
 
 const dashboardRoutes = [
     {
@@ -87,6 +88,13 @@ const dashboardRoutes = [
         name: "Login",
         icon: "nc-icon nc-single-02",
         component: Login,
+        layout: "/admin"
+    },
+    {
+        path: "/register",
+        name: "Register",
+        icon: "nc-icon nc-single-02",
+        component: Register,
         layout: "/admin"
     }
 ];
