@@ -15,16 +15,16 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import Dashboard from "views/Dashboard.js";
-import UserProfile from "views/UserProfile.js";
-import TableList from "views/TableList.js";
-import Typography from "views/Typography.js";
-import Icons from "views/Icons.js";
-import Maps from "views/Maps.js";
-import Notifications from "views/Notifications.js";
-import Kanban from "views/Kanban";
-import Login from "views/login"
-import Register from "views/register"
+import Dashboard from "pages/Dashboard.js";
+import UserProfile from "pages/UserProfile.js";
+import TableList from "pages/TableList.js";
+import Typography from "pages/Typography.js";
+import Icons from "pages/Icons.js";
+import Maps from "pages/Maps.js";
+import Notifications from "pages/Notifications.js";
+import Kanban from "pages/Kanban";
+import Login from "pages/auth/login"
+import Register from "pages/register"
 
 const dashboardRoutes = [
     {

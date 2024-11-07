@@ -17,9 +17,14 @@ import {
     Tooltip,
 } from "react-bootstrap";
 import { useFormik } from "formik";
+import { useDispatch, useSelector } from "react-redux";
+import { fetchPosts, postsSelector } from "../../../slices/posts";
 
 
 function LayoutPage() {
+
+    const dispatch = useDispatch();
+    const { posts, loading, hasErrors } = useSelector(postsSelector);
 
     const initialValues = {
         username: "",
@@ -34,12 +39,15 @@ function LayoutPage() {
     });
 
 
+    useEffect(() => {
+        dispatch(fetchPosts());
+    }, [dispatch]);
+
 
     const handleSubmitData = (values) => {
 
         console.log("event : ", values);
     }
-
 
 
     return (
