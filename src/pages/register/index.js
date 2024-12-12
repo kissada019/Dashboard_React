@@ -3,8 +3,6 @@ import Register from "../../modules/register";
 
 
 function LayoutPage() {
-
-
     return (
         <React.Fragment>
             <Register />

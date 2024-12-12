@@ -28,9 +28,8 @@ import "./assets/scss/light-bootstrap-dashboard-react.scss?v=2.0.0";
 import "./assets/css/demo.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-import rootReducer from "./slices";
+import { store } from "./redux/store"
 
-const store = configureStore({ reducer: rootReducer });
 
 import AdminLayout from "layouts/Admin.js";
 
