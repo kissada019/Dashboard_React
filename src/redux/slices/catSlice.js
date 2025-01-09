@@ -47,7 +47,7 @@ export const catSlice = createSlice({
             .addCase(onGetAllCat.fulfilled, (state, action) => {
                 state.loading = false;
                 if (action.payload?.success) {
-                    state.tableCat.data = action.payload.responseObject;
+                    state.tableCat.data = action.payload;
                 } else {
                     alert.warning(alert.getMessage(action));
                 }

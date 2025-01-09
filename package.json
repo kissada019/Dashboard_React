@@ -30,7 +30,8 @@
     "reactstrap": "8.8.1",
     "recoil": "^0.7.7",
     "sass": "1.53.0",
-    "sweetalert2": "^11.14.5"
+    "sweetalert2": "^11.14.5",
+    "yup": "^1.5.0"
   },
   "optionalDependencies": {
     "jquery": "3.5.1",

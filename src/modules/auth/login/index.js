@@ -1,6 +1,11 @@
 import React, { useEffect } from "react";
 import ChartistGraph from "react-chartist";
 import { useRecoilState, useRecoilValue } from "recoil";
+/* hooks */
+// import useAuth from "hooks/useAuth";
+// import useAuth from "hooks/useAuth";
+import useAuth from "hooks/useAuth";
+import userInfoStorage from "storage/userInfoStorage";
 // react-bootstrap components
 import {
     Badge,
@@ -22,6 +27,10 @@ import { useDispatch, useSelector } from "react-redux";
 
 function LayoutPage() {
 
+    /* libs */
+    // const navigate = useNavigate();
+    const auth = useAuth();
+
     const dispatch = useDispatch();
 
     const initialValues = {
@@ -37,18 +46,39 @@ function LayoutPage() {
     });
 
 
-    // useEffect(() => {
-    //     dispatch(fetchPosts());
-    // }, [dispatch]);
-
+    // React.useEffect(() => {
+    //     // auth.logout();
+    //     let userInfo = userInfoStorage.get();
+    //     console.log("userInfo : ", userInfo)
+    //     if (userInfo && !_.isEmpty(userInfo) && userInfo.token) {
+    //         // navigate("/home");
+    //     }
+    // }, []);
 
     const handleSubmitData = (values) => {
 
-        console.log("event : ", values);
+
         let request = {
             username: values.username,
             password: values.password,
         };
+
+        console.log("event : ", request);
+
+        auth.login(request).then((response) => {
+            // setLoading(false);
+            console.log("login response : ", response);
+            if (response.success === true) {
+                window.location.href = '/home'
+            }
+            else {
+                formik.setErrors({ submit: response.message });
+            }
+        }).catch(error => {
+            console.log("login error : ", error);
+            // setLoading(false);
+            formik.setErrors({ submit: error.message });
+        });
     }
 
 
