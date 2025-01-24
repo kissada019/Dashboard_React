@@ -115,6 +115,8 @@ const LayoutPage = () => {
         //     </Row>
         // </Container>
 
+
+
         <div className="register-container justify-content-md-center" style={{ width: '400px', margin: '0 auto', padding: '20px', boxShadow: '0 0 10px rgba(0,0,0,0.1)', borderRadius: '10px' }}>
             <h2>Create an Account</h2>
             <Form onSubmit={handleSubmit}>
