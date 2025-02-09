@@ -4,59 +4,61 @@ import alert from "../../utils/alert"; // ใช้ alert สำหรับแ�
 
 /* initial state */
 const initialState = {
-    tableCat: {
-        form: {
-            username: "",
-            password: "",
-        },
-        page: 1,
-        sizePerPage: 10,
-        total: 0,
-        data: [],
-        detail: {},
-        isSearch: false,
+  tableCat: {
+    form: {
+      username: "",
+      password: "",
     },
-    loading: false, // เพิ่ม state สำหรับการโหลดข้อมูล
+    page: 1,
+    sizePerPage: 10,
+    total: 0,
+    data: [],
+    detail: {},
+    isSearch: false,
+  },
+  loading: false, // เพิ่ม state สำหรับการโหลดข้อมูล
 };
 
 /* Async Thunk: Fetch all cats */
 export const onGetAllCat = createAsyncThunk(
-    "catSlice/api/Cat/GetAll",
-    async (_, { rejectWithValue }) => {
-        try {
-            const response = await service.api.get("api/Cat/GetAll");
-            return response;
-        } catch (error) {
-            return rejectWithValue(error.message);
-        }
+  "catSlice/api/Cat/GetAll",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await service.api.get("api/Cat/GetAll");
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.message);
     }
+  }
 );
 
 /* Slice */
 export const catSlice = createSlice({
-    name: "catSlice",
-    initialState,
-    reducers: {
-        onClearCatData: () => initialState, // รีเซ็ต state
-    },
-    extraReducers: (builder) => {
-        builder
-            .addCase(onGetAllCat.pending, (state) => {
-                state.loading = true;
-            })
-            .addCase(onGetAllCat.fulfilled, (state, action) => {
-                state.loading = false;
-                if (action.payload?.success) {
-                    state.tableCat.data = action.payload;
-                } else {
-                    alert.warning(alert.getMessage(action));
-                }
-            })
-            .addCase(onGetAllCat.rejected, (state, action) => {
-                state.loading = false;
-                alert.error("Failed to fetch cat data: " + action.payload);
-            });
-    },
+  name: "catSlice",
+  initialState,
+  reducers: {
+    onClearCatData: () => initialState, // รีเซ็ต state
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(onGetAllCat.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(onGetAllCat.fulfilled, (state, action) => {
+        console.log("action : ", action);
+
+        state.loading = false;
+        if (action.payload) {
+          state.tableCat.data = action.payload;
+        } else {
+          alert.warning(alert.getMessage(action));
+        }
+      })
+      .addCase(onGetAllCat.rejected, (state, action) => {
+        state.loading = false;
+        alert.error("Failed to fetch cat data: " + action.payload);
+      });
+  },
 });
 
 /* Export Actions และ Reducer */

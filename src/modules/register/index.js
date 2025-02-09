@@ -1,188 +1,214 @@
-// RegisterForm.js
-import React, { useState } from 'react';
-import { Form, Button, Container, Row, Col } from 'react-bootstrap';
+import React from "react";
 
-/* libs */
-import { useDispatch } from "react-redux";
+// react-bootstrap components
+import {
+  Badge,
+  Button,
+  Card,
+  Form,
+  Navbar,
+  Nav,
+  Container,
+  Row,
+  Col,
+} from "react-bootstrap";
 
-/* redux */
-// import { onGetAllCat } from "redux/slices/catSlice";
-import { onGetAllCat } from 'redux/slices/catSlice';
-
-const LayoutPage = () => {
-    /* libs */
-    const dispatch = useDispatch();
-
-    const [formData, setFormData] = useState({
-        username: '',
-        email: '',
-        password: '',
-        confirmPassword: ''
-    });
-
-    const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        // Logic สำหรับตรวจสอบข้อมูลหรือส่งข้อมูลไปยัง backend
-        console.log(formData);
-    };
-
-    React.useEffect(() => {
-
-        dispatch(onGetAllCat()).then(response => {
-            console.log("onInsertSprint response : ", response);
-        })
-    });
-
-
-
-
-    const [form, setForm] = useState({
-        name: '',
-        email: '',
-        password: '',
-        confirmPassword: '',
-        agreeToTerms: false,
-    });
-
-
-
-    return (
-        // <Container className="mt-5">
-        //     <Row className="justify-content-md-center">
-        //         <Col md={6}>
-        //             <h2>Register</h2>
-        //             <Form onSubmit={handleSubmit}>
-        //                 <Form.Group controlId="formUsername" className="mb-3">
-        //                     <Form.Label>Username</Form.Label>
-        //                     <Form.Control
-        //                         type="text"
-        //                         placeholder="Enter username"
-        //                         name="username"
-        //                         value={formData.username}
-        //                         onChange={handleChange}
-        //                         required
-        //                     />
-        //                 </Form.Group>
-
-        //                 <Form.Group controlId="formEmail" className="mb-3">
-        //                     <Form.Label>Email address</Form.Label>
-        //                     <Form.Control
-        //                         type="email"
-        //                         placeholder="Enter email"
-        //                         name="email"
-        //                         value={formData.email}
-        //                         onChange={handleChange}
-        //                         required
-        //                     />
-        //                 </Form.Group>
-
-        //                 <Form.Group controlId="formPassword" className="mb-3">
-        //                     <Form.Label>Password</Form.Label>
-        //                     <Form.Control
-        //                         type="password"
-        //                         placeholder="Password"
-        //                         name="password"
-        //                         value={formData.password}
-        //                         onChange={handleChange}
-        //                         required
-        //                     />
-        //                 </Form.Group>
-
-        //                 <Form.Group controlId="formConfirmPassword" className="mb-3">
-        //                     <Form.Label>Confirm Password</Form.Label>
-        //                     <Form.Control
-        //                         type="password"
-        //                         placeholder="Confirm Password"
-        //                         name="confirmPassword"
-        //                         value={formData.confirmPassword}
-        //                         onChange={handleChange}
-        //                         required
-        //                     />
-        //                 </Form.Group>
-
-        //                 <Button variant="primary" type="submit">
-        //                     Register
-        //                 </Button>
-        //             </Form>
-        //         </Col>
-        //     </Row>
-        // </Container>
-
-
-
-        <div className="register-container justify-content-md-center" style={{ width: '400px', margin: '0 auto', padding: '20px', boxShadow: '0 0 10px rgba(0,0,0,0.1)', borderRadius: '10px' }}>
-            <h2>Create an Account</h2>
-            <Form onSubmit={handleSubmit}>
-                <Form.Group controlId="formName" className="mb-3">
-                    <Form.Label>Your Name</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="name"
-                        placeholder="Enter your name"
-                        value={form.name}
-                        onChange={handleChange}
-                        required
-                    />
-                </Form.Group>
-
-                <Form.Group controlId="formEmail" className="mb-3">
-                    <Form.Label>Your Email</Form.Label>
-                    <Form.Control
-                        type="email"
-                        name="email"
-                        placeholder="Enter your email"
-                        value={form.email}
-                        onChange={handleChange}
-                        required
-                    />
-                </Form.Group>
-
-                <Form.Group controlId="formPassword" className="mb-3">
-                    <Form.Label>Password</Form.Label>
-                    <Form.Control
-                        type="password"
-                        name="password"
-                        placeholder="Enter your password"
-                        value={form.password}
-                        onChange={handleChange}
-                        required
-                    />
-                </Form.Group>
-
-                <Form.Group controlId="formConfirmPassword" className="mb-3">
-                    <Form.Label>Repeat your password</Form.Label>
-                    <Form.Control
-                        type="password"
-                        name="confirmPassword"
-                        placeholder="Repeat your password"
-                        value={form.confirmPassword}
-                        onChange={handleChange}
-                        required
-                    />
-                </Form.Group>
-
-                <Button
-                    variant="primary"
+function User() {
+  return (
+    <>
+      <Container fluid>
+        <Row>
+          <Col md="8">
+            <Card>
+              <Card.Header>
+                <Card.Title as="h4">เพิ่มต้นไม้</Card.Title>
+              </Card.Header>
+              <Card.Body>
+                <Form>
+                  <Row>
+                    <Col className="pr-1" md="5">
+                      <Form.Group>
+                        <label>Company (disabled)</label>
+                        <Form.Control
+                          defaultValue="Creative Code Inc."
+                          placeholder="Company"
+                          type="text"
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+                    <Col className="px-1" md="3">
+                      <Form.Group>
+                        <label>Username</label>
+                        <Form.Control
+                          defaultValue="michael23"
+                          placeholder="Username"
+                          type="text"
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+                    <Col className="pl-1" md="4">
+                      <Form.Group>
+                        <label htmlFor="exampleInputEmail1">
+                          Email address
+                        </label>
+                        <Form.Control
+                          placeholder="Email"
+                          type="email"
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col className="pr-1" md="6">
+                      <Form.Group>
+                        <label>First Name</label>
+                        <Form.Control
+                          defaultValue="Mike"
+                          placeholder="Company"
+                          type="text"
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+                    <Col className="pl-1" md="6">
+                      <Form.Group>
+                        <label>Last Name</label>
+                        <Form.Control
+                          defaultValue="Andrew"
+                          placeholder="Last Name"
+                          type="text"
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col md="12">
+                      <Form.Group>
+                        <label>Address</label>
+                        <Form.Control
+                          defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
+                          placeholder="Home Address"
+                          type="text"
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col className="pr-1" md="4">
+                      <Form.Group>
+                        <label>City</label>
+                        <Form.Control
+                          defaultValue="Mike"
+                          placeholder="City"
+                          type="text"
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+                    <Col className="px-1" md="4">
+                      <Form.Group>
+                        <label>Country</label>
+                        <Form.Control
+                          defaultValue="Andrew"
+                          placeholder="Country"
+                          type="text"
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+                    <Col className="pl-1" md="4">
+                      <Form.Group>
+                        <label>Postal Code</label>
+                        <Form.Control
+                          placeholder="ZIP Code"
+                          type="number"
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Row>
+                    <Col md="12">
+                      <Form.Group>
+                        <label>About Me</label>
+                        <Form.Control
+                          cols="80"
+                          defaultValue="Lamborghini Mercy, Your chick she so thirsty, I'm in
+                          that two seat Lambo."
+                          placeholder="Here can be your description"
+                          rows="4"
+                          as="textarea"
+                        ></Form.Control>
+                      </Form.Group>
+                    </Col>
+                  </Row>
+                  <Button
+                    className="btn-fill pull-right"
                     type="submit"
-                    className="w-100"
-                    style={{ background: 'linear-gradient(to right, #00C9A7, #92FE9D)' }}
+                    variant="info"
+                  >
+                    Update Profile
+                  </Button>
+                  <div className="clearfix"></div>
+                </Form>
+              </Card.Body>
+            </Card>
+          </Col>
+          <Col md="4">
+            <Card className="card-user">
+              <div className="card-image">
+                <img
+                  alt="..."
+                  src={require("assets/img/photo-1431578500526-4d9613015464.jpeg")}
+                ></img>
+              </div>
+              <Card.Body>
+                <div className="author">
+                  <a href="#pablo" onClick={(e) => e.preventDefault()}>
+                    <img
+                      alt="..."
+                      className="avatar border-gray"
+                      src={require("assets/img/faces/face-3.jpg")}
+                    ></img>
+                    <h5 className="title">Mike Andrew</h5>
+                  </a>
+                  <p className="description">michael24</p>
+                </div>
+                <p className="description text-center">
+                  "Lamborghini Mercy <br></br>
+                  Your chick she so thirsty <br></br>
+                  I'm in that two seat Lambo"
+                </p>
+              </Card.Body>
+              <hr></hr>
+              <div className="button-container mr-auto ml-auto">
+                <Button
+                  className="btn-simple btn-icon"
+                  href="#pablo"
+                  onClick={(e) => e.preventDefault()}
+                  variant="link"
                 >
-                    REGISTER
+                  <i className="fab fa-facebook-square"></i>
                 </Button>
-            </Form>
-            <p style={{ marginTop: '10px' }}>
-                Have already an account? <a href="/login">Login here</a>
-            </p>
-        </div>
-    );
-};
+                <Button
+                  className="btn-simple btn-icon"
+                  href="#pablo"
+                  onClick={(e) => e.preventDefault()}
+                  variant="link"
+                >
+                  <i className="fab fa-twitter"></i>
+                </Button>
+                <Button
+                  className="btn-simple btn-icon"
+                  href="#pablo"
+                  onClick={(e) => e.preventDefault()}
+                  variant="link"
+                >
+                  <i className="fab fa-google-plus-square"></i>
+                </Button>
+              </div>
+            </Card>
+          </Col>
+        </Row>
+      </Container>
+    </>
+  );
+}
 
-export default LayoutPage;
-
+export default User;

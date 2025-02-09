@@ -23,80 +23,88 @@ import Icons from "pages/Icons.js";
 import Maps from "pages/Maps.js";
 import Notifications from "pages/Notifications.js";
 import Kanban from "pages/Kanban";
-import Login from "pages/auth/login"
-import Register from "pages/register"
+import Login from "pages/auth/login";
+import Register from "pages/register";
+import Tree from "pages/tree";
 
 const dashboardRoutes = [
-    {
-        path: "/dashboard",
-        name: "Dashboard",
-        icon: "nc-icon nc-chart-pie-35",
-        component: Dashboard,
-        layout: "/admin"
-    },
-    {
-        path: "/user",
-        name: "User Profile",
-        icon: "nc-icon nc-circle-09",
-        component: UserProfile,
-        layout: "/admin"
-    },
-    {
-        path: "/table",
-        name: "Table List",
-        icon: "nc-icon nc-notes",
-        component: TableList,
-        layout: "/admin"
-    },
-    {
-        path: "/typography",
-        name: "Typography",
-        icon: "nc-icon nc-paper-2",
-        component: Typography,
-        layout: "/admin"
-    },
-    {
-        path: "/icons",
-        name: "Icons",
-        icon: "nc-icon nc-atom",
-        component: Icons,
-        layout: "/admin"
-    },
-    {
-        path: "/maps",
-        name: "Maps",
-        icon: "nc-icon nc-pin-3",
-        component: Maps,
-        layout: "/admin"
-    },
-    {
-        path: "/notifications",
-        name: "Notifications",
-        icon: "nc-icon nc-bell-55",
-        component: Notifications,
-        layout: "/admin"
-    },
-    {
-        path: "/kanban",
-        name: "Kanban",
-        icon: "nc-icon nc-badge",
-        component: Kanban,
-        layout: "/admin"
-    },
-    {
-        path: "/login",
-        name: "Login",
-        icon: "nc-icon nc-single-02",
-        component: Login,
-        layout: "/admin"
-    },
-    {
-        path: "/register",
-        name: "Register",
-        icon: "nc-icon nc-single-02",
-        component: Register,
-        layout: "/admin"
-    }
+  {
+    path: "/dashboard",
+    name: "Dashboard",
+    icon: "nc-icon nc-chart-pie-35",
+    component: Dashboard,
+    layout: "/admin",
+  },
+  {
+    path: "/tree",
+    name: "ต้นไม้",
+    icon: "nc-icon nc-notes",
+    component: Tree,
+    layout: "/admin",
+  },
+  {
+    path: "/register",
+    name: "Register",
+    icon: "nc-icon nc-paper-2",
+    component: Register,
+    layout: "/admin",
+  },
+  {
+    path: "/user",
+    name: "User Profile",
+    icon: "nc-icon nc-circle-09",
+    component: UserProfile,
+    layout: "/admin",
+  },
+  {
+    path: "/table",
+    name: "Table List",
+    icon: "nc-icon nc-notes",
+    component: TableList,
+    layout: "/admin",
+  },
+  {
+    path: "/typography",
+    name: "Typography",
+    icon: "nc-icon nc-paper-2",
+    component: Typography,
+    layout: "/admin",
+  },
+  {
+    path: "/icons",
+    name: "Icons",
+    icon: "nc-icon nc-atom",
+    component: Icons,
+    layout: "/admin",
+  },
+  {
+    path: "/maps",
+    name: "Maps",
+    icon: "nc-icon nc-pin-3",
+    component: Maps,
+    layout: "/admin",
+  },
+  {
+    path: "/notifications",
+    name: "Notifications",
+    icon: "nc-icon nc-bell-55",
+    component: Notifications,
+    layout: "/admin",
+  },
+  {
+    path: "/kanban",
+    name: "Kanban",
+    icon: "nc-icon nc-badge",
+    component: Kanban,
+    layout: "/admin",
+  },
+  {
+    path: "/login",
+    name: "Login",
+    icon: "nc-icon nc-single-02",
+    component: Login,
+    layout: "/admin",
+  },
 ];
 
 export default dashboardRoutes;
