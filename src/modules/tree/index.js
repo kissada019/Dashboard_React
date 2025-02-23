@@ -19,6 +19,8 @@ const LayoutPage = () => {
 
   const [data, setData] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   React.useEffect(() => {
     dispatch(onGetAllTree()).then((response) => {
@@ -27,23 +29,21 @@ const LayoutPage = () => {
     });
   }, []);
 
-  // Handle search input change
   const handleSearchChange = (event) => {
     setSearchTerm(event.target.value.toLowerCase());
+    setCurrentPage(1);
   };
 
-  // Filter data based on search term
   const filteredData = data?.filter(
     (item) =>
       item.name.toLowerCase().includes(searchTerm) ||
-      item.gender.toLowerCase().includes(searchTerm) ||
-      item.breed.toLowerCase().includes(searchTerm) ||
-      item.color.toLowerCase().includes(searchTerm) ||
-      item.age.toString().includes(searchTerm)
+      item.species.toLowerCase().includes(searchTerm) ||
+      item.price_old.toString().includes(searchTerm) ||
+      item.price_new.toString().includes(searchTerm) ||
+      item.amount.toString().includes(searchTerm)
   );
 
   const addData = () => {
-    // dispatch(onCreateTree({ name: "New Tree", type: "Oak" }));
     console.log("test");
   };
 
@@ -51,12 +51,26 @@ const LayoutPage = () => {
     history.push("/admin/register");
   };
 
+  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const paginatedData = filteredData.slice(
+    (currentPage - 1) * itemsPerPage,
+    currentPage * itemsPerPage
+  );
+
+  const handlePreviousPage = () => {
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleNextPage = () => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
   return (
-    <Container fluid>
-      <Card className="card-tasks">
+    <Container fluid className="p-4">
+      <Card className="card-tasks p-3">
         <Card.Header>
           <div className="places-buttons">
-            <Row className="justify-content-between ">
+            <Row className="justify-content-between mb-3">
               <Col lg="1" md="1">
                 <Card.Title as="h4">ต้นไม้</Card.Title>
               </Col>
@@ -73,7 +87,7 @@ const LayoutPage = () => {
                 </div>
               </Col>
             </Row>
-            <Row className="justify-content-end mt-2">
+            <Row className="justify-content-end mt-2 mb-3">
               <Col lg="3" md="3">
                 <Form.Control
                   type="text"
@@ -90,7 +104,7 @@ const LayoutPage = () => {
             <Table className="table table-hover no-border">
               <thead>
                 <tr>
-                  <th>ลำดัย</th>
+                  <th>ลำดับ</th>
                   <th>ชื่อ</th>
                   <th>พันธุ์</th>
                   <th>ราคาซื้อ</th>
@@ -100,9 +114,9 @@ const LayoutPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {filteredData?.map((item) => (
+                {paginatedData?.map((item, index) => (
                   <tr key={item.id}>
-                    <td>{item.id}</td>
+                    <td>{(currentPage - 1) * itemsPerPage + index + 1}</td>
                     <td>{item.name}</td>
                     <td>{item.species}</td>
                     <td>{item.price_old}</td>
@@ -111,7 +125,7 @@ const LayoutPage = () => {
                     <td>
                       <Button
                         variant="outline-primary"
-                        className="me-2 mr-1 btn btn-warning"
+                        className="me-2 btn btn-warning"
                         size="sm"
                       >
                         <Pencil size={16} />
@@ -129,6 +143,13 @@ const LayoutPage = () => {
                 ))}
               </tbody>
             </Table>
+            <div className="d-flex justify-content-between mt-3">
+              <Button onClick={handlePreviousPage}>Previous</Button>
+              <span>
+                Page {currentPage} of {totalPages}
+              </span>
+              <Button onClick={handleNextPage}>Next</Button>
+            </div>
           </div>
         </Card.Body>
       </Card>

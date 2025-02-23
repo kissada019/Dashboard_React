@@ -35,8 +35,10 @@ export const onGetAllTree = createAsyncThunk(
 /* Async Thunk: Create a new tree */
 export const onCreateTree = createAsyncThunk(
   "treeSlice/api/Tree/Create",
-  async (treeData, { rejectWithValue }) => {
+  async (treeData) => {
     try {
+      // console.log("treeData : ", treeData);
+
       const response = await service.api.post("api/Tree/Create", treeData);
       alert.success("Tree created successfully!");
       return response;

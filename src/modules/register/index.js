@@ -1,6 +1,7 @@
 import React from "react";
-
+import numeral from "numeral";
 // react-bootstrap components
+import { useFormik } from "formik";
 import {
   Badge,
   Button,
@@ -12,8 +13,50 @@ import {
   Row,
   Col,
 } from "react-bootstrap";
+import { useDispatch } from "react-redux";
+import { onGetAllTree, onCreateTree } from "../../redux/slices/treeSlice";
 
 function User() {
+  const dispatch = useDispatch();
+  const initialValues = {
+    name: "",
+    species: "",
+    price_old: 0,
+    price_new: 0,
+    amount: 0,
+  };
+
+  const formik = useFormik({
+    initialValues: initialValues,
+    enableReinitialze: true,
+    // validationSchema: validationSchema,
+    onSubmit: (values) => handleSubmitData(values),
+  });
+
+  const handleSubmitData = (values) => {
+    // let request = {
+    //   name: values.name,
+    //   species: values.species,
+    //   price_old: numeral(values.price_old).format("0,0.00"),
+    //   price_new: numeral(values.price_new).format("0,0.00"),
+    //   amount: numeral(values.amount).format("0,0"),
+    // };
+
+    // values = values?.map((value, index) => ({
+    //   name: value.name,
+    //   species: value.species,
+    //   price_old: numeral(value.price_old).format("0,0.00"),
+    //   price_new: numeral(value.price_new).format("0,0.00"),
+    //   amount: numeral(value.amount).format("0,0"),
+    // }));
+
+    console.log("values : ", values);
+
+    dispatch(onCreateTree(values)).then((response) => {
+      console.log("onInsertProjectAndSystem response: ", response);
+    });
+  };
+
   return (
     <>
       <Container fluid>
@@ -24,36 +67,33 @@ function User() {
                 <Card.Title as="h4">เพิ่มต้นไม้</Card.Title>
               </Card.Header>
               <Card.Body>
-                <Form>
+                <Form onSubmit={formik.handleSubmit}>
                   <Row>
                     <Col className="pr-1" md="5">
                       <Form.Group>
-                        <label>Company (disabled)</label>
+                        <label>ชื่อ</label>
                         <Form.Control
-                          defaultValue="Creative Code Inc."
-                          placeholder="Company"
+                          placeholder="ชื่อ"
+                          name="name"
+                          id="name"
+                          onChange={(e) => {
+                            formik.handleChange(e);
+                          }}
                           type="text"
                         ></Form.Control>
                       </Form.Group>
                     </Col>
                     <Col className="px-1" md="3">
                       <Form.Group>
-                        <label>Username</label>
+                        <label>พันธุ์</label>
                         <Form.Control
-                          defaultValue="michael23"
-                          placeholder="Username"
+                          placeholder="พันธุ์"
+                          name="species"
+                          id="species"
+                          onChange={(e) => {
+                            formik.handleChange(e);
+                          }}
                           type="text"
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                    <Col className="pl-1" md="4">
-                      <Form.Group>
-                        <label htmlFor="exampleInputEmail1">
-                          Email address
-                        </label>
-                        <Form.Control
-                          placeholder="Email"
-                          type="email"
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -61,63 +101,27 @@ function User() {
                   <Row>
                     <Col className="pr-1" md="6">
                       <Form.Group>
-                        <label>First Name</label>
+                        <label>ราคาซื้อ</label>
                         <Form.Control
-                          defaultValue="Mike"
-                          placeholder="Company"
-                          type="text"
+                          placeholder="ราคาซื้อ"
+                          name="price_old"
+                          // id="price_old"
+                          onChange={(e) => {
+                            formik.handleChange(e);
+                          }}
+                          type="number"
                         ></Form.Control>
                       </Form.Group>
                     </Col>
                     <Col className="pl-1" md="6">
                       <Form.Group>
-                        <label>Last Name</label>
+                        <label>ราคาขาย</label>
                         <Form.Control
-                          defaultValue="Andrew"
-                          placeholder="Last Name"
-                          type="text"
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col md="12">
-                      <Form.Group>
-                        <label>Address</label>
-                        <Form.Control
-                          defaultValue="Bld Mihail Kogalniceanu, nr. 8 Bl 1, Sc 1, Ap 09"
-                          placeholder="Home Address"
-                          type="text"
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="pr-1" md="4">
-                      <Form.Group>
-                        <label>City</label>
-                        <Form.Control
-                          defaultValue="Mike"
-                          placeholder="City"
-                          type="text"
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                    <Col className="px-1" md="4">
-                      <Form.Group>
-                        <label>Country</label>
-                        <Form.Control
-                          defaultValue="Andrew"
-                          placeholder="Country"
-                          type="text"
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                    <Col className="pl-1" md="4">
-                      <Form.Group>
-                        <label>Postal Code</label>
-                        <Form.Control
-                          placeholder="ZIP Code"
+                          placeholder="ราคาขาย"
+                          name="price_new"
+                          onChange={(e) => {
+                            formik.handleChange(e);
+                          }}
                           type="number"
                         ></Form.Control>
                       </Form.Group>
@@ -126,24 +130,25 @@ function User() {
                   <Row>
                     <Col md="12">
                       <Form.Group>
-                        <label>About Me</label>
+                        <label>จำนวน</label>
                         <Form.Control
-                          cols="80"
-                          defaultValue="Lamborghini Mercy, Your chick she so thirsty, I'm in
-                          that two seat Lambo."
-                          placeholder="Here can be your description"
-                          rows="4"
-                          as="textarea"
+                          placeholder="จำนวน"
+                          name="amount"
+                          onChange={(e) => {
+                            formik.handleChange(e);
+                          }}
+                          type="number"
                         ></Form.Control>
                       </Form.Group>
                     </Col>
                   </Row>
+
                   <Button
-                    className="btn-fill pull-right"
+                    className="btn-fill pull-right mt-2"
                     type="submit"
                     variant="info"
                   >
-                    Update Profile
+                    เพิ่ม
                   </Button>
                   <div className="clearfix"></div>
                 </Form>
