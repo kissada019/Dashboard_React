@@ -9,9 +9,14 @@ import {
   Col,
 } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
+import alert from "../../utils/alert";
 import { Pencil, Trash } from "lucide-react";
 import { useDispatch } from "react-redux";
-import { onGetAllTree, onCreateTree } from "../../redux/slices/treeSlice";
+import {
+  onGetAllTree,
+  onCreateTree,
+  onDeleteTree,
+} from "../../redux/slices/treeSlice";
 
 const LayoutPage = () => {
   const dispatch = useDispatch();
@@ -43,8 +48,37 @@ const LayoutPage = () => {
       item.amount.toString().includes(searchTerm)
   );
 
-  const addData = () => {
-    console.log("test");
+  const handleDeleteTree = (id) => {
+    alert.custom
+      .fire({
+        icon: "warning",
+        title: "คุณต้องการลบข้อมูลต้นไม้ id = " + id,
+        showCancelButton: true,
+        confirmButtonText: "ยืนยัน",
+        cancelButtonText: "ยกเลิก",
+      })
+      .then((result) => {
+        if (result.isConfirmed) {
+          console.log("delete id : ", id);
+          dispatch(onDeleteTree(id)).then(() => {
+            alert.custom
+              .fire({
+                icon: "success",
+                title: "ลบข้อมูลเรียบร้อย",
+                confirmButtonText: "ยืนยัน",
+              })
+              .then((result) => {
+                if (result.isConfirmed) {
+                  setData((prevData) =>
+                    prevData.filter((item) => item.id !== id)
+                  );
+                }
+              });
+          });
+        } else if (result.dismiss === alert.custom.DismissReason.cancel) {
+          console.log("ยกเลิกการลบ");
+        }
+      });
   };
 
   const handleCreateClick = () => {
@@ -135,6 +169,7 @@ const LayoutPage = () => {
                         className="me-2 btn btn-danger"
                         variant="outline-danger"
                         size="sm"
+                        onClick={() => handleDeleteTree(item.id)}
                       >
                         <Trash size={16} />
                       </Button>

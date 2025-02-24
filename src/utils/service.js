@@ -71,6 +71,38 @@ const post = (path, request, isLoading = true, isAlert = true) => {
   });
 };
 
+const deleted = (path, request, isLoading = true, isAlert = true) => {
+  const userInfoStore = userInfoStorage.get();
+  const accessToken = userInfoStore && userInfoStore.token;
+  const token = accessToken ? "Bearer " + accessToken : "";
+  layout.loading.show(isLoading);
+  return new Promise((resolve, reject) => {
+    axios
+      .delete(
+        _apiURL + path,
+        request, // Directly passing request instead of wrapping it
+        {
+          headers: {
+            "Content-Type": "application/json; charset=utf-8",
+            Authorization: token,
+          },
+        }
+      )
+      .then((result) => {
+        layout.loading.hide(isLoading);
+        resolve(result.data);
+      })
+      .catch((error) => {
+        layout.loading.hide(isLoading);
+        if (isAlert && path) {
+          let lastPath = path.split("/").slice(-1)[0];
+          alert.error(error.message, constantCase(lastPath));
+        }
+        reject(error);
+      });
+  });
+};
+
 const postFormData = (path, formData, isLoading = true, isAlert = true) => {
   const userInfoStore = userInfoStorage.get();
   const accessToken = userInfoStore && userInfoStore.token;
@@ -104,6 +136,7 @@ const service = {
   api: {
     get,
     post,
+    deleted,
     postFormData,
   },
 };

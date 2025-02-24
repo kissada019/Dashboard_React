@@ -21,10 +21,10 @@ const initialState = {
 
 /* Async Thunk: Fetch all trees */
 export const onGetAllTree = createAsyncThunk(
-  "treeSlice/api/Tree/GetAll",
+  "treeSlice/api/trees",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await service.api.get("api/Tree/GetAll");
+      const response = await service.api.get("api/trees");
       return response;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -34,12 +34,26 @@ export const onGetAllTree = createAsyncThunk(
 
 /* Async Thunk: Create a new tree */
 export const onCreateTree = createAsyncThunk(
-  "treeSlice/api/Tree/Create",
+  "treeSlice/api/trees",
   async (treeData) => {
     try {
       // console.log("treeData : ", treeData);
-      const response = await service.api.post("api/Tree/Create", treeData);
+      const response = await service.api.post("api/trees", treeData);
       return response;
+    } catch (error) {
+      alert.error("Failed to create tree: " + error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const onDeleteTree = createAsyncThunk(
+  "treeSlice/api/trees",
+  async (id) => {
+    try {
+      console.log("treeData : ", id);
+      const response = await service.api.deleted("api/trees/" + id);
+      // return response;
     } catch (error) {
       alert.error("Failed to create tree: " + error.message);
       return rejectWithValue(error.message);
@@ -71,21 +85,21 @@ export const treeSlice = createSlice({
       .addCase(onGetAllTree.rejected, (state, action) => {
         state.loading = false;
         alert.error("Failed to fetch tree data: " + action.payload);
-      })
-
-      /* Create Tree */
-      .addCase(onCreateTree.pending, (state) => {
-        state.loading = true;
-      })
-      .addCase(onCreateTree.fulfilled, (state, action) => {
-        state.loading = false;
-        if (action.payload) {
-          state.tableTree.data.push(action.payload); // Add new tree to the list
-        }
-      })
-      .addCase(onCreateTree.rejected, (state) => {
-        state.loading = false;
       });
+
+    /* Create Tree */
+    // .addCase(onCreateTree.pending, (state) => {
+    //   state.loading = true;
+    // })
+    // .addCase(onCreateTree.fulfilled, (state, action) => {
+    //   state.loading = false;
+    //   if (action.payload) {
+    //     state.tableTree.data.push(action.payload); // Add new tree to the list
+    //   }
+    // })
+    // .addCase(onCreateTree.rejected, (state) => {
+    //   state.loading = false;
+    // });
   },
 });
 

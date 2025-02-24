@@ -22,7 +22,6 @@ function User() {
   const dispatch = useDispatch();
   const history = useHistory();
 
-
   const initialValues = {
     name: "",
     species: "",
@@ -39,40 +38,21 @@ function User() {
   });
 
   const handleSubmitData = (values) => {
-    // let request = {
-    //   name: values.name,
-    //   species: values.species,
-    //   price_old: numeral(values.price_old).format("0,0.00"),
-    //   price_new: numeral(values.price_new).format("0,0.00"),
-    //   amount: numeral(values.amount).format("0,0"),
-    // };
-
-    // values = values?.map((value, index) => ({
-    //   name: value.name,
-    //   species: value.species,
-    //   price_old: numeral(value.price_old).format("0,0.00"),
-    //   price_new: numeral(value.price_new).format("0,0.00"),
-    //   amount: numeral(value.amount).format("0,0"),
-    // }));
-
-    console.log("values : ", values);
-
+    // console.log("values : ", values);
     dispatch(onCreateTree(values)).then((response) => {
       console.log("onInsertProjectAndSystem response: ", response);
       if (response.payload) {
-        // alert.success("Tree created successfully!");
-        alert.custom.fire({
-          icon: 'success',
-          title: "Tree created successfully!",
-          confirmButtonText: "ยืนยัน",
-        }).then((result) => {
-          if (result.isConfirmed) {
-            // navigate(`/user_tracking/search/${common.encrypt(ticketId)}`)
-            history.push("/admin/tree");
-          }
-        });
-
-
+        alert.custom
+          .fire({
+            icon: "success",
+            title: "Tree created successfully!",
+            confirmButtonText: "ยืนยัน",
+          })
+          .then((result) => {
+            if (result.isConfirmed) {
+              history.push("/admin/tree");
+            }
+          });
       }
     });
   };

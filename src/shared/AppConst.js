@@ -8,16 +8,16 @@ const versionPre = "0.1.0";
 const versionPrd = "0.1.0";
 
 const dev = {
-  APP_NAME: "Cat Shop System ",
-  APP_SHORT_NAME: "Cat",
-  APP_CODE: "Cat",
+  APP_NAME: "Tree Shop System ",
+  APP_SHORT_NAME: "Tree",
+  APP_CODE: "Tree",
   APP_VERSION: versionDev,
   ENV: env,
   ENV_DESC: "สำหรับทดสอบ Develop",
   CONSOLE_LOG: true,
   SESSION_EXPIRED_MINUTES: 720 /* minutes */,
   // API_URL: "http://10.0.0.208/SRM/",
-  API_URL: "https://localhost:7258/",
+  API_URL: "http://localhost:8080/",
   DEVELOPMENT_DOCUMENTS_URL: "http://10.0.0.202:8060/",
 };
 
