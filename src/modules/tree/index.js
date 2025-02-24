@@ -125,7 +125,7 @@ const LayoutPage = () => {
                     <td>
                       <Button
                         variant="outline-primary"
-                        className="me-2 btn btn-warning"
+                        className="me-2 btn btn-warning mr-1"
                         size="sm"
                       >
                         <Pencil size={16} />

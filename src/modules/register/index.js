@@ -1,5 +1,7 @@
 import React from "react";
 import numeral from "numeral";
+import { useHistory } from "react-router-dom";
+import alert from "../../utils/alert";
 // react-bootstrap components
 import { useFormik } from "formik";
 import {
@@ -18,6 +20,9 @@ import { onGetAllTree, onCreateTree } from "../../redux/slices/treeSlice";
 
 function User() {
   const dispatch = useDispatch();
+  const history = useHistory();
+
+
   const initialValues = {
     name: "",
     species: "",
@@ -54,6 +59,21 @@ function User() {
 
     dispatch(onCreateTree(values)).then((response) => {
       console.log("onInsertProjectAndSystem response: ", response);
+      if (response.payload) {
+        // alert.success("Tree created successfully!");
+        alert.custom.fire({
+          icon: 'success',
+          title: "Tree created successfully!",
+          confirmButtonText: "ยืนยัน",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // navigate(`/user_tracking/search/${common.encrypt(ticketId)}`)
+            history.push("/admin/tree");
+          }
+        });
+
+
+      }
     });
   };
 

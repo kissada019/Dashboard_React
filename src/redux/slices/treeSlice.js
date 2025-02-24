@@ -38,9 +38,7 @@ export const onCreateTree = createAsyncThunk(
   async (treeData) => {
     try {
       // console.log("treeData : ", treeData);
-
       const response = await service.api.post("api/Tree/Create", treeData);
-      alert.success("Tree created successfully!");
       return response;
     } catch (error) {
       alert.error("Failed to create tree: " + error.message);
