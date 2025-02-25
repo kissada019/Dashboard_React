@@ -40,6 +40,23 @@ export const onGetAllTree = createAsyncThunk(
   }
 );
 
+export const onGetTreeById = createAsyncThunk(
+  "treeSlice/api/trees",
+  async (id) => {
+    try {
+      let response = null
+      if (_apiURL === "DEV") {
+        response = await service.api.get(`api/Tree/GetTreeById/${id}`);
+      } else if (_apiURL === "PRE") {
+        response = await service.api.get("api/trees");
+      }
+      return response;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 /* Async Thunk: Create a new tree */
 export const onCreateTree = createAsyncThunk(
   "treeSlice/api/trees",
