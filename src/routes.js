@@ -26,8 +26,8 @@ import Kanban from "pages/Kanban";
 import Login from "pages/auth/login";
 import Register from "pages/register";
 import Tree from "pages/tree";
-// import TreeEdit from "pages/tree/edit"
-import TreeDetail from "pages/tree/treeDetail"
+import TreeEdit from "pages/tree/edit"
+// import TreeDetail from "pages/tree/treeDetail"
 
 const dashboardRoutes = [
   {
@@ -41,7 +41,7 @@ const dashboardRoutes = [
     path: "/tree/:id",
     name: "รายละเอียดต้นไม้",
     icon: "nc-icon nc-single-copy-04",
-    component: TreeDetail, // New component for detailed view
+    component: TreeEdit, // New component for detailed view
     layout: "/admin",
   },
   {
