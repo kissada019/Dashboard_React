@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import service from "../../utils/service"; // ใช้ service สำหรับเรียก API
 import alert from "../../utils/alert"; // ใช้ alert สำหรับแสดงข้อความ
-
+import appConst from "../../shared/AppConst";
 /* initial state */
 const initialState = {
   tableTree: {
@@ -19,12 +19,20 @@ const initialState = {
   loading: false, // เพิ่ม state สำหรับการโหลดข้อมูล
 };
 
+const _apiURL = appConst.ENV;
+console.log("_apiURL : ", _apiURL.ENV);
+
 /* Async Thunk: Fetch all trees */
 export const onGetAllTree = createAsyncThunk(
   "treeSlice/api/trees",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await service.api.get("api/trees");
+      let response = null
+      if (_apiURL === "DEV") {
+        response = await service.api.get("api/Tree/GetAll");
+      } else if (_apiURL === "PRE") {
+        response = await service.api.get("api/trees");
+      }
       return response;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -38,7 +46,14 @@ export const onCreateTree = createAsyncThunk(
   async (treeData) => {
     try {
       // console.log("treeData : ", treeData);
-      const response = await service.api.post("api/trees", treeData);
+
+      let response = null
+      if (_apiURL === "DEV") {
+        // response = await service.api.get("api/Tree/GetAll");
+        response = await service.api.post("api/Tree/Create", treeData);
+      } else if (_apiURL === "PRE") {
+        response = await service.api.post("api/trees", treeData);
+      }
       return response;
     } catch (error) {
       alert.error("Failed to create tree: " + error.message);

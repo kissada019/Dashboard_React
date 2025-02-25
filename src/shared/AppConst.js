@@ -8,7 +8,7 @@ const versionPre = "0.1.0";
 const versionPrd = "0.1.0";
 
 const dev = {
-  APP_NAME: "Tree Shop System ",
+  APP_NAME: "Tree Tree System ",
   APP_SHORT_NAME: "Tree",
   APP_CODE: "Tree",
   APP_VERSION: versionDev,
@@ -17,22 +17,22 @@ const dev = {
   CONSOLE_LOG: true,
   SESSION_EXPIRED_MINUTES: 720 /* minutes */,
   // API_URL: "http://10.0.0.208/SRM/",
-  API_URL: "http://localhost:8080/",
+  API_URL: "https://localhost:7258/",
   DEVELOPMENT_DOCUMENTS_URL: "http://10.0.0.202:8060/",
 };
 
-// const pre = {
-//     APP_NAME: 'Software Request Management',
-//     APP_SHORT_NAME: 'SRM',
-//     APP_CODE: 'SRM',
-//     APP_VERSION: versionPre,
-//     ENV: env,
-//     ENV_DESC: 'สำหรับทดสอบ Pre-Production',
-//     CONSOLE_LOG: true,
-//     SESSION_EXPIRED_MINUTES: 720, /* minutes */
-//     API_URL: "http://10.0.0.208/SRM_Pre/",
-//     DEVELOPMENT_DOCUMENTS_URL: 'http://10.0.0.202:8060/',
-// };
+const pre = {
+  APP_NAME: "Tree Tree System ",
+  APP_SHORT_NAME: "Tree",
+  APP_CODE: 'Tree',
+  APP_VERSION: versionPre,
+  ENV: env,
+  ENV_DESC: 'สำหรับทดสอบ Pre-Production',
+  CONSOLE_LOG: true,
+  SESSION_EXPIRED_MINUTES: 720, /* minutes */
+  API_URL: "https://localhost:8080/",
+  DEVELOPMENT_DOCUMENTS_URL: 'http://10.0.0.202:8060/',
+};
 
 // const prd = {
 //     APP_NAME: 'Software Request Management',

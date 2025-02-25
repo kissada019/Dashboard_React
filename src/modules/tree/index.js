@@ -8,7 +8,7 @@ import {
   Row,
   Col,
 } from "react-bootstrap";
-import { useHistory } from "react-router-dom";
+import { useHistory, Link } from "react-router-dom";
 import alert from "../../utils/alert";
 import { Pencil, Trash } from "lucide-react";
 import { useDispatch } from "react-redux";
@@ -119,6 +119,11 @@ const LayoutPage = () => {
                     Create
                   </Button>
                 </div>
+                {/* <div className="numbers text-right">
+                  <Link to="/admin/tree/4">
+                    <button>ดูรายละเอียดต้นไม้ ID 4</button>
+                  </Link>
+                </div> */}
               </Col>
             </Row>
             <Row className="justify-content-end mt-2 mb-3">
