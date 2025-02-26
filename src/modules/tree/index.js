@@ -85,11 +85,17 @@ const LayoutPage = () => {
     history.push("/admin/register");
   };
 
+  const handleEditClick = (id) => {
+    history.push(`/admin/tree/${id}`);
+  };
+
   const totalPages = Math.ceil(filteredData.length / itemsPerPage);
   const paginatedData = filteredData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage
   );
+  // console.log("paginatedData : ", paginatedData);
+
 
   const handlePreviousPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -105,7 +111,7 @@ const LayoutPage = () => {
         <Card.Header>
           <div className="places-buttons">
             <Row className="justify-content-between mb-3">
-              <Col lg="1" md="1">
+              <Col lg="3" md="3">
                 <Card.Title as="h4">ต้นไม้</Card.Title>
               </Col>
               <Col lg="1" md="1">
@@ -119,11 +125,6 @@ const LayoutPage = () => {
                     Create
                   </Button>
                 </div>
-                {/* <div className="numbers text-right">
-                  <Link to="/admin/tree/4">
-                    <button>ดูรายละเอียดต้นไม้ ID 4</button>
-                  </Link>
-                </div> */}
               </Col>
             </Row>
             <Row className="justify-content-end mt-2 mb-3">
@@ -166,6 +167,7 @@ const LayoutPage = () => {
                         variant="outline-primary"
                         className="me-2 btn btn-warning mr-1"
                         size="sm"
+                        onClick={() => handleEditClick(item.id)}
                       >
                         <Pencil size={16} />
                       </Button>

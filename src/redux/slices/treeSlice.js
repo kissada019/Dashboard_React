@@ -83,9 +83,14 @@ export const onDeleteTree = createAsyncThunk(
   "treeSlice/api/trees",
   async (id) => {
     try {
-      console.log("treeData : ", id);
-      const response = await service.api.deleted("api/trees/" + id);
-      // return response;
+      let response = null
+      if (_apiURL === "DEV") {
+        response = await service.api.deleted("api/Tree/Remove/" + id);
+      } else if (_apiURL === "PRE") {
+        response = await service.api.deleted("api/trees/" + id);
+      }
+
+      return response;
     } catch (error) {
       alert.error("Failed to create tree: " + error.message);
       return rejectWithValue(error.message);

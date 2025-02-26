@@ -11,11 +11,13 @@ import {
     Row,
     Col,
 } from "react-bootstrap";
+import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { onGetTreeById } from "../../redux/slices/treeSlice"; // Import the function to fetch tree details
 
 function Edit() {
     const dispatch = useDispatch();
+    const history = useHistory();
     // const navigate = useNavigate();
     const { id } = useParams(); // Get ID from the URL
     const [data, setData] = useState([]);
@@ -42,6 +44,10 @@ function Edit() {
         });
     }, []);
 
+
+    const handleCreateClick = () => {
+        history.push("/admin/tree");
+    };
 
 
     const handleSubmitData = (values) => {
@@ -72,7 +78,35 @@ function Edit() {
                 <Col md="8">
                     <Card>
                         <Card.Header>
-                            <Card.Title as="h4">แก้ไขต้นไม้</Card.Title>
+                            <div className="places-buttons">
+                                <Row className="justify-content-between mb-3">
+                                    <Col lg="3" md="3">
+                                        <Card.Title as="h4">แก้ไขต้นไม้</Card.Title>
+                                    </Col>
+                                    <Col lg="2" md="2">
+                                        <div className="numbers text-right">
+                                            <Button
+                                                variant="outline-primary"
+                                                className="btn btn-primary"
+                                                onClick={handleCreateClick}
+                                                size="sm"
+                                            >
+                                                Back
+                                            </Button>
+                                        </div>
+                                    </Col>
+                                </Row>
+                                {/* <Row className="justify-content-end mt-2 mb-3">
+                                    <Col lg="3" md="3">
+                                        <Form.Control
+                                            type="text"
+                                            placeholder="Search..."
+                                            value={searchTerm}
+                                            onChange={handleSearchChange}
+                                        />
+                                    </Col>
+                                </Row> */}
+                            </div>
                         </Card.Header>
                         <Card.Body>
                             <Form onSubmit={formik.handleSubmit}>

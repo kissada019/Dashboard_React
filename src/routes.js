@@ -43,6 +43,7 @@ const dashboardRoutes = [
     icon: "nc-icon nc-single-copy-04",
     component: TreeEdit, // New component for detailed view
     layout: "/admin",
+    hidden: true
   },
   {
     path: "/tree",
