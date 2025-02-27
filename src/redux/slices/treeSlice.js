@@ -27,7 +27,7 @@ export const onGetAllTree = createAsyncThunk(
   "treeSlice/api/trees",
   async (_, { rejectWithValue }) => {
     try {
-      let response = null
+      let response = null;
       if (_apiURL === "DEV") {
         response = await service.api.get("api/Tree/GetAll");
       } else if (_apiURL === "PRE") {
@@ -44,11 +44,11 @@ export const onGetTreeById = createAsyncThunk(
   "treeSlice/api/trees",
   async (id) => {
     try {
-      let response = null
+      let response = null;
       if (_apiURL === "DEV") {
         response = await service.api.get(`api/Tree/GetTreeById/${id}`);
       } else if (_apiURL === "PRE") {
-        response = await service.api.get("api/trees");
+        response = await service.api.get(`api/trees/${id}`);
       }
       return response;
     } catch (error) {
@@ -64,7 +64,7 @@ export const onCreateTree = createAsyncThunk(
     try {
       // console.log("treeData : ", treeData);
 
-      let response = null
+      let response = null;
       if (_apiURL === "DEV") {
         // response = await service.api.get("api/Tree/GetAll");
         response = await service.api.post("api/Tree/Create", treeData);
@@ -84,7 +84,7 @@ export const onUpdateTree = createAsyncThunk(
   async (treeData) => {
     try {
       // console.log("treeData : ", treeData);
-      let response = null
+      let response = null;
       if (_apiURL === "DEV") {
         response = await service.api.put("api/Tree/Update", treeData);
       } else if (_apiURL === "PRE") {
@@ -102,7 +102,7 @@ export const onDeleteTree = createAsyncThunk(
   "treeSlice/api/trees",
   async (id) => {
     try {
-      let response = null
+      let response = null;
       if (_apiURL === "DEV") {
         response = await service.api.deleted("api/Tree/Remove/" + id);
       } else if (_apiURL === "PRE") {

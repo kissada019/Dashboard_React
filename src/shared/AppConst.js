@@ -1,5 +1,5 @@
-const env = "DEV";
-// const env = 'PRE';
+// const env = "DEV";
+const env = "PRE";
 // const env = 'PRD';
 
 /* app version */
@@ -24,14 +24,14 @@ const dev = {
 const pre = {
   APP_NAME: "Tree Tree System ",
   APP_SHORT_NAME: "Tree",
-  APP_CODE: 'Tree',
+  APP_CODE: "Tree",
   APP_VERSION: versionPre,
   ENV: env,
-  ENV_DESC: 'สำหรับทดสอบ Pre-Production',
+  ENV_DESC: "สำหรับทดสอบ Pre-Production",
   CONSOLE_LOG: true,
-  SESSION_EXPIRED_MINUTES: 720, /* minutes */
-  API_URL: "https://localhost:8080/",
-  DEVELOPMENT_DOCUMENTS_URL: 'http://10.0.0.202:8060/',
+  SESSION_EXPIRED_MINUTES: 720 /* minutes */,
+  API_URL: "http://localhost:8080/",
+  DEVELOPMENT_DOCUMENTS_URL: "http://10.0.0.202:8060/",
 };
 
 // const prd = {
@@ -50,7 +50,7 @@ const pre = {
 let exportConfig = {};
 
 if (env === "DEV") exportConfig = dev;
-// if (env === "PRE") exportConfig = pre;
+if (env === "PRE") exportConfig = pre;
 // if (env === "PRD") exportConfig = prd;
 
 export default exportConfig;
