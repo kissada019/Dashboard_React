@@ -13,7 +13,7 @@ import {
 } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { onGetTreeById } from "../../redux/slices/treeSlice"; // Import the function to fetch tree details
+import { onGetTreeById, onUpdateTree } from "../../redux/slices/treeSlice"; // Import the function to fetch tree details
 
 function Edit() {
     const dispatch = useDispatch();
@@ -51,22 +51,22 @@ function Edit() {
 
 
     const handleSubmitData = (values) => {
-        // dispatch(onUpdateTree({ id, ...values })).then((response) => {
-        //     if (response.payload) {
-        //         alert.custom
-        //             .fire({
-        //                 icon: "success",
-        //                 title: "Tree updated successfully!",
-        //                 confirmButtonText: "ยืนยัน",
-        //             })
-        //             .then((result) => {
-        //                 if (result.isConfirmed) {
-        //                     // navigate("/admin/tree");
-        //                 }
-        //             });
-        //     }
-        // });
-        console.log("test");
+        dispatch(onUpdateTree({ id, ...values })).then((response) => {
+            if (response.payload) {
+                alert.custom
+                    .fire({
+                        icon: "success",
+                        title: "อัพเดทเรียบร้อย",
+                        confirmButtonText: "ยืนยัน",
+                    })
+                    .then((result) => {
+                        if (result.isConfirmed) {
+                            history.push("/admin/tree");
+                        }
+                    });
+            }
+        });
+        // console.log("test");
 
     };
 
@@ -184,7 +184,7 @@ function Edit() {
                                     type="submit"
                                     variant="info"
                                 >
-                                    บันทึกการเปลี่ยนแปลง
+                                    บันทึก
                                 </Button>
                                 <div className="clearfix"></div>
                             </Form>

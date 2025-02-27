@@ -37,6 +37,11 @@ function User() {
     onSubmit: (values) => handleSubmitData(values),
   });
 
+
+  const handleCreateClick = () => {
+    history.push("/admin/tree");
+  };
+
   const handleSubmitData = (values) => {
     // console.log("values : ", values);
     dispatch(onCreateTree(values)).then((response) => {
@@ -64,7 +69,25 @@ function User() {
           <Col md="8">
             <Card>
               <Card.Header>
-                <Card.Title as="h4">เพิ่มต้นไม้</Card.Title>
+                <div className="places-buttons">
+                  <Row className="justify-content-between mb-3">
+                    <Col lg="3" md="3">
+                      <Card.Title as="h4">เพิ่มต้นไม้</Card.Title>
+                    </Col>
+                    <Col lg="2" md="2">
+                      <div className="numbers text-right">
+                        <Button
+                          variant="outline-primary"
+                          className="btn btn-primary"
+                          onClick={handleCreateClick}
+                          size="sm"
+                        >
+                          Back
+                        </Button>
+                      </div>
+                    </Col>
+                  </Row>
+                </div>
               </Card.Header>
               <Card.Body>
                 <Form onSubmit={formik.handleSubmit}>

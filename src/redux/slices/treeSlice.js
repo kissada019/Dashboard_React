@@ -79,6 +79,25 @@ export const onCreateTree = createAsyncThunk(
   }
 );
 
+export const onUpdateTree = createAsyncThunk(
+  "treeSlice/api/trees",
+  async (treeData) => {
+    try {
+      // console.log("treeData : ", treeData);
+      let response = null
+      if (_apiURL === "DEV") {
+        response = await service.api.put("api/Tree/Update", treeData);
+      } else if (_apiURL === "PRE") {
+        response = await service.api.post("api/trees", treeData);
+      }
+      return response;
+    } catch (error) {
+      alert.error("Failed to create tree: " + error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 export const onDeleteTree = createAsyncThunk(
   "treeSlice/api/trees",
   async (id) => {
