@@ -25,21 +25,59 @@ import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 
 function LayoutPage() {
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // alert(`The name you entered was: ${name}`)
-    console.log("event ");
+  /* libs */
+  // const navigate = useNavigate();
+  const auth = useAuth();
+
+  const dispatch = useDispatch();
+
+  const initialValues = {
+    username: "",
+    password: "",
   };
 
-<<<<<<< HEAD:src/modules/auth/login/index.js
-    /* libs */
-    // const navigate = useNavigate();
-    const auth = useAuth();
+  const formik = useFormik({
+    initialValues: initialValues,
+    enableReinitialze: true,
+    // validationSchema: validationSchema,
+    onSubmit: (values) => handleSubmitData(values),
+  });
 
-    const dispatch = useDispatch();
+  // React.useEffect(() => {
+  //     // auth.logout();
+  //     let userInfo = userInfoStorage.get();
+  //     console.log("userInfo : ", userInfo)
+  //     if (userInfo && !_.isEmpty(userInfo) && userInfo.token) {
+  //         // navigate("/home");
+  //     }
+  // }, []);
 
-=======
-<<<<<<< HEAD
+  const handleSubmitData = (values) => {
+    let request = {
+      username: values.username,
+      password: values.password,
+    };
+
+    console.log("event : ", request);
+
+    auth
+      .login(request)
+      .then((response) => {
+        // setLoading(false);
+        console.log("login response : ", response);
+        if (response.success === true) {
+          window.location.href = "/home";
+        } else {
+          formik.setErrors({ submit: response.message });
+        }
+      })
+      .catch((error) => {
+        console.log("login error : ", error);
+        // setLoading(false);
+        formik.setErrors({ submit: error.message });
+      });
+  };
+
   return (
     <>
       <Container fluid>
@@ -60,7 +98,7 @@ function LayoutPage() {
                   </Card.Title>
                 </Card.Header>
 
-                <Form onSubmit={handleSubmit}>
+                <form onSubmit={formik.handleSubmit}>
                   <Row>
                     <Col className="px-3" md="12">
                       <Form.Group>
@@ -70,135 +108,11 @@ function LayoutPage() {
                           id="username"
                           name="username"
                           type="text"
+                          onChange={(e) => {
+                            formik.handleChange(e);
+                          }}
                         ></Form.Control>
                       </Form.Group>
-=======
->>>>>>> main:src/views/login/index.js
-    const initialValues = {
-        username: "",
-        password: ""
-    };
-
-    const formik = useFormik({
-        initialValues: initialValues,
-        enableReinitialze: true,
-        // validationSchema: validationSchema,
-        onSubmit: (values) => handleSubmitData(values),
-    });
-
-
-    // React.useEffect(() => {
-    //     // auth.logout();
-    //     let userInfo = userInfoStorage.get();
-    //     console.log("userInfo : ", userInfo)
-    //     if (userInfo && !_.isEmpty(userInfo) && userInfo.token) {
-    //         // navigate("/home");
-    //     }
-    // }, []);
-
-    const handleSubmitData = (values) => {
-
-
-        let request = {
-            username: values.username,
-            password: values.password,
-        };
-
-        console.log("event : ", request);
-
-        auth.login(request).then((response) => {
-            // setLoading(false);
-            console.log("login response : ", response);
-            if (response.success === true) {
-                window.location.href = '/home'
-            }
-            else {
-                formik.setErrors({ submit: response.message });
-            }
-        }).catch(error => {
-            console.log("login error : ", error);
-            // setLoading(false);
-            formik.setErrors({ submit: error.message });
-        });
-    }
-
-
-    return (
-        <>
-            <Container fluid>
-                <Row className="d-flex justify-content-center">
-                    <Col md="4" >
-                        <Card className="login-user mt-4">
-                            <Card.Body>
-                                <div className="author">
-                                    <img
-                                        alt="..."
-                                        className="avatar border-gray"
-                                        src={require("assets/img/faces/face-3.jpg")}
-                                    ></img>
-                                </div>
-                                <Card.Header>
-                                    <Card.Title as="h4" className=" text-center">
-                                        Login
-                                    </Card.Title>
-                                </Card.Header>
-
-                                <form onSubmit={formik.handleSubmit}>
-                                    <Row>
-                                        <Col className="px-3" md="12">
-                                            <Form.Group>
-                                                <label>Username </label>
-                                                <Form.Control
-                                                    placeholder="Username"
-                                                    id='username'
-                                                    name='username'
-                                                    type="text"
-                                                    onChange={(e) => {
-                                                        formik.handleChange(e)
-                                                    }}
-                                                ></Form.Control>
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-                                    <Row>
-                                        <Col className="px-3" md="12">
-                                            <Form.Group>
-                                                <label>Password </label>
-                                                <Form.Control
-                                                    placeholder="Password"
-                                                    id='password'
-                                                    name='password'
-                                                    type="password"
-                                                    onChange={(e) => {
-                                                        formik.handleChange(e)
-                                                    }}
-                                                ></Form.Control>
-                                            </Form.Group>
-                                        </Col>
-                                    </Row>
-                                    <Card.Title as="h4" className=" text-center">
-                                        <Button
-                                            className="btn btn-fill pull-right btn-sm m-1 mt-3"
-                                            type="submit"
-                                            variant="info"
-                                        >
-                                            Login
-                                        </Button>
-
-                                        <a href={`kanban`}>
-                                            <Button
-                                                className="btn btn-fill pull-right btn-sm m-1 mt-3"
-                                                variant="info"
-                                            >
-                                                Register
-                                            </Button>
-                                        </a>
-
-                                    </Card.Title>
-                                </form>
-                            </Card.Body>
-                        </Card>
->>>>>>> 71b8d5f336326da0ef5ecfe357a7047a6d686379
                     </Col>
                   </Row>
                   <Row>
@@ -207,9 +121,12 @@ function LayoutPage() {
                         <label>Password </label>
                         <Form.Control
                           placeholder="Password"
-                          id="paasword"
-                          name="paasword"
-                          type="text"
+                          id="password"
+                          name="password"
+                          type="password"
+                          onChange={(e) => {
+                            formik.handleChange(e);
+                          }}
                         ></Form.Control>
                       </Form.Group>
                     </Col>
@@ -232,7 +149,7 @@ function LayoutPage() {
                       </Button>
                     </a>
                   </Card.Title>
-                </Form>
+                </form>
               </Card.Body>
             </Card>
           </Col>
