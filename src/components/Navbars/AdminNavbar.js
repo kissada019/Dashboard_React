@@ -210,6 +210,25 @@ function Header() {
                                 <span className="no-icon">Register</span>
                             </Nav.Link>
                         </Nav.Item>
+
+                        <Nav.Item>
+                            <Nav.Link
+                                className="m-0"
+                                href="tree"
+                            // onClick={(e) => e.preventDefault()}
+                            >
+                                <span className="no-icon">ต้นไม้</span>
+                            </Nav.Link>
+                        </Nav.Item>
+                        <Nav.Item>
+                            <Nav.Link
+                                className="m-0"
+                                href="tree/:id"
+                            // onClick={(e) => e.preventDefault()}
+                            >
+                                <span className="no-icon">ต้นไม้</span>
+                            </Nav.Link>
+                        </Nav.Item>
                     </Nav>
                 </Navbar.Collapse>
             </Container>

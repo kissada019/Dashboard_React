@@ -27,6 +27,8 @@ function Sidebar({ color, image, routes }) {
     const activeRoute = (routeName) => {
         return location.pathname.indexOf(routeName) > -1 ? "active" : "";
     };
+    const route = routes.filter(route => !route.hidden)
+
     return (
         <div className="sidebar" data-image={image} data-color={color}>
             <div
@@ -50,7 +52,7 @@ function Sidebar({ color, image, routes }) {
                     </a>
                 </div>
                 <Nav>
-                    {routes.map((prop, key) => {
+                    {route.map((prop, key) => {
                         if (!prop.redirect)
                             return (
                                 <li
