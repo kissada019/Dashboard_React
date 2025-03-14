@@ -94,7 +94,7 @@ function User() {
                   <Row>
                     <Col className="pr-1" md="5">
                       <Form.Group>
-                        <label>ชื่อ</label>
+                        <label>ชื่อdasjiodata</label>
                         <Form.Control
                           placeholder="ชื่อ"
                           name="name"
@@ -108,7 +108,7 @@ function User() {
                     </Col>
                     <Col className="px-1" md="3">
                       <Form.Group>
-                        <label>พันธุ์</label>
+                        <label>พันธุ์sdfasdt</label>
                         <Form.Control
                           placeholder="พันธุ์"
                           name="species"
@@ -124,7 +124,7 @@ function User() {
                   <Row>
                     <Col className="pr-1" md="6">
                       <Form.Group>
-                        <label>ราคาซื้อ</label>
+                        <label>ราคาซื้อdsafsdat</label>
                         <Form.Control
                           placeholder="ราคาซื้อ"
                           name="price_old"
@@ -138,7 +138,7 @@ function User() {
                     </Col>
                     <Col className="pl-1" md="6">
                       <Form.Group>
-                        <label>ราคาขาย</label>
+                        <label>ราคาขายsdafasdrastd</label>
                         <Form.Control
                           placeholder="ราคาขาย"
                           name="price_new"
