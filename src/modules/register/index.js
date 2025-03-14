@@ -96,7 +96,7 @@ function User() {
                       <Form.Group>
                         <label>ชื่อdasjiodata</label>
                         <Form.Control
-                          placeholder="ชื่อ"
+                          placeholder="ชื่อasdasdas"
                           name="name"
                           id="name"
                           onChange={(e) => {
@@ -104,8 +104,8 @@ function User() {
                           }}
                           type="text"
                         ></Form.Control>
-                      </Form.Group>
-                    </Col>
+                      </Form.Group >
+                    </Col >
                     <Col className="px-1" md="3">
                       <Form.Group>
                         <label>พันธุ์sdfasdt</label>
@@ -118,9 +118,9 @@ function User() {
                           }}
                           type="text"
                         ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
+                      </Form.Group >
+                    </Col >
+                  </Row >
                   <Row>
                     <Col className="pr-1" md="6">
                       <Form.Group>
@@ -134,8 +134,8 @@ function User() {
                           }}
                           type="number"
                         ></Form.Control>
-                      </Form.Group>
-                    </Col>
+                      </Form.Group >
+                    </Col >
                     <Col className="pl-1" md="6">
                       <Form.Group>
                         <label>ราคาขายsdafasdrastd</label>
@@ -147,9 +147,9 @@ function User() {
                           }}
                           type="number"
                         ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
+                      </Form.Group >
+                    </Col >
+                  </Row >
                   <Row>
                     <Col md="12">
                       <Form.Group>
@@ -174,10 +174,10 @@ function User() {
                     เพิ่ม
                   </Button>
                   <div className="clearfix"></div>
-                </Form>
-              </Card.Body>
-            </Card>
-          </Col>
+                </Form >
+              </Card.Body >
+            </Card >
+          </Col >
           <Col md="4">
             <Card className="card-user">
               <div className="card-image">
@@ -233,8 +233,8 @@ function User() {
               </div>
             </Card>
           </Col>
-        </Row>
-      </Container>
+        </Row >
+      </Container >
     </>
   );
 }
