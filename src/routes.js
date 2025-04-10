@@ -28,7 +28,8 @@ import Register from "pages/register";
 import Tree from "pages/tree";
 import TreeEdit from "pages/tree/edit"
 import GitDocument from "pages/gitDocument"
-// import TreeDetail from "pages/tree/treeDetail"
+import BackendChallenge from 'pages/backendChallenge'
+
 
 const dashboardRoutes = [
   {
@@ -122,6 +123,13 @@ const dashboardRoutes = [
     name: "GitDocument",
     icon: "nc-icon nc-puzzle-10",
     component: GitDocument,
+    layout: "/admin",
+  },
+  {
+    path: "/backendChallenge",
+    name: "BackendChallenge",
+    icon: "nc-icon nc-puzzle-10",
+    component: BackendChallenge,
     layout: "/admin",
   },
 ];
