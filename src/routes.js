@@ -27,6 +27,7 @@ import Login from "pages/auth/login";
 import Register from "pages/register";
 import Tree from "pages/tree";
 import TreeEdit from "pages/tree/edit"
+import GitDocument from "pages/gitDocument"
 // import TreeDetail from "pages/tree/treeDetail"
 
 const dashboardRoutes = [
@@ -114,6 +115,13 @@ const dashboardRoutes = [
     name: "Login",
     icon: "nc-icon nc-single-02",
     component: Login,
+    layout: "/admin",
+  },
+  {
+    path: "/gitDocument",
+    name: "GitDocument",
+    icon: "nc-icon nc-puzzle-10",
+    component: GitDocument,
     layout: "/admin",
   },
 ];
