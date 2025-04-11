@@ -26,10 +26,8 @@ import Kanban from "pages/Kanban";
 import Login from "pages/auth/login";
 import Register from "pages/register";
 import Tree from "pages/tree";
-import TreeEdit from "pages/tree/edit"
-import GitDocument from "pages/gitDocument"
-import BackendChallenge from 'pages/backendChallenge'
-
+import TreeEdit from "pages/tree/edit";
+import GitDocument from "pages/gitDocument";
 
 const dashboardRoutes = [
   {
@@ -45,7 +43,7 @@ const dashboardRoutes = [
     icon: "nc-icon nc-single-copy-04",
     component: TreeEdit, // New component for detailed view
     layout: "/admin",
-    hidden: true
+    hidden: true,
   },
   {
     path: "/tree",
@@ -123,13 +121,6 @@ const dashboardRoutes = [
     name: "GitDocument",
     icon: "nc-icon nc-puzzle-10",
     component: GitDocument,
-    layout: "/admin",
-  },
-  {
-    path: "/backendChallenge",
-    name: "BackendChallenge",
-    icon: "nc-icon nc-puzzle-10",
-    component: BackendChallenge,
     layout: "/admin",
   },
 ];
