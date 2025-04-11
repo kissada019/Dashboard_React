@@ -1,5 +1,5 @@
-const env = "DEV";
-// const env = "PRE";
+// const env = "DEV";
+const env = "PRE";
 // const env = 'PRD';
 
 /* app version */
