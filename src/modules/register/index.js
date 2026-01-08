@@ -1,26 +1,35 @@
-import React from "react";
-import numeral from "numeral";
-import { useHistory } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useHistory, useParams } from "react-router-dom";
 import alert from "../../utils/alert";
-// react-bootstrap components
 import { useFormik } from "formik";
 import {
-  Badge,
   Button,
   Card,
   Form,
-  Navbar,
-  Nav,
   Container,
   Row,
   Col,
 } from "react-bootstrap";
 import { useDispatch } from "react-redux";
-import { onGetAllTree, onCreateTree } from "../../redux/slices/treeSlice";
+import { onCreateTree, onGetTreeById, onUpdateTree } from "../../redux/slices/treeSlice";
+import { 
+  Sprout, 
+  DollarSign, 
+  Plus, 
+  ArrowLeft,
+  Leaf,
+  Hash,
+  Save
+} from "lucide-react";
 
-function User() {
+function AddTree() {
   const dispatch = useDispatch();
   const history = useHistory();
+  const { id } = useParams(); // Get ID from URL if editing
+  const [loading, setLoading] = useState(false);
+  const [treeData, setTreeData] = useState(null);
+
+  const isEditMode = !!id;
 
   const initialValues = {
     name: "",
@@ -32,211 +41,312 @@ function User() {
 
   const formik = useFormik({
     initialValues: initialValues,
-    enableReinitialze: true,
-    // validationSchema: validationSchema,
+    enableReinitialize: true,
     onSubmit: (values) => handleSubmitData(values),
   });
 
+  // Fetch tree data if in edit mode
+  useEffect(() => {
+    if (isEditMode && id) {
+      setLoading(true);
+      dispatch(onGetTreeById(id)).then((response) => {
+        console.log("onGetTreeById response: ", response?.payload);
+        if (response?.payload) {
+          const data = response.payload;
+          setTreeData(data);
+          // Update formik values with fetched data
+          formik.setValues({
+            name: data.name || "",
+            species: data.species || "",
+            price_old: data.price_old || 0,
+            price_new: data.price_new || 0,
+            amount: data.amount || 0,
+          });
+        }
+        setLoading(false);
+      }).catch((error) => {
+        console.error("Error fetching tree data: ", error);
+        setLoading(false);
+        alert.custom.fire({
+          icon: "error",
+          title: "เกิดข้อผิดพลาด",
+          text: "ไม่สามารถโหลดข้อมูลต้นไม้ได้",
+          confirmButtonText: "ตกลง",
+        });
+      });
+    }
+  }, [id, isEditMode, dispatch, formik]);
 
-  const handleCreateClick = () => {
-    history.push("/admin/tree");
+  const handleBackClick = () => {
+    history.push("/admin/tree2");
   };
 
   const handleSubmitData = (values) => {
-    // console.log("values : ", values);
-    dispatch(onCreateTree(values)).then((response) => {
-      console.log("onInsertProjectAndSystem response: ", response);
-      if (response.payload) {
-        alert.custom
-          .fire({
-            icon: "success",
-            title: "Tree created successfully!",
-            confirmButtonText: "ยืนยัน",
-          })
-          .then((result) => {
-            if (result.isConfirmed) {
-              history.push("/admin/tree");
-            }
+    // Validate that required fields are filled
+    if (!values.name || !values.species) {
+      alert.custom.fire({
+        icon: "error",
+        title: "กรุณากรอกข้อมูลให้ครบถ้วน",
+        text: "กรุณากรอกชื่อต้นไม้และพันธุ์",
+        confirmButtonText: "ตกลง",
+      });
+      return;
+    }
+
+    // Convert string numbers to actual numbers
+    const submitValues = {
+      ...values,
+      price_old: parseFloat(values.price_old) || 0,
+      price_new: parseFloat(values.price_new) || 0,
+      amount: parseInt(values.amount) || 0,
+    };
+
+    if (isEditMode) {
+      // Update existing tree
+      dispatch(onUpdateTree({ id, ...submitValues })).then((response) => {
+        console.log("onUpdateTree response: ", response);
+        if (response.payload) {
+          alert.custom
+            .fire({
+              icon: "success",
+              title: "อัพเดทเรียบร้อย!",
+              text: "ข้อมูลต้นไม้ถูกอัพเดทเรียบร้อยแล้ว",
+              confirmButtonText: "ตกลง",
+            })
+            .then((result) => {
+              if (result.isConfirmed) {
+                history.push("/admin/tree2");
+              }
+            });
+        } else {
+          alert.custom.fire({
+            icon: "error",
+            title: "เกิดข้อผิดพลาด",
+            text: "ไม่สามารถอัพเดทข้อมูลต้นไม้ได้ กรุณาลองใหม่อีกครั้ง",
+            confirmButtonText: "ตกลง",
           });
-      }
-    });
+        }
+      });
+    } else {
+      // Create new tree
+      dispatch(onCreateTree(submitValues)).then((response) => {
+        console.log("onCreateTree response: ", response);
+        if (response.payload) {
+          alert.custom
+            .fire({
+              icon: "success",
+              title: "เพิ่มต้นไม้สำเร็จ!",
+              text: "ต้นไม้ถูกเพิ่มเข้าสู่ระบบเรียบร้อยแล้ว",
+              confirmButtonText: "ตกลง",
+            })
+            .then((result) => {
+              if (result.isConfirmed) {
+                history.push("/admin/tree2");
+              }
+            });
+        } else {
+          alert.custom.fire({
+            icon: "error",
+            title: "เกิดข้อผิดพลาด",
+            text: "ไม่สามารถเพิ่มต้นไม้ได้ กรุณาลองใหม่อีกครั้ง",
+            confirmButtonText: "ตกลง",
+          });
+        }
+      });
+    }
   };
 
   return (
-    <>
-      <Container fluid>
-        <Row>
-          <Col md="8">
-            <Card>
-              <Card.Header>
-                <div className="places-buttons">
-                  <Row className="justify-content-between mb-3">
-                    <Col lg="3" md="3">
-                      <Card.Title as="h4">เพิ่มต้นไม้</Card.Title>
-                    </Col>
-                    <Col lg="2" md="2">
-                      <div className="numbers text-right">
-                        <Button
-                          variant="outline-primary"
-                          className="btn btn-primary"
-                          onClick={handleCreateClick}
-                          size="sm"
-                        >
-                          Back
-                        </Button>
-                      </div>
-                    </Col>
-                  </Row>
+    <div className="add-tree-page-wrapper">
+      <Container fluid className="add-tree-container">
+        <Row className="d-flex justify-content-center">
+          <Col md="10" lg="8" xl="7">
+            <Card className="add-tree-card-plant">
+              <div className="plant-decoration-top">
+                <div className="plant-leaf leaf-1"></div>
+                <div className="plant-leaf leaf-2"></div>
+                <div className="plant-leaf leaf-3"></div>
+              </div>
+
+              <Card.Header className="add-tree-header">
+                <div className="d-flex justify-content-between align-items-center">
+                  <div className="d-flex align-items-center">
+                    <div className="plant-icon-wrapper-small mr-3">
+                      <Sprout size={32} className="plant-icon" />
+                    </div>
+                    <div>
+                      <Card.Title as="h3" className="add-tree-title mb-0">
+                        {isEditMode ? "แก้ไขต้นไม้" : "เพิ่มต้นไม้ใหม่"}
+                      </Card.Title>
+                      <p className="add-tree-subtitle mb-0">
+                        {isEditMode ? "แก้ไขข้อมูลต้นไม้" : "กรอกข้อมูลต้นไม้ที่ต้องการเพิ่ม"}
+                      </p>
+                    </div>
+                  </div>
+                  <Button
+                    variant="outline-secondary"
+                    className="btn-back-plant"
+                    onClick={handleBackClick}
+                    size="sm"
+                  >
+                    <ArrowLeft size={18} className="mr-2" />
+                    กลับ
+                  </Button>
                 </div>
               </Card.Header>
-              <Card.Body>
-                <Form onSubmit={formik.handleSubmit}>
+
+              <Card.Body className="add-tree-card-body">
+                {loading ? (
+                  <div className="text-center py-5">
+                    <div className="spinner-border text-success" role="status">
+                      <span className="sr-only">กำลังโหลด...</span>
+                    </div>
+                    <p className="mt-3 text-muted">กำลังโหลดข้อมูล...</p>
+                  </div>
+                ) : (
+                <Form onSubmit={formik.handleSubmit} className="add-tree-form">
                   <Row>
-                    <Col className="pr-1" md="5">
-                      <Form.Group>
-                        <label>ชื่อdasjiodata</label>
+                    <Col md="6" className="mb-3">
+                      <Form.Group className="form-group-plant">
+                        <Form.Label className="form-label-plant">
+                          <Leaf size={18} className="label-icon" />
+                          ชื่อต้นไม้ <span className="text-danger">*</span>
+                        </Form.Label>
                         <Form.Control
-                          placeholder="ชื่อasdasdas"
+                          placeholder="เช่น ต้นมะม่วง"
                           name="name"
                           id="name"
-                          onChange={(e) => {
-                            formik.handleChange(e);
-                          }}
+                          value={formik.values.name}
+                          onChange={formik.handleChange}
                           type="text"
-                        ></Form.Control>
-                      </Form.Group >
-                    </Col >
-                    <Col className="px-1" md="3">
-                      <Form.Group>
-                        <label>พันธุ์sdfasdt</label>
+                          className="form-control-plant"
+                          required
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col md="6" className="mb-3">
+                      <Form.Group className="form-group-plant">
+                        <Form.Label className="form-label-plant">
+                          <Sprout size={18} className="label-icon" />
+                          พันธุ์ <span className="text-danger">*</span>
+                        </Form.Label>
                         <Form.Control
-                          placeholder="พันธุ์"
+                          placeholder="เช่น มะม่วงน้ำดอกไม้"
                           name="species"
                           id="species"
-                          onChange={(e) => {
-                            formik.handleChange(e);
-                          }}
+                          value={formik.values.species}
+                          onChange={formik.handleChange}
                           type="text"
-                        ></Form.Control>
-                      </Form.Group >
-                    </Col >
-                  </Row >
-                  <Row>
-                    <Col className="pr-1" md="6">
-                      <Form.Group>
-                        <label>ราคาซื้อdsafsdat</label>
-                        <Form.Control
-                          placeholder="ราคาซื้อ"
-                          name="price_old"
-                          // id="price_old"
-                          onChange={(e) => {
-                            formik.handleChange(e);
-                          }}
-                          type="number"
-                        ></Form.Control>
-                      </Form.Group >
-                    </Col >
-                    <Col className="pl-1" md="6">
-                      <Form.Group>
-                        <label>ราคาขายsdafasdrastd</label>
-                        <Form.Control
-                          placeholder="ราคาขาย"
-                          name="price_new"
-                          onChange={(e) => {
-                            formik.handleChange(e);
-                          }}
-                          type="number"
-                        ></Form.Control>
-                      </Form.Group >
-                    </Col >
-                  </Row >
-                  <Row>
-                    <Col md="12">
-                      <Form.Group>
-                        <label>จำนวน</label>
-                        <Form.Control
-                          placeholder="จำนวน"
-                          name="amount"
-                          onChange={(e) => {
-                            formik.handleChange(e);
-                          }}
-                          type="number"
-                        ></Form.Control>
+                          className="form-control-plant"
+                          required
+                        />
                       </Form.Group>
                     </Col>
                   </Row>
 
-                  <Button
-                    className="btn-fill pull-right mt-2"
-                    type="submit"
-                    variant="info"
-                  >
-                    เพิ่ม
-                  </Button>
-                  <div className="clearfix"></div>
-                </Form >
-              </Card.Body >
-            </Card >
-          </Col >
-          <Col md="4">
-            <Card className="card-user">
-              <div className="card-image">
-                <img
-                  alt="..."
-                  src={require("assets/img/photo-1431578500526-4d9613015464.jpeg")}
-                ></img>
-              </div>
-              <Card.Body>
-                <div className="author">
-                  <a href="#pablo" onClick={(e) => e.preventDefault()}>
-                    <img
-                      alt="..."
-                      className="avatar border-gray"
-                      src={require("assets/img/faces/face-3.jpg")}
-                    ></img>
-                    <h5 className="title">Mike Andrew</h5>
-                  </a>
-                  <p className="description">michael24</p>
-                </div>
-                <p className="description text-center">
-                  "Lamborghini Mercy <br></br>
-                  Your chick she so thirsty <br></br>
-                  I'm in that two seat Lambo"
-                </p>
+                  <Row>
+                    <Col md="6" className="mb-3">
+                      <Form.Group className="form-group-plant">
+                        <Form.Label className="form-label-plant">
+                          <DollarSign size={18} className="label-icon" />
+                          ราคาซื้อ (บาท)
+                        </Form.Label>
+                        <Form.Control
+                          placeholder="0"
+                          name="price_old"
+                          id="price_old"
+                          value={formik.values.price_old}
+                          onChange={formik.handleChange}
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          className="form-control-plant"
+                        />
+                      </Form.Group>
+                    </Col>
+                    <Col md="6" className="mb-3">
+                      <Form.Group className="form-group-plant">
+                        <Form.Label className="form-label-plant">
+                          <DollarSign size={18} className="label-icon" />
+                          ราคาขาย (บาท)
+                        </Form.Label>
+                        <Form.Control
+                          placeholder="0"
+                          name="price_new"
+                          id="price_new"
+                          value={formik.values.price_new}
+                          onChange={formik.handleChange}
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          className="form-control-plant"
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
+                  <Row>
+                    <Col md="6" className="mb-4">
+                      <Form.Group className="form-group-plant">
+                        <Form.Label className="form-label-plant">
+                          <Hash size={18} className="label-icon" />
+                          จำนวน (ต้น)
+                        </Form.Label>
+                        <Form.Control
+                          placeholder="0"
+                          name="amount"
+                          id="amount"
+                          value={formik.values.amount}
+                          onChange={formik.handleChange}
+                          type="number"
+                          min="0"
+                          className="form-control-plant"
+                        />
+                      </Form.Group>
+                    </Col>
+                  </Row>
+
+                  <div className="d-flex justify-content-end mt-4">
+                    <Button
+                      variant="outline-secondary"
+                      className="btn-cancel-plant mr-3"
+                      onClick={handleBackClick}
+                      size="lg"
+                    >
+                      ยกเลิก
+                    </Button>
+                    <Button
+                      className="btn-submit-plant"
+                      type="submit"
+                      size="lg"
+                    >
+                      {isEditMode ? (
+                        <>
+                          <Save size={20} className="mr-2" />
+                          บันทึก
+                        </>
+                      ) : (
+                        <>
+                          <Plus size={20} className="mr-2" />
+                          เพิ่มต้นไม้
+                        </>
+                      )}
+                    </Button>
+                  </div>
+                </Form>
+                )}
               </Card.Body>
-              <hr></hr>
-              <div className="button-container mr-auto ml-auto">
-                <Button
-                  className="btn-simple btn-icon"
-                  href="#pablo"
-                  onClick={(e) => e.preventDefault()}
-                  variant="link"
-                >
-                  <i className="fab fa-facebook-square"></i>
-                </Button>
-                <Button
-                  className="btn-simple btn-icon"
-                  href="#pablo"
-                  onClick={(e) => e.preventDefault()}
-                  variant="link"
-                >
-                  <i className="fab fa-twitter"></i>
-                </Button>
-                <Button
-                  className="btn-simple btn-icon"
-                  href="#pablo"
-                  onClick={(e) => e.preventDefault()}
-                  variant="link"
-                >
-                  <i className="fab fa-google-plus-square"></i>
-                </Button>
+
+              <div className="plant-decoration-bottom">
+                <div className="plant-leaf leaf-4"></div>
+                <div className="plant-leaf leaf-5"></div>
               </div>
             </Card>
           </Col>
-        </Row >
-      </Container >
-    </>
+        </Row>
+      </Container>
+    </div>
   );
 }
 
-export default User;
+export default AddTree;

@@ -27,7 +27,12 @@ import Login from "pages/auth/login";
 import Register from "pages/register";
 import Tree from "pages/tree";
 import TreeEdit from "pages/tree/edit";
+import TreeDetailShopee from "pages/tree/treeDetailShopee";
+import Tree2 from "pages/tree2";
 import GitDocument from "pages/gitDocument";
+import Cart from "pages/cart";
+import Checkout from "pages/checkout";
+import Test from "pages/test";
 
 const dashboardRoutes = [
   {
@@ -39,23 +44,37 @@ const dashboardRoutes = [
   },
   {
     path: "/tree/:id",
-    name: "รายละเอียดต้นไม้",
+    name: "แก้ไขต้นไม้",
     icon: "nc-icon nc-single-copy-04",
-    component: TreeEdit, // New component for detailed view
+    component: Register, // Use Register component for both add and edit
     layout: "/admin",
     hidden: true,
   },
   {
-    path: "/tree",
-    name: "ต้นไม้",
+    path: "/tree-detail/:id",
+    name: "ดูรายละเอียดต้นไม้",
+    icon: "nc-icon nc-single-copy-04",
+    component: TreeDetailShopee,
+    layout: "/admin",
+    hidden: true,
+  },
+  // {
+  //   path: "/tree",
+  //   name: "ต้นไม้",
+  //   icon: "nc-icon nc-notes",
+  //   component: Tree,
+  //   layout: "/admin",
+  // },
+  {
+    path: "/tree2",
+    name: "ต้นไม้ ",
     icon: "nc-icon nc-notes",
-    component: Tree,
+    component: Tree2,
     layout: "/admin",
   },
-
   {
     path: "/register",
-    name: "Register",
+    name: "เพิ่มต้นไม้ใหม่",
     icon: "nc-icon nc-paper-2",
     component: Register,
     layout: "/admin",
@@ -122,6 +141,30 @@ const dashboardRoutes = [
     icon: "nc-icon nc-puzzle-10",
     component: GitDocument,
     layout: "/admin",
+  },
+  {
+    path: "/cart",
+    name: "ตะกร้าสินค้า",
+    icon: "nc-icon nc-cart-simple",
+    component: Cart,
+    layout: "/admin",
+    hidden: true,
+  },
+  {
+    path: "/checkout",
+    name: "ชำระเงิน",
+    icon: "nc-icon nc-credit-card",
+    component: Checkout,
+    layout: "/admin",
+    hidden: true,
+  },
+  {
+    path: "/test",
+    name: "test",
+    icon: "nc-icon nc-credit-card",
+    component: Test,
+    layout: "/admin",
+    // hidden: true,
   },
 ];
 

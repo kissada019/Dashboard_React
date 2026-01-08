@@ -1,35 +1,21 @@
-import React, { useEffect } from "react";
-import ChartistGraph from "react-chartist";
-import { useRecoilState, useRecoilValue } from "recoil";
+import React from "react";
 /* hooks */
-// import useAuth from "hooks/useAuth";
-// import useAuth from "hooks/useAuth";
 import useAuth from "hooks/useAuth";
-import userInfoStorage from "storage/userInfoStorage";
 // react-bootstrap components
 import {
-  Badge,
   Button,
   Card,
-  Navbar,
-  Nav,
-  Table,
   Container,
   Row,
   Col,
   Form,
-  OverlayTrigger,
-  Tooltip,
 } from "react-bootstrap";
 import { useFormik } from "formik";
-import { useDispatch, useSelector } from "react-redux";
+import { Leaf, User, Lock, LogIn } from "lucide-react";
 
 function LayoutPage() {
   /* libs */
-  // const navigate = useNavigate();
   const auth = useAuth();
-
-  const dispatch = useDispatch();
 
   const initialValues = {
     username: "",
@@ -39,18 +25,8 @@ function LayoutPage() {
   const formik = useFormik({
     initialValues: initialValues,
     enableReinitialze: true,
-    // validationSchema: validationSchema,
     onSubmit: (values) => handleSubmitData(values),
   });
-
-  // React.useEffect(() => {
-  //     // auth.logout();
-  //     let userInfo = userInfoStorage.get();
-  //     console.log("userInfo : ", userInfo)
-  //     if (userInfo && !_.isEmpty(userInfo) && userInfo.token) {
-  //         // navigate("/home");
-  //     }
-  // }, []);
 
   const handleSubmitData = (values) => {
     let request = {
@@ -63,7 +39,6 @@ function LayoutPage() {
     auth
       .login(request)
       .then((response) => {
-        // setLoading(false);
         console.log("login response : ", response);
         if (response.success === true) {
           window.location.href = "/home";
@@ -73,89 +48,100 @@ function LayoutPage() {
       })
       .catch((error) => {
         console.log("login error : ", error);
-        // setLoading(false);
         formik.setErrors({ submit: error.message });
       });
   };
 
   return (
-    <>
-      <Container fluid>
-        <Row className="d-flex justify-content-center">
-          <Col md="4">
-            <Card className="login-user mt-4">
-              <Card.Body>
-                <div className="author">
-                  <img
-                    alt="..."
-                    className="avatar border-gray"
-                    src={require("assets/img/faces/face-3.jpg")}
-                  ></img>
+    <div className="login-page-wrapper">
+      <Container fluid className="login-container">
+        <Row className="d-flex justify-content-center align-items-center min-vh-100">
+          <Col md="5" lg="4" xl="3">
+            <Card className="login-card-plant">
+              <div className="plant-decoration-top">
+                <div className="plant-leaf leaf-1"></div>
+                <div className="plant-leaf leaf-2"></div>
+                <div className="plant-leaf leaf-3"></div>
+              </div>
+              
+              <Card.Body className="login-card-body">
+                <div className="login-header">
+                  <div className="plant-icon-wrapper">
+                    <Leaf size={48} className="plant-icon" />
+                  </div>
+                  <Card.Title as="h3" className="login-title">
+                    ยินดีต้อนรับ
+                  </Card.Title>
+                  <p className="login-subtitle">เข้าสู่ระบบร้านขายต้นไม้</p>
                 </div>
-                <Card.Header>
-                  <Card.Title as="h4" className=" text-center">
-                    Login
-                  </Card.Title>
-                </Card.Header>
 
-                <form onSubmit={formik.handleSubmit}>
-                  <Row>
-                    <Col className="px-3" md="12">
-                      <Form.Group>
-                        <label>Username </label>
-                        <Form.Control
-                          placeholder="Username"
-                          id="username"
-                          name="username"
-                          type="text"
-                          onChange={(e) => {
-                            formik.handleChange(e);
-                          }}
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col className="px-3" md="12">
-                      <Form.Group>
-                        <label>Password </label>
-                        <Form.Control
-                          placeholder="Password"
-                          id="password"
-                          name="password"
-                          type="password"
-                          onChange={(e) => {
-                            formik.handleChange(e);
-                          }}
-                        ></Form.Control>
-                      </Form.Group>
-                    </Col>
-                  </Row>
-                  <Card.Title as="h4" className=" text-center">
-                    <Button
-                      className="btn btn-fill pull-right btn-sm m-1 mt-3"
-                      type="submit"
-                      variant="info"
-                    >
-                      Login
-                    </Button>
+                <form onSubmit={formik.handleSubmit} className="login-form">
+                  <Form.Group className="mb-3 form-group-plant">
+                    <Form.Label className="form-label-plant">
+                      <User size={18} className="label-icon" />
+                      ชื่อผู้ใช้
+                    </Form.Label>
+                    <Form.Control
+                      placeholder="กรุณากรอกชื่อผู้ใช้"
+                      id="username"
+                      name="username"
+                      type="text"
+                      className="form-control-plant"
+                      onChange={(e) => {
+                        formik.handleChange(e);
+                      }}
+                    />
+                  </Form.Group>
 
-                    <a href={`kanban`}>
-                      <Button
-                        className="btn btn-fill pull-right btn-sm m-1 mt-3"
-                        variant="info"
-                      >
-                        Register
-                      </Button>
+                  <Form.Group className="mb-4 form-group-plant">
+                    <Form.Label className="form-label-plant">
+                      <Lock size={18} className="label-icon" />
+                      รหัสผ่าน
+                    </Form.Label>
+                    <Form.Control
+                      placeholder="กรุณากรอกรหัสผ่าน"
+                      id="password"
+                      name="password"
+                      type="password"
+                      className="form-control-plant"
+                      onChange={(e) => {
+                        formik.handleChange(e);
+                      }}
+                    />
+                  </Form.Group>
+
+                  {formik.errors.submit && (
+                    <div className="alert alert-danger mb-3" role="alert">
+                      {formik.errors.submit}
+                    </div>
+                  )}
+
+                  <Button
+                    className="btn-login-plant w-100 mb-3"
+                    type="submit"
+                    size="lg"
+                  >
+                    <LogIn size={20} className="me-2" />
+                    เข้าสู่ระบบ
+                  </Button>
+
+                  <div className="text-center">
+                    <a href={`kanban`} className="register-link">
+                      ยังไม่มีบัญชี? สมัครสมาชิก
                     </a>
-                  </Card.Title>
+                  </div>
                 </form>
               </Card.Body>
+
+              <div className="plant-decoration-bottom">
+                <div className="plant-leaf leaf-4"></div>
+                <div className="plant-leaf leaf-5"></div>
+              </div>
             </Card>
           </Col>
         </Row>
       </Container>
-    </>
+    </div>
   );
 }
 

@@ -2,11 +2,13 @@ import { configureStore } from "@reduxjs/toolkit";
 /* Slices */
 import catSlice from "./slices/catSlice";
 import treeSlice from "./slices/treeSlice";
+import cartSlice from "./slices/cartSlice";
 
 export const store = configureStore({
   reducer: {
     catSlice: catSlice,
     treeSlice: treeSlice,
+    cart: cartSlice,
   },
 });
 
