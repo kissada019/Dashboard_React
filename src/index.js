@@ -16,9 +16,8 @@
 
 */
 import React from "react";
-import ReactDOM from "react-dom/client";
+import ReactDOM from "react-dom";
 import { Provider } from "react-redux";
-import { configureStore } from "@reduxjs/toolkit";
 
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 
@@ -28,14 +27,12 @@ import "./assets/scss/light-bootstrap-dashboard-react.scss?v=2.0.0";
 import "./assets/css/demo.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
-import { store } from "./redux/store"
+import { store } from "./redux/store";
 
 
 import AdminLayout from "layouts/Admin.js";
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
-
-root.render(
+ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter>
       <Switch>
@@ -43,5 +40,6 @@ root.render(
         <Redirect from="/" to="/admin/dashboard" />
       </Switch>
     </BrowserRouter>
-  </Provider>
+  </Provider>,
+  document.getElementById("root")
 );

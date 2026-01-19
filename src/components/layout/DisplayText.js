@@ -2,7 +2,7 @@ import React from "react";
 /* libs */
 import Linkify from 'react-linkify';
 // import Highlighter from "react-highlight-words";
-import ReactHtmlParser from 'react-html-parser';
+import parse from "html-react-parser";
 import { findAll } from "highlight-words-core";
 
 /**
@@ -77,7 +77,7 @@ const DisplayText = ({
                                     {decoratedText}
                                 </a>
                             )}>
-                                {ReactHtmlParser(handleGethighlightedText(text, handleGetSearchWords(searchWords)))}
+                                {parse(handleGethighlightedText(text, handleGetSearchWords(searchWords)))}
                             </Linkify>
                         </span>
                     )
@@ -90,16 +90,16 @@ const DisplayText = ({
                                     {decoratedText}
                                 </a>
                             )}>
-                                {ReactHtmlParser(text?.toString())}
+                                {parse(text?.toString())}
                             </Linkify>
                         </span>
                     )
                 }
                 else if (!isLinkify && isHighlight) {
-                    return <span className={className}>{ReactHtmlParser(handleGethighlightedText(text, handleGetSearchWords(searchWords)))}</span>
+                    return <span className={className}>{parse(handleGethighlightedText(text, handleGetSearchWords(searchWords)))}</span>
                 }
                 else {
-                    return <span className={className}>{ReactHtmlParser(text?.toString())}</span>
+                    return <span className={className}>{parse(text?.toString())}</span>
                 }
             }
             else {
