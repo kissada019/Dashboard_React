@@ -28,7 +28,6 @@ import Register from "pages/register";
 import Tree from "pages/tree";
 import TreeEdit from "pages/tree/edit";
 import TreeDetailShopee from "pages/tree/treeDetailShopee";
-import Tree2 from "pages/tree2";
 import GitDocument from "pages/gitDocument";
 import Cart from "pages/cart";
 import Checkout from "pages/checkout";
@@ -66,10 +65,10 @@ const dashboardRoutes = [
   //   layout: "/admin",
   // },
   {
-    path: "/tree2",
+    path: "/tree",
     name: "ต้นไม้ ",
     icon: "nc-icon nc-notes",
-    component: Tree2,
+    component: Tree,
     layout: "/admin",
   },
   {

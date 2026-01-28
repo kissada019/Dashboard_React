@@ -1,6 +1,11 @@
 import React from "react";
 /* hooks */
-import useAuth from "hooks/useAuth";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  onChangeLoginForm,
+  onLogin,
+  onResetLoginForm,
+} from "../../../redux/slices/authSlice";
 // react-bootstrap components
 import {
   Button,
@@ -15,12 +20,10 @@ import { Leaf, User, Lock, LogIn } from "lucide-react";
 
 function LayoutPage() {
   /* libs */
-  const auth = useAuth();
+  const dispatch = useDispatch();
+  const { form, loading } = useSelector((state) => state.auth);
 
-  const initialValues = {
-    username: "",
-    password: "",
-  };
+  const initialValues = form;
 
   const formik = useFormik({
     initialValues: initialValues,
@@ -29,26 +32,42 @@ function LayoutPage() {
   });
 
   const handleSubmitData = (values) => {
-    let request = {
+    const request = {
       username: values.username,
       password: values.password,
     };
 
-    console.log("event : ", request);
+    console.log("login request:", {
+      username: values.username,
+      password: values.password,
+    });
 
-    auth
-      .login(request)
+    dispatch(onLogin(request))
+      .unwrap()
       .then((response) => {
-        console.log("login response : ", response);
-        if (response.success === true) {
+        const token =
+          response?.token ||
+          response?.accessToken ||
+          response?.responseObject?.token ||
+          response?.responseObject?.accessToken;
+        const success =
+          response?.success === true ||
+          response?.status === true ||
+          Boolean(token);
+        if (success) {
+          dispatch(onResetLoginForm());
           window.location.href = "/home";
         } else {
-          formik.setErrors({ submit: response.message });
+          const message =
+            response?.message ||
+            response?.error ||
+            "เข้าสู่ระบบไม่สำเร็จ";
+          formik.setErrors({ submit: message });
         }
       })
       .catch((error) => {
         console.log("login error : ", error);
-        formik.setErrors({ submit: error.message });
+        formik.setErrors({ submit: error });
       });
   };
 
@@ -87,8 +106,15 @@ function LayoutPage() {
                       name="username"
                       type="text"
                       className="form-control-plant"
+                      value={formik.values.username}
                       onChange={(e) => {
                         formik.handleChange(e);
+                        dispatch(
+                          onChangeLoginForm({
+                            name: "username",
+                            value: e.target.value,
+                          })
+                        );
                       }}
                     />
                   </Form.Group>
@@ -104,8 +130,15 @@ function LayoutPage() {
                       name="password"
                       type="password"
                       className="form-control-plant"
+                      value={formik.values.password}
                       onChange={(e) => {
                         formik.handleChange(e);
+                        dispatch(
+                          onChangeLoginForm({
+                            name: "password",
+                            value: e.target.value,
+                          })
+                        );
                       }}
                     />
                   </Form.Group>
@@ -120,6 +153,7 @@ function LayoutPage() {
                     className="btn-login-plant w-100 mb-3"
                     type="submit"
                     size="lg"
+                    disabled={loading}
                   >
                     <LogIn size={20} className="me-2" />
                     เข้าสู่ระบบ

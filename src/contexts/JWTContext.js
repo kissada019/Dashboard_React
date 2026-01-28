@@ -1,4 +1,5 @@
 import { createContext, useEffect, useReducer } from "react";
+import axios from "axios";
 /* libs */
 import _ from "lodash";
 import moment from "moment";
@@ -7,7 +8,6 @@ import AppConst from "shared/AppConst";
 /* storage */
 import userInfoStorage from "../storage/userInfoStorage";
 /* utils */
-import service from "../utils/service";
 import common from "utils/common";
 
 /* action type */
@@ -57,6 +57,8 @@ const AuthContext = createContext({
     login: () => Promise.resolve()
 
 });
+
+const LOGIN_URL = "http://localhost:3000/auth/login";
 
 /* provider */
 function AuthProvider({ children }) {
@@ -116,29 +118,41 @@ function AuthProvider({ children }) {
 
     /* functions */
     const login = async (request) => {
-        console.log("sssssss11");
-
         return new Promise(async (resolve, reject) => {
-            await service.api.post('Permission/Login', request, false, false).then((response) => {
-                if (response.success === true) {
-                    //add session expired
-                    let userLogin = {
-                        ...response.responseObject,
-                        isSkip: false,
-                        sessionExpired: moment().add(AppConst.SESSION_EXPIRED_MINUTES, 'minutes').format()
-                    }
-                    userInfoStorage.set(userLogin);
-                    dispatch({
-                        type: "LOG_IN",
-                        payload: {
-                            userInfo: response.responseObject,
-                        }
-                    });
-                }
-                resolve(response);
-            }).catch((error) => {
+            try {
+                const response = await axios.post(LOGIN_URL, request, {
+                    headers: {
+                        "Content-Type": "application/json; charset=utf-8",
+                    },
+                });
+                const data = response?.data ?? response;
+                const token =
+                    data?.token ||
+                    data?.accessToken ||
+                    data?.responseObject?.token ||
+                    data?.responseObject?.accessToken ||
+                    "";
+                const userInfo = data?.user || data?.responseObject || data || {};
+                const userLogin = {
+                    ...userInfo,
+                    token,
+                    isSkip: false,
+                    sessionExpired: moment()
+                        .add(AppConst.SESSION_EXPIRED_MINUTES, "minutes")
+                        .format(),
+                };
+
+                userInfoStorage.set(userLogin);
+                dispatch({
+                    type: "LOG_IN",
+                    payload: {
+                        userInfo: userLogin,
+                    },
+                });
+                resolve(data);
+            } catch (error) {
                 reject(error);
-            });
+            }
         });
     };
 

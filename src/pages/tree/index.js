@@ -1,8 +1,7 @@
-import React, { useEffect } from "react";
+import React from "react";
 import Tree from "../../modules/tree/index";
 
-
-function LayoutPage() {
+function Tree2Page() {
     return (
         <React.Fragment>
             <Tree />
@@ -10,4 +9,5 @@ function LayoutPage() {
     );
 }
 
-export default LayoutPage;
+export default Tree2Page;
+
