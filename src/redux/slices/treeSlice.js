@@ -29,7 +29,8 @@ export const onGetAllTree = createAsyncThunk(
     try {
       let response = null;
       if (_apiURL === "DEV") {
-        response = await service.api.get("api/Tree/GetAll");
+        response = await service.api.get("tree");
+        console.log("response : ", response);
       } else if (_apiURL === "PRE") {
         response = await service.api.get("api/trees");
       }
