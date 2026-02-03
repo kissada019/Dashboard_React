@@ -12,8 +12,18 @@ import {
 } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 import alert from "../../utils/alert";
-import { onGetAllTree } from "../../redux/slices/treeSlice";
-import { Pencil, Trash, Plus, Search, Sprout, Package, DollarSign, TrendingUp, Eye } from "lucide-react";
+import { onGetAllTree, onGetTreeById } from "../../redux/slices/treeSlice";
+import {
+  Pencil,
+  Trash,
+  Plus,
+  Search,
+  Sprout,
+  Package,
+  DollarSign,
+  TrendingUp,
+  Eye,
+} from "lucide-react";
 
 const TreePage = () => {
   const history = useHistory();
@@ -74,6 +84,7 @@ const TreePage = () => {
   };
 
   const handleViewDetail = (id) => {
+    dispatch(onGetTreeById(id));
     history.push(`/admin/tree-detail/${id}`);
   };
 
@@ -93,36 +104,55 @@ const TreePage = () => {
 
   // Calculate statistics
   const totalTrees = data.length;
-  const totalAmount = data.reduce((sum, item) => sum + item.amount, 0);
-  const totalValue = data.reduce((sum, item) => sum + (item.price_new * item.amount), 0);
-  const avgProfit = data.length > 0 
-    ? data.reduce((sum, item) => sum + (item.price_new - item.price_old), 0) / data.length 
-    : 0;
+  const totalQuantity = data.reduce((sum, item) => sum + item.quantity, 0);
+  const totalValue = data.reduce(
+    (sum, item) => sum + item.sell_price * item.quantity,
+    0
+  );
+  const avgProfit =
+    data.length > 0
+      ? data.reduce(
+          (sum, item) => sum + (item.sell_price - item.buy_price),
+          0
+        ) / data.length
+      : 0;
 
   return (
     <Container fluid className="p-4">
       {/* Statistics Cards */}
       <Row className="mb-4">
         <Col lg="3" md="6" sm="6">
-          <Card className="card-stats" style={{ 
-            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-            color: 'white',
-            border: 'none',
-            boxShadow: '0 4px 15px rgba(102, 126, 234, 0.4)'
-          }}>
+          <Card
+            className="card-stats"
+            style={{
+              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+              color: "white",
+              border: "none",
+              boxShadow: "0 4px 15px rgba(102, 126, 234, 0.4)",
+            }}
+          >
             <Card.Body>
               <Row>
                 <Col xs="5">
-                  <div className="icon-big text-center" style={{ fontSize: '2.5rem' }}>
+                  <div
+                    className="icon-big text-center"
+                    style={{ fontSize: "2.5rem" }}
+                  >
                     <Sprout size={48} />
                   </div>
                 </Col>
                 <Col xs="7">
                   <div className="numbers">
-                    <p className="card-category" style={{ color: 'rgba(255,255,255,0.8)', marginBottom: '5px' }}>
+                    <p
+                      className="card-category"
+                      style={{
+                        color: "rgba(255,255,255,0.8)",
+                        marginBottom: "5px",
+                      }}
+                    >
                       จำนวนชนิด
                     </p>
-                    <Card.Title as="h4" style={{ color: 'white', margin: 0 }}>
+                    <Card.Title as="h4" style={{ color: "white", margin: 0 }}>
                       {totalTrees}
                     </Card.Title>
                   </div>
@@ -132,26 +162,38 @@ const TreePage = () => {
           </Card>
         </Col>
         <Col lg="3" md="6" sm="6">
-          <Card className="card-stats" style={{ 
-            background: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-            color: 'white',
-            border: 'none',
-            boxShadow: '0 4px 15px rgba(245, 87, 108, 0.4)'
-          }}>
+          <Card
+            className="card-stats"
+            style={{
+              background: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
+              color: "white",
+              border: "none",
+              boxShadow: "0 4px 15px rgba(245, 87, 108, 0.4)",
+            }}
+          >
             <Card.Body>
               <Row>
                 <Col xs="5">
-                  <div className="icon-big text-center" style={{ fontSize: '2.5rem' }}>
+                  <div
+                    className="icon-big text-center"
+                    style={{ fontSize: "2.5rem" }}
+                  >
                     <Package size={48} />
                   </div>
                 </Col>
                 <Col xs="7">
                   <div className="numbers">
-                    <p className="card-category" style={{ color: 'rgba(255,255,255,0.8)', marginBottom: '5px' }}>
+                    <p
+                      className="card-category"
+                      style={{
+                        color: "rgba(255,255,255,0.8)",
+                        marginBottom: "5px",
+                      }}
+                    >
                       จำนวนทั้งหมด
                     </p>
-                    <Card.Title as="h4" style={{ color: 'white', margin: 0 }}>
-                      {totalAmount}
+                    <Card.Title as="h4" style={{ color: "white", margin: 0 }}>
+                      {totalQuantity}
                     </Card.Title>
                   </div>
                 </Col>
@@ -160,25 +202,37 @@ const TreePage = () => {
           </Card>
         </Col>
         <Col lg="3" md="6" sm="6">
-          <Card className="card-stats" style={{ 
-            background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-            color: 'white',
-            border: 'none',
-            boxShadow: '0 4px 15px rgba(79, 172, 254, 0.4)'
-          }}>
+          <Card
+            className="card-stats"
+            style={{
+              background: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
+              color: "white",
+              border: "none",
+              boxShadow: "0 4px 15px rgba(79, 172, 254, 0.4)",
+            }}
+          >
             <Card.Body>
               <Row>
                 <Col xs="5">
-                  <div className="icon-big text-center" style={{ fontSize: '2.5rem' }}>
+                  <div
+                    className="icon-big text-center"
+                    style={{ fontSize: "2.5rem" }}
+                  >
                     <DollarSign size={48} />
                   </div>
                 </Col>
                 <Col xs="7">
                   <div className="numbers">
-                    <p className="card-category" style={{ color: 'rgba(255,255,255,0.8)', marginBottom: '5px' }}>
+                    <p
+                      className="card-category"
+                      style={{
+                        color: "rgba(255,255,255,0.8)",
+                        marginBottom: "5px",
+                      }}
+                    >
                       มูลค่ารวม
                     </p>
-                    <Card.Title as="h4" style={{ color: 'white', margin: 0 }}>
+                    <Card.Title as="h4" style={{ color: "white", margin: 0 }}>
                       {totalValue.toLocaleString()} ฿
                     </Card.Title>
                   </div>
@@ -188,25 +242,37 @@ const TreePage = () => {
           </Card>
         </Col>
         <Col lg="3" md="6" sm="6">
-          <Card className="card-stats" style={{ 
-            background: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-            color: 'white',
-            border: 'none',
-            boxShadow: '0 4px 15px rgba(67, 233, 123, 0.4)'
-          }}>
+          <Card
+            className="card-stats"
+            style={{
+              background: "linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)",
+              color: "white",
+              border: "none",
+              boxShadow: "0 4px 15px rgba(67, 233, 123, 0.4)",
+            }}
+          >
             <Card.Body>
               <Row>
                 <Col xs="5">
-                  <div className="icon-big text-center" style={{ fontSize: '2.5rem' }}>
+                  <div
+                    className="icon-big text-center"
+                    style={{ fontSize: "2.5rem" }}
+                  >
                     <TrendingUp size={48} />
                   </div>
                 </Col>
                 <Col xs="7">
                   <div className="numbers">
-                    <p className="card-category" style={{ color: 'rgba(255,255,255,0.8)', marginBottom: '5px' }}>
+                    <p
+                      className="card-category"
+                      style={{
+                        color: "rgba(255,255,255,0.8)",
+                        marginBottom: "5px",
+                      }}
+                    >
                       กำไรเฉลี่ย
                     </p>
-                    <Card.Title as="h4" style={{ color: 'white', margin: 0 }}>
+                    <Card.Title as="h4" style={{ color: "white", margin: 0 }}>
                       {avgProfit.toFixed(0)} ฿
                     </Card.Title>
                   </div>
@@ -218,22 +284,33 @@ const TreePage = () => {
       </Row>
 
       {/* Main Content Card */}
-      <Card className="card-tasks" style={{ 
-        border: 'none',
-        boxShadow: '0 2px 10px rgba(0,0,0,0.1)',
-        borderRadius: '12px',
-        overflow: 'hidden'
-      }}>
-        <Card.Header style={{ 
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-          color: 'white',
-          padding: '20px 30px',
-          border: 'none'
-        }}>
+      <Card
+        className="card-tasks"
+        style={{
+          border: "none",
+          boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+          borderRadius: "12px",
+          overflow: "hidden",
+        }}
+      >
+        <Card.Header
+          style={{
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            color: "white",
+            padding: "20px 30px",
+            border: "none",
+          }}
+        >
           <Row className="justify-content-between align-items-center">
             <Col lg="6" md="6">
-              <Card.Title as="h4" style={{ color: 'white', margin: 0, fontWeight: '600' }}>
-                <Sprout size={28} style={{ marginRight: '10px', verticalAlign: 'middle' }} />
+              <Card.Title
+                as="h4"
+                style={{ color: "white", margin: 0, fontWeight: "600" }}
+              >
+                <Sprout
+                  size={28}
+                  style={{ marginRight: "10px", verticalAlign: "middle" }}
+                />
                 จัดการข้อมูลต้นไม้
               </Card.Title>
             </Col>
@@ -243,33 +320,36 @@ const TreePage = () => {
                 className="me-2"
                 onClick={handleCreateClick}
                 style={{
-                  borderRadius: '8px',
-                  padding: '8px 20px',
-                  fontWeight: '500',
-                  boxShadow: '0 2px 8px rgba(0,0,0,0.15)'
+                  borderRadius: "8px",
+                  padding: "8px 20px",
+                  fontWeight: "500",
+                  boxShadow: "0 2px 8px rgba(0,0,0,0.15)",
                 }}
               >
-                <Plus size={18} style={{ marginRight: '5px', verticalAlign: 'middle' }} />
+                <Plus
+                  size={18}
+                  style={{ marginRight: "5px", verticalAlign: "middle" }}
+                />
                 เพิ่มข้อมูลใหม่
               </Button>
             </Col>
           </Row>
         </Card.Header>
-        <Card.Body style={{ padding: '30px' }}>
+        <Card.Body style={{ padding: "30px" }}>
           {/* Search Bar */}
           <Row className="mb-4">
             <Col lg="4" md="6">
-              <div style={{ position: 'relative' }}>
-                <Search 
-                  size={20} 
-                  style={{ 
-                    position: 'absolute', 
-                    left: '15px', 
-                    top: '50%', 
-                    transform: 'translateY(-50%)',
-                    color: '#999',
-                    zIndex: 10
-                  }} 
+              <div style={{ position: "relative" }}>
+                <Search
+                  size={20}
+                  style={{
+                    position: "absolute",
+                    left: "15px",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    color: "#999",
+                    zIndex: 10,
+                  }}
                 />
                 <Form.Control
                   type="text"
@@ -277,150 +357,223 @@ const TreePage = () => {
                   value={searchTerm}
                   onChange={handleSearchChange}
                   style={{
-                    paddingLeft: '45px',
-                    borderRadius: '10px',
-                    border: '2px solid #e0e0e0',
-                    fontSize: '14px',
-                    transition: 'all 0.3s ease'
+                    paddingLeft: "45px",
+                    borderRadius: "10px",
+                    border: "2px solid #e0e0e0",
+                    fontSize: "14px",
+                    transition: "all 0.3s ease",
                   }}
-                  onFocus={(e) => e.target.style.borderColor = '#667eea'}
-                  onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
+                  onFocus={(e) => (e.target.style.borderColor = "#667eea")}
+                  onBlur={(e) => (e.target.style.borderColor = "#e0e0e0")}
                 />
               </div>
             </Col>
             <Col lg="8" md="6" className="text-right">
-              <Badge 
-                bg="info" 
-                style={{ 
-                  padding: '8px 15px', 
-                  fontSize: '14px',
-                  borderRadius: '8px'
+              <Badge
+                bg="info"
+                style={{
+                  padding: "8px 15px",
+                  fontSize: "14px",
+                  borderRadius: "8px",
                 }}
               >
-                {loading ? "กำลังโหลด..." : `พบทั้งหมด ${filteredData.length} รายการ`}
+                {loading
+                  ? "กำลังโหลด..."
+                  : `พบทั้งหมด ${filteredData.length} รายการ`}
               </Badge>
             </Col>
           </Row>
 
           {/* Table */}
-          <div className="table-responsive" style={{ borderRadius: '10px', overflow: 'hidden' }}>
-            <Table 
-              hover 
-              style={{ 
+          <div
+            className="table-responsive"
+            style={{ borderRadius: "10px", overflow: "hidden" }}
+          >
+            <Table
+              hover
+              style={{
                 margin: 0,
-                backgroundColor: 'white'
+                backgroundColor: "white",
               }}
             >
-              <thead style={{ 
-                background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-                color: '#333'
-              }}>
+              <thead
+                style={{
+                  background:
+                    "linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)",
+                  color: "#333",
+                }}
+              >
                 <tr>
-                  <th style={{ 
-                    padding: '15px',
-                    fontWeight: '600',
-                    borderBottom: '2px solid #ddd'
-                  }}>ลำดับ</th>
-                  <th style={{ 
-                    padding: '15px',
-                    fontWeight: '600',
-                    borderBottom: '2px solid #ddd'
-                  }}>ชื่อ</th>
-                  <th style={{ 
-                    padding: '15px',
-                    fontWeight: '600',
-                    borderBottom: '2px solid #ddd'
-                  }}>พันธุ์</th>
-                  <th style={{ 
-                    padding: '15px',
-                    fontWeight: '600',
-                    borderBottom: '2px solid #ddd'
-                  }}>ราคาซื้อ</th>
-                  <th style={{ 
-                    padding: '15px',
-                    fontWeight: '600',
-                    borderBottom: '2px solid #ddd'
-                  }}>ราคาขาย</th>
-                  <th style={{ 
-                    padding: '15px',
-                    fontWeight: '600',
-                    borderBottom: '2px solid #ddd'
-                  }}>จำนวน</th>
-                  <th style={{ 
-                    padding: '15px',
-                    fontWeight: '600',
-                    borderBottom: '2px solid #ddd',
-                    textAlign: 'center'
-                  }}>จัดการ</th>
+                  <th
+                    style={{
+                      padding: "15px",
+                      fontWeight: "600",
+                      borderBottom: "2px solid #ddd",
+                    }}
+                  >
+                    ลำดับ
+                  </th>
+                  <th
+                    style={{
+                      padding: "15px",
+                      fontWeight: "600",
+                      borderBottom: "2px solid #ddd",
+                    }}
+                  >
+                    ชื่อ
+                  </th>
+                  <th
+                    style={{
+                      padding: "15px",
+                      fontWeight: "600",
+                      borderBottom: "2px solid #ddd",
+                    }}
+                  >
+                    พันธุ์
+                  </th>
+                  <th
+                    style={{
+                      padding: "15px",
+                      fontWeight: "600",
+                      borderBottom: "2px solid #ddd",
+                    }}
+                  >
+                    ราคาซื้อ
+                  </th>
+                  <th
+                    style={{
+                      padding: "15px",
+                      fontWeight: "600",
+                      borderBottom: "2px solid #ddd",
+                    }}
+                  >
+                    ราคาขาย
+                  </th>
+                  <th
+                    style={{
+                      padding: "15px",
+                      fontWeight: "600",
+                      borderBottom: "2px solid #ddd",
+                    }}
+                  >
+                    จำนวน
+                  </th>
+                  <th
+                    style={{
+                      padding: "15px",
+                      fontWeight: "600",
+                      borderBottom: "2px solid #ddd",
+                      textAlign: "center",
+                    }}
+                  >
+                    จัดการ
+                  </th>
                 </tr>
               </thead>
               <tbody>
                 {paginatedData?.length > 0 ? (
                   paginatedData.map((item, index) => {
                     return (
-                      <tr 
+                      <tr
                         key={item.id}
                         style={{
-                          transition: 'all 0.2s ease',
-                          cursor: 'pointer'
+                          transition: "all 0.2s ease",
+                          cursor: "pointer",
                         }}
                         onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = '#f8f9fa';
-                          e.currentTarget.style.transform = 'scale(1.01)';
+                          e.currentTarget.style.backgroundColor = "#f8f9fa";
+                          e.currentTarget.style.transform = "scale(1.01)";
                         }}
                         onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'white';
-                          e.currentTarget.style.transform = 'scale(1)';
+                          e.currentTarget.style.backgroundColor = "white";
+                          e.currentTarget.style.transform = "scale(1)";
                         }}
                       >
-                        <td style={{ padding: '15px', verticalAlign: 'middle' }}>
-                          <Badge bg="secondary" style={{ borderRadius: '6px', padding: '5px 10px' }}>
+                        <td
+                          style={{ padding: "15px", verticalAlign: "middle" }}
+                        >
+                          <Badge
+                            bg="secondary"
+                            style={{ borderRadius: "6px", padding: "5px 10px" }}
+                          >
                             {(currentPage - 1) * itemsPerPage + index + 1}
                           </Badge>
                         </td>
-                        <td style={{ padding: '15px', verticalAlign: 'middle', fontWeight: '500' }}>
+                        <td
+                          style={{
+                            padding: "15px",
+                            verticalAlign: "middle",
+                            fontWeight: "500",
+                          }}
+                        >
                           {item.name}
                         </td>
-                        <td style={{ padding: '15px', verticalAlign: 'middle' }}>
-                          <Badge bg="info" style={{ borderRadius: '6px', padding: '5px 10px' }}>
+                        <td
+                          style={{ padding: "15px", verticalAlign: "middle" }}
+                        >
+                          <Badge
+                            bg="info"
+                            style={{ borderRadius: "6px", padding: "5px 10px" }}
+                          >
                             {item.species}
                           </Badge>
                         </td>
-                        <td style={{ padding: '15px', verticalAlign: 'middle' }}>
-                          <span style={{ color: '#666' }}>{item.buy_price.toLocaleString()} ฿</span>
+                        <td
+                          style={{ padding: "15px", verticalAlign: "middle" }}
+                        >
+                          <span style={{ color: "#666" }}>
+                            {item.buy_price.toLocaleString()} ฿
+                          </span>
                         </td>
-                        <td style={{ padding: '15px', verticalAlign: 'middle' }}>
-                          <span style={{ color: '#28a745', fontWeight: '600' }}>
+                        <td
+                          style={{ padding: "15px", verticalAlign: "middle" }}
+                        >
+                          <span style={{ color: "#28a745", fontWeight: "600" }}>
                             {item.sell_price.toLocaleString()} ฿
                           </span>
                         </td>
-                        <td style={{ padding: '15px', verticalAlign: 'middle' }}>
-                          <Badge 
-                            bg={item.quantity > 10 ? "success" : item.quantity > 5 ? "warning" : "danger"}
-                            style={{ borderRadius: '6px', padding: '5px 10px' }}
+                        <td
+                          style={{ padding: "15px", verticalAlign: "middle" }}
+                        >
+                          <Badge
+                            bg={
+                              item.quantity > 10
+                                ? "success"
+                                : item.quantity > 5
+                                ? "warning"
+                                : "danger"
+                            }
+                            style={{ borderRadius: "6px", padding: "5px 10px" }}
                           >
                             {item.quantity} ต้น
                           </Badge>
                         </td>
-                        <td style={{ padding: '15px', verticalAlign: 'middle', textAlign: 'center' }}>
+                        <td
+                          style={{
+                            padding: "15px",
+                            verticalAlign: "middle",
+                            textAlign: "center",
+                          }}
+                        >
                           <Button
                             variant="outline-info"
                             className="me-2"
                             size="sm"
                             onClick={() => handleViewDetail(item.id)}
                             style={{
-                              borderRadius: '6px',
-                              padding: '5px 12px',
-                              borderWidth: '2px',
-                              transition: 'all 0.2s ease'
+                              borderRadius: "6px",
+                              padding: "5px 12px",
+                              borderWidth: "2px",
+                              transition: "all 0.2s ease",
                             }}
                             onMouseEnter={(e) => {
-                              e.currentTarget.style.transform = 'scale(1.1)';
-                              e.currentTarget.style.boxShadow = '0 2px 8px rgba(23,162,184,0.4)';
+                              e.currentTarget.style.transform = "scale(1.1)";
+                              e.currentTarget.style.boxShadow =
+                                "0 2px 8px rgba(23,162,184,0.4)";
                             }}
                             onMouseLeave={(e) => {
-                              e.currentTarget.style.transform = 'scale(1)';
-                              e.currentTarget.style.boxShadow = 'none';
+                              e.currentTarget.style.transform = "scale(1)";
+                              e.currentTarget.style.boxShadow = "none";
                             }}
                             title="ดูรายละเอียด"
                           >
@@ -432,18 +585,19 @@ const TreePage = () => {
                             size="sm"
                             onClick={() => handleEditClick(item.id)}
                             style={{
-                              borderRadius: '6px',
-                              padding: '5px 12px',
-                              borderWidth: '2px',
-                              transition: 'all 0.2s ease'
+                              borderRadius: "6px",
+                              padding: "5px 12px",
+                              borderWidth: "2px",
+                              transition: "all 0.2s ease",
                             }}
                             onMouseEnter={(e) => {
-                              e.currentTarget.style.transform = 'scale(1.1)';
-                              e.currentTarget.style.boxShadow = '0 2px 8px rgba(255,193,7,0.4)';
+                              e.currentTarget.style.transform = "scale(1.1)";
+                              e.currentTarget.style.boxShadow =
+                                "0 2px 8px rgba(255,193,7,0.4)";
                             }}
                             onMouseLeave={(e) => {
-                              e.currentTarget.style.transform = 'scale(1)';
-                              e.currentTarget.style.boxShadow = 'none';
+                              e.currentTarget.style.transform = "scale(1)";
+                              e.currentTarget.style.boxShadow = "none";
                             }}
                             title="แก้ไข"
                           >
@@ -454,18 +608,19 @@ const TreePage = () => {
                             size="sm"
                             onClick={() => handleDeleteTree(item.id)}
                             style={{
-                              borderRadius: '6px',
-                              padding: '5px 12px',
-                              borderWidth: '2px',
-                              transition: 'all 0.2s ease'
+                              borderRadius: "6px",
+                              padding: "5px 12px",
+                              borderWidth: "2px",
+                              transition: "all 0.2s ease",
                             }}
                             onMouseEnter={(e) => {
-                              e.currentTarget.style.transform = 'scale(1.1)';
-                              e.currentTarget.style.boxShadow = '0 2px 8px rgba(220,53,69,0.4)';
+                              e.currentTarget.style.transform = "scale(1.1)";
+                              e.currentTarget.style.boxShadow =
+                                "0 2px 8px rgba(220,53,69,0.4)";
                             }}
                             onMouseLeave={(e) => {
-                              e.currentTarget.style.transform = 'scale(1)';
-                              e.currentTarget.style.boxShadow = 'none';
+                              e.currentTarget.style.transform = "scale(1)";
+                              e.currentTarget.style.boxShadow = "none";
                             }}
                             title="ลบ"
                           >
@@ -477,9 +632,19 @@ const TreePage = () => {
                   })
                 ) : (
                   <tr>
-                    <td colSpan="7" style={{ padding: '40px', textAlign: 'center', color: '#999' }}>
-                      <Sprout size={48} style={{ marginBottom: '10px', opacity: 0.3 }} />
-                      <p style={{ margin: 0, fontSize: '16px' }}>ไม่พบข้อมูล</p>
+                    <td
+                      colSpan="7"
+                      style={{
+                        padding: "40px",
+                        textAlign: "center",
+                        color: "#999",
+                      }}
+                    >
+                      <Sprout
+                        size={48}
+                        style={{ marginBottom: "10px", opacity: 0.3 }}
+                      />
+                      <p style={{ margin: 0, fontSize: "16px" }}>ไม่พบข้อมูล</p>
                     </td>
                   </tr>
                 )}
@@ -489,43 +654,45 @@ const TreePage = () => {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div 
+            <div
               className="d-flex justify-content-between align-items-center mt-4"
               style={{
-                padding: '15px',
-                background: '#f8f9fa',
-                borderRadius: '10px'
+                padding: "15px",
+                background: "#f8f9fa",
+                borderRadius: "10px",
               }}
             >
-              <Button 
+              <Button
                 onClick={handlePreviousPage}
                 disabled={currentPage === 1}
                 variant="outline-primary"
                 style={{
-                  borderRadius: '8px',
-                  padding: '8px 20px',
-                  borderWidth: '2px',
-                  fontWeight: '500'
+                  borderRadius: "8px",
+                  padding: "8px 20px",
+                  borderWidth: "2px",
+                  fontWeight: "500",
                 }}
               >
                 ก่อนหน้า
               </Button>
-              <span style={{ 
-                fontSize: '14px', 
-                fontWeight: '500',
-                color: '#666'
-              }}>
+              <span
+                style={{
+                  fontSize: "14px",
+                  fontWeight: "500",
+                  color: "#666",
+                }}
+              >
                 หน้า {currentPage} จาก {totalPages}
               </span>
-              <Button 
+              <Button
                 onClick={handleNextPage}
                 disabled={currentPage === totalPages}
                 variant="outline-primary"
                 style={{
-                  borderRadius: '8px',
-                  padding: '8px 20px',
-                  borderWidth: '2px',
-                  fontWeight: '500'
+                  borderRadius: "8px",
+                  padding: "8px 20px",
+                  borderWidth: "2px",
+                  fontWeight: "500",
                 }}
               >
                 ถัดไป
@@ -539,4 +706,3 @@ const TreePage = () => {
 };
 
 export default TreePage;
-

@@ -144,8 +144,8 @@ const postFormData = (path, formData, isLoading = true, isAlert = true) => {
     axios
       .post(_apiURL + path, formData, {
         headers: {
-          "Content-Type": "multipart/form-data",
           Authorization: token,
+          // ไม่ตั้ง Content-Type เพื่อให้ axios ใส่ boundary ให้ FormData
         },
       })
       .then((result) => {

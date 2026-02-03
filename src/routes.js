@@ -16,22 +16,13 @@
 
 */
 import Dashboard from "pages/Dashboard.js";
-import UserProfile from "pages/UserProfile.js";
-import TableList from "pages/TableList.js";
-import Typography from "pages/Typography.js";
-import Icons from "pages/Icons.js";
-import Maps from "pages/Maps.js";
-import Notifications from "pages/Notifications.js";
-import Kanban from "pages/Kanban";
 import Login from "pages/auth/login";
 import Register from "pages/register";
+import Edit from "pages/tree/edit";
 import Tree from "pages/tree";
-import TreeEdit from "pages/tree/edit";
 import TreeDetailShopee from "pages/tree/treeDetailShopee";
-import GitDocument from "pages/gitDocument";
 import Cart from "pages/cart";
 import Checkout from "pages/checkout";
-import Test from "pages/test";
 
 const dashboardRoutes = [
   {
@@ -45,9 +36,16 @@ const dashboardRoutes = [
     path: "/tree/:id",
     name: "แก้ไขต้นไม้",
     icon: "nc-icon nc-single-copy-04",
-    component: Register, // Use Register component for both add and edit
+    component: Edit, // Use Register component for both add and edit
     layout: "/admin",
     hidden: true,
+  },
+  {
+    path: "/tree",
+    name: "ต้นไม้ ",
+    icon: "nc-icon nc-notes",
+    component: Tree,
+    layout: "/admin",
   },
   {
     path: "/tree-detail/:id",
@@ -57,20 +55,6 @@ const dashboardRoutes = [
     layout: "/admin",
     hidden: true,
   },
-  // {
-  //   path: "/tree",
-  //   name: "ต้นไม้",
-  //   icon: "nc-icon nc-notes",
-  //   component: Tree,
-  //   layout: "/admin",
-  // },
-  {
-    path: "/tree",
-    name: "ต้นไม้ ",
-    icon: "nc-icon nc-notes",
-    component: Tree,
-    layout: "/admin",
-  },
   {
     path: "/register",
     name: "เพิ่มต้นไม้ใหม่",
@@ -79,67 +63,12 @@ const dashboardRoutes = [
     layout: "/admin",
   },
   {
-    path: "/user",
-    name: "User Profile",
-    icon: "nc-icon nc-circle-09",
-    component: UserProfile,
-    layout: "/admin",
-  },
-  {
-    path: "/table",
-    name: "Table List",
-    icon: "nc-icon nc-notes",
-    component: TableList,
-    layout: "/admin",
-  },
-  {
-    path: "/typography",
-    name: "Typography",
-    icon: "nc-icon nc-paper-2",
-    component: Typography,
-    layout: "/admin",
-  },
-  {
-    path: "/icons",
-    name: "Icons",
-    icon: "nc-icon nc-atom",
-    component: Icons,
-    layout: "/admin",
-  },
-  {
-    path: "/maps",
-    name: "Maps",
-    icon: "nc-icon nc-pin-3",
-    component: Maps,
-    layout: "/admin",
-  },
-  {
-    path: "/notifications",
-    name: "Notifications",
-    icon: "nc-icon nc-bell-55",
-    component: Notifications,
-    layout: "/admin",
-  },
-  {
-    path: "/kanban",
-    name: "Kanban",
-    icon: "nc-icon nc-badge",
-    component: Kanban,
-    layout: "/admin",
-  },
-  {
     path: "/login",
     name: "Login",
     icon: "nc-icon nc-single-02",
     component: Login,
     layout: "/admin",
-  },
-  {
-    path: "/gitDocument",
-    name: "GitDocument",
-    icon: "nc-icon nc-puzzle-10",
-    component: GitDocument,
-    layout: "/admin",
+    hidden: true,
   },
   {
     path: "/cart",
@@ -156,14 +85,6 @@ const dashboardRoutes = [
     component: Checkout,
     layout: "/admin",
     hidden: true,
-  },
-  {
-    path: "/test",
-    name: "test",
-    icon: "nc-icon nc-credit-card",
-    component: Test,
-    layout: "/admin",
-    // hidden: true,
   },
 ];
 

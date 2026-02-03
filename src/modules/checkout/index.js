@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Container, Row, Col, Card, Button, Form, Badge } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Form,
+  Badge,
+} from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -61,7 +69,8 @@ const Checkout = () => {
     if (!formData.address.trim()) newErrors.address = "กรุณากรอกที่อยู่";
     if (!formData.district.trim()) newErrors.district = "กรุณากรอกอำเภอ/เขต";
     if (!formData.province.trim()) newErrors.province = "กรุณากรอกจังหวัด";
-    if (!formData.postalCode.trim()) newErrors.postalCode = "กรุณากรอกรหัสไปรษณีย์";
+    if (!formData.postalCode.trim())
+      newErrors.postalCode = "กรุณากรอกรหัสไปรษณีย์";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -93,10 +102,11 @@ const Checkout = () => {
     // Simulate API call
     setTimeout(() => {
       alert.custom.close();
-      alert.custom.fire({
-        icon: "success",
-        title: "สั่งซื้อสำเร็จ!",
-        html: `
+      alert.custom
+        .fire({
+          icon: "success",
+          title: "สั่งซื้อสำเร็จ!",
+          html: `
           <p>คำสั่งซื้อของคุณได้รับการยืนยันแล้ว</p>
           <p style="font-size: 14px; color: #666; margin-top: 10px;">
             หมายเลขคำสั่งซื้อ: <strong>ORD-${Date.now()}</strong>
@@ -105,22 +115,39 @@ const Checkout = () => {
             เราจะส่งอีเมลยืนยันไปที่ ${formData.email}
           </p>
         `,
-        confirmButtonText: "ตกลง",
-        confirmButtonColor: "#4a7c2a",
-      }).then(() => {
-        dispatch(clearCart());
-        history.push("/admin/tree");
-      });
+          confirmButtonText: "ตกลง",
+          confirmButtonColor: "#4a7c2a",
+        })
+        .then(() => {
+          dispatch(clearCart());
+          history.push("/admin/tree");
+        });
     }, 2000);
   };
 
   if (cart.items.length === 0) {
     return (
-      <Container fluid className="p-4" style={{ backgroundColor: "#f8f9f6", minHeight: "100vh" }}>
-        <Card style={{ borderRadius: "16px", border: "1px solid #d4e6d1", boxShadow: "0 4px 12px rgba(45, 80, 22, 0.08)" }}>
+      <Container
+        fluid
+        className="p-4"
+        style={{ backgroundColor: "#f8f9f6", minHeight: "100vh" }}
+      >
+        <Card
+          style={{
+            borderRadius: "16px",
+            border: "1px solid #d4e6d1",
+            boxShadow: "0 4px 12px rgba(45, 80, 22, 0.08)",
+          }}
+        >
           <Card.Body className="text-center p-5">
-            <CreditCard size={80} color="#d4e6d1" style={{ marginBottom: "20px" }} />
-            <h3 style={{ color: "#2d5016", marginBottom: "15px" }}>ไม่มีสินค้าในตะกร้า</h3>
+            <CreditCard
+              size={80}
+              color="#d4e6d1"
+              style={{ marginBottom: "20px" }}
+            />
+            <h3 style={{ color: "#2d5016", marginBottom: "15px" }}>
+              ไม่มีสินค้าในตะกร้า
+            </h3>
             <p style={{ color: "#5a7c3a", marginBottom: "30px" }}>
               กรุณาเพิ่มสินค้าลงตะกร้าก่อนดำเนินการชำระเงิน
             </p>
@@ -143,10 +170,14 @@ const Checkout = () => {
   }
 
   const shippingFee = 0; // ฟรี
-  const totalAmount = cart.total + shippingFee;
+  const totalQuantity = cart.total + shippingFee;
 
   return (
-    <Container fluid className="p-4" style={{ backgroundColor: "#f8f9f6", minHeight: "100vh" }}>
+    <Container
+      fluid
+      className="p-4"
+      style={{ backgroundColor: "#f8f9f6", minHeight: "100vh" }}
+    >
       {/* Header */}
       <div className="mb-4">
         <Button
@@ -161,10 +192,16 @@ const Checkout = () => {
             marginBottom: "15px",
           }}
         >
-          <ArrowLeft size={18} style={{ marginRight: "8px", verticalAlign: "middle" }} />
+          <ArrowLeft
+            size={18}
+            style={{ marginRight: "8px", verticalAlign: "middle" }}
+          />
           กลับ
         </Button>
-        <h2 style={{ color: "#2d5016", fontWeight: "700" }} className="d-flex align-items-center">
+        <h2
+          style={{ color: "#2d5016", fontWeight: "700" }}
+          className="d-flex align-items-center"
+        >
           <CreditCard size={28} style={{ marginRight: "10px" }} />
           ชำระเงิน
         </h2>
@@ -173,7 +210,13 @@ const Checkout = () => {
       <Row>
         {/* Order Form */}
         <Col lg={8} md={12} className="mb-4">
-          <Card style={{ borderRadius: "16px", border: "1px solid #d4e6d1", boxShadow: "0 4px 12px rgba(45, 80, 22, 0.08)" }}>
+          <Card
+            style={{
+              borderRadius: "16px",
+              border: "1px solid #d4e6d1",
+              boxShadow: "0 4px 12px rgba(45, 80, 22, 0.08)",
+            }}
+          >
             <Card.Header
               style={{
                 backgroundColor: "#e8f5e3",
@@ -182,7 +225,10 @@ const Checkout = () => {
                 padding: "20px",
               }}
             >
-              <h5 style={{ margin: 0, fontWeight: "700", color: "#2d5016" }} className="d-flex align-items-center">
+              <h5
+                style={{ margin: 0, fontWeight: "700", color: "#2d5016" }}
+                className="d-flex align-items-center"
+              >
                 <User size={20} style={{ marginRight: "10px" }} />
                 ข้อมูลการจัดส่ง
               </h5>
@@ -192,8 +238,16 @@ const Checkout = () => {
                 <Row>
                   <Col md={6}>
                     <Form.Group className="mb-3">
-                      <Form.Label style={{ color: "#2d5016", fontWeight: "600" }}>
-                        <User size={16} style={{ marginRight: "5px", verticalAlign: "middle" }} />
+                      <Form.Label
+                        style={{ color: "#2d5016", fontWeight: "600" }}
+                      >
+                        <User
+                          size={16}
+                          style={{
+                            marginRight: "5px",
+                            verticalAlign: "middle",
+                          }}
+                        />
                         ชื่อ <span style={{ color: "#c97d60" }}>*</span>
                       </Form.Label>
                       <Form.Control
@@ -207,12 +261,18 @@ const Checkout = () => {
                           borderColor: errors.firstName ? "#c97d60" : "#d4e6d1",
                         }}
                       />
-                      <Form.Control.Feedback type="invalid">{errors.firstName}</Form.Control.Feedback>
+                      <Form.Control.Feedback type="invalid">
+                        {errors.firstName}
+                      </Form.Control.Feedback>
                     </Form.Group>
                   </Col>
                   <Col md={6}>
                     <Form.Group className="mb-3">
-                      <Form.Label style={{ color: "#2d5016", fontWeight: "600" }}>นามสกุล <span style={{ color: "#c97d60" }}>*</span></Form.Label>
+                      <Form.Label
+                        style={{ color: "#2d5016", fontWeight: "600" }}
+                      >
+                        นามสกุล <span style={{ color: "#c97d60" }}>*</span>
+                      </Form.Label>
                       <Form.Control
                         type="text"
                         name="lastName"
@@ -224,7 +284,9 @@ const Checkout = () => {
                           borderColor: errors.lastName ? "#c97d60" : "#d4e6d1",
                         }}
                       />
-                      <Form.Control.Feedback type="invalid">{errors.lastName}</Form.Control.Feedback>
+                      <Form.Control.Feedback type="invalid">
+                        {errors.lastName}
+                      </Form.Control.Feedback>
                     </Form.Group>
                   </Col>
                 </Row>
@@ -232,9 +294,18 @@ const Checkout = () => {
                 <Row>
                   <Col md={6}>
                     <Form.Group className="mb-3">
-                      <Form.Label style={{ color: "#2d5016", fontWeight: "600" }}>
-                        <Phone size={16} style={{ marginRight: "5px", verticalAlign: "middle" }} />
-                        เบอร์โทรศัพท์ <span style={{ color: "#c97d60" }}>*</span>
+                      <Form.Label
+                        style={{ color: "#2d5016", fontWeight: "600" }}
+                      >
+                        <Phone
+                          size={16}
+                          style={{
+                            marginRight: "5px",
+                            verticalAlign: "middle",
+                          }}
+                        />
+                        เบอร์โทรศัพท์{" "}
+                        <span style={{ color: "#c97d60" }}>*</span>
                       </Form.Label>
                       <Form.Control
                         type="tel"
@@ -247,13 +318,23 @@ const Checkout = () => {
                           borderColor: errors.phone ? "#c97d60" : "#d4e6d1",
                         }}
                       />
-                      <Form.Control.Feedback type="invalid">{errors.phone}</Form.Control.Feedback>
+                      <Form.Control.Feedback type="invalid">
+                        {errors.phone}
+                      </Form.Control.Feedback>
                     </Form.Group>
                   </Col>
                   <Col md={6}>
                     <Form.Group className="mb-3">
-                      <Form.Label style={{ color: "#2d5016", fontWeight: "600" }}>
-                        <Mail size={16} style={{ marginRight: "5px", verticalAlign: "middle" }} />
+                      <Form.Label
+                        style={{ color: "#2d5016", fontWeight: "600" }}
+                      >
+                        <Mail
+                          size={16}
+                          style={{
+                            marginRight: "5px",
+                            verticalAlign: "middle",
+                          }}
+                        />
                         อีเมล <span style={{ color: "#c97d60" }}>*</span>
                       </Form.Label>
                       <Form.Control
@@ -267,14 +348,19 @@ const Checkout = () => {
                           borderColor: errors.email ? "#c97d60" : "#d4e6d1",
                         }}
                       />
-                      <Form.Control.Feedback type="invalid">{errors.email}</Form.Control.Feedback>
+                      <Form.Control.Feedback type="invalid">
+                        {errors.email}
+                      </Form.Control.Feedback>
                     </Form.Group>
                   </Col>
                 </Row>
 
                 <Form.Group className="mb-3">
                   <Form.Label style={{ color: "#2d5016", fontWeight: "600" }}>
-                    <MapPin size={16} style={{ marginRight: "5px", verticalAlign: "middle" }} />
+                    <MapPin
+                      size={16}
+                      style={{ marginRight: "5px", verticalAlign: "middle" }}
+                    />
                     ที่อยู่ <span style={{ color: "#c97d60" }}>*</span>
                   </Form.Label>
                   <Form.Control
@@ -289,13 +375,19 @@ const Checkout = () => {
                       borderColor: errors.address ? "#c97d60" : "#d4e6d1",
                     }}
                   />
-                  <Form.Control.Feedback type="invalid">{errors.address}</Form.Control.Feedback>
+                  <Form.Control.Feedback type="invalid">
+                    {errors.address}
+                  </Form.Control.Feedback>
                 </Form.Group>
 
                 <Row>
                   <Col md={4}>
                     <Form.Group className="mb-3">
-                      <Form.Label style={{ color: "#2d5016", fontWeight: "600" }}>อำเภอ/เขต <span style={{ color: "#c97d60" }}>*</span></Form.Label>
+                      <Form.Label
+                        style={{ color: "#2d5016", fontWeight: "600" }}
+                      >
+                        อำเภอ/เขต <span style={{ color: "#c97d60" }}>*</span>
+                      </Form.Label>
                       <Form.Control
                         type="text"
                         name="district"
@@ -307,12 +399,18 @@ const Checkout = () => {
                           borderColor: errors.district ? "#c97d60" : "#d4e6d1",
                         }}
                       />
-                      <Form.Control.Feedback type="invalid">{errors.district}</Form.Control.Feedback>
+                      <Form.Control.Feedback type="invalid">
+                        {errors.district}
+                      </Form.Control.Feedback>
                     </Form.Group>
                   </Col>
                   <Col md={4}>
                     <Form.Group className="mb-3">
-                      <Form.Label style={{ color: "#2d5016", fontWeight: "600" }}>จังหวัด <span style={{ color: "#c97d60" }}>*</span></Form.Label>
+                      <Form.Label
+                        style={{ color: "#2d5016", fontWeight: "600" }}
+                      >
+                        จังหวัด <span style={{ color: "#c97d60" }}>*</span>
+                      </Form.Label>
                       <Form.Control
                         type="text"
                         name="province"
@@ -324,12 +422,18 @@ const Checkout = () => {
                           borderColor: errors.province ? "#c97d60" : "#d4e6d1",
                         }}
                       />
-                      <Form.Control.Feedback type="invalid">{errors.province}</Form.Control.Feedback>
+                      <Form.Control.Feedback type="invalid">
+                        {errors.province}
+                      </Form.Control.Feedback>
                     </Form.Group>
                   </Col>
                   <Col md={4}>
                     <Form.Group className="mb-3">
-                      <Form.Label style={{ color: "#2d5016", fontWeight: "600" }}>รหัสไปรษณีย์ <span style={{ color: "#c97d60" }}>*</span></Form.Label>
+                      <Form.Label
+                        style={{ color: "#2d5016", fontWeight: "600" }}
+                      >
+                        รหัสไปรษณีย์ <span style={{ color: "#c97d60" }}>*</span>
+                      </Form.Label>
                       <Form.Control
                         type="text"
                         name="postalCode"
@@ -339,17 +443,24 @@ const Checkout = () => {
                         maxLength={5}
                         style={{
                           borderRadius: "8px",
-                          borderColor: errors.postalCode ? "#c97d60" : "#d4e6d1",
+                          borderColor: errors.postalCode
+                            ? "#c97d60"
+                            : "#d4e6d1",
                         }}
                       />
-                      <Form.Control.Feedback type="invalid">{errors.postalCode}</Form.Control.Feedback>
+                      <Form.Control.Feedback type="invalid">
+                        {errors.postalCode}
+                      </Form.Control.Feedback>
                     </Form.Group>
                   </Col>
                 </Row>
 
                 <Form.Group className="mb-3">
                   <Form.Label style={{ color: "#2d5016", fontWeight: "600" }}>
-                    <CreditCard size={16} style={{ marginRight: "5px", verticalAlign: "middle" }} />
+                    <CreditCard
+                      size={16}
+                      style={{ marginRight: "5px", verticalAlign: "middle" }}
+                    />
                     วิธีการชำระเงิน <span style={{ color: "#c97d60" }}>*</span>
                   </Form.Label>
                   <Form.Select
@@ -368,7 +479,9 @@ const Checkout = () => {
                 </Form.Group>
 
                 <Form.Group className="mb-3">
-                  <Form.Label style={{ color: "#2d5016", fontWeight: "600" }}>หมายเหตุ (ถ้ามี)</Form.Label>
+                  <Form.Label style={{ color: "#2d5016", fontWeight: "600" }}>
+                    หมายเหตุ (ถ้ามี)
+                  </Form.Label>
                   <Form.Control
                     as="textarea"
                     rows={3}
@@ -383,8 +496,20 @@ const Checkout = () => {
                   />
                 </Form.Group>
 
-                <div className="d-flex align-items-center" style={{ padding: "15px", backgroundColor: "#f0f5ee", borderRadius: "10px", marginTop: "20px" }}>
-                  <Lock size={18} color="#4a7c2a" style={{ marginRight: "10px" }} />
+                <div
+                  className="d-flex align-items-center"
+                  style={{
+                    padding: "15px",
+                    backgroundColor: "#f0f5ee",
+                    borderRadius: "10px",
+                    marginTop: "20px",
+                  }}
+                >
+                  <Lock
+                    size={18}
+                    color="#4a7c2a"
+                    style={{ marginRight: "10px" }}
+                  />
                   <span style={{ fontSize: "14px", color: "#5a7c3a" }}>
                     ข้อมูลของคุณจะถูกเก็บเป็นความลับและใช้เฉพาะเพื่อการจัดส่งสินค้าเท่านั้น
                   </span>
@@ -396,7 +521,15 @@ const Checkout = () => {
 
         {/* Order Summary */}
         <Col lg={4} md={12}>
-          <Card style={{ borderRadius: "16px", border: "1px solid #d4e6d1", boxShadow: "0 4px 12px rgba(45, 80, 22, 0.08)", position: "sticky", top: "20px" }}>
+          <Card
+            style={{
+              borderRadius: "16px",
+              border: "1px solid #d4e6d1",
+              boxShadow: "0 4px 12px rgba(45, 80, 22, 0.08)",
+              position: "sticky",
+              top: "20px",
+            }}
+          >
             <Card.Header
               style={{
                 backgroundColor: "#e8f5e3",
@@ -405,15 +538,33 @@ const Checkout = () => {
                 padding: "20px",
               }}
             >
-              <h5 style={{ margin: 0, fontWeight: "700", color: "#2d5016" }}>สรุปคำสั่งซื้อ</h5>
+              <h5 style={{ margin: 0, fontWeight: "700", color: "#2d5016" }}>
+                สรุปคำสั่งซื้อ
+              </h5>
             </Card.Header>
             <Card.Body className="p-4">
               {/* Order Items */}
-              <div style={{ maxHeight: "300px", overflowY: "auto", marginBottom: "20px" }}>
+              <div
+                style={{
+                  maxHeight: "300px",
+                  overflowY: "auto",
+                  marginBottom: "20px",
+                }}
+              >
                 {cart.items.map((item) => (
-                  <div key={item.id} className="d-flex align-items-center mb-3" style={{ paddingBottom: "15px", borderBottom: "1px solid #d4e6d1" }}>
+                  <div
+                    key={item.id}
+                    className="d-flex align-items-center mb-3"
+                    style={{
+                      paddingBottom: "15px",
+                      borderBottom: "1px solid #d4e6d1",
+                    }}
+                  >
                     <img
-                      src={item.image || "https://via.placeholder.com/60x60?text=Tree"}
+                      src={
+                        item.image ||
+                        "https://via.placeholder.com/60x60?text=Tree"
+                      }
                       alt={item.name}
                       style={{
                         width: "60px",
@@ -424,18 +575,32 @@ const Checkout = () => {
                         border: "1px solid #d4e6d1",
                       }}
                       onError={(e) => {
-                        e.target.src = "https://via.placeholder.com/60x60?text=Tree";
+                        e.target.src =
+                          "https://via.placeholder.com/60x60?text=Tree";
                       }}
                     />
                     <div style={{ flex: 1 }}>
-                      <div style={{ fontSize: "14px", fontWeight: "600", color: "#2d5016", marginBottom: "3px" }}>
+                      <div
+                        style={{
+                          fontSize: "14px",
+                          fontWeight: "600",
+                          color: "#2d5016",
+                          marginBottom: "3px",
+                        }}
+                      >
                         {item.name}
                       </div>
                       <div style={{ fontSize: "12px", color: "#5a7c3a" }}>
                         {item.quantity} x {item.price.toLocaleString()} ฿
                       </div>
                     </div>
-                    <div style={{ fontSize: "14px", fontWeight: "700", color: "#2d5016" }}>
+                    <div
+                      style={{
+                        fontSize: "14px",
+                        fontWeight: "700",
+                        color: "#2d5016",
+                      }}
+                    >
                       {(item.price * item.quantity).toLocaleString()} ฿
                     </div>
                   </div>
@@ -447,20 +612,41 @@ const Checkout = () => {
               <div className="mb-3">
                 <div className="d-flex justify-content-between mb-2">
                   <span style={{ color: "#5a7c3a" }}>ยอดรวมสินค้า:</span>
-                  <span style={{ color: "#2d5016", fontWeight: "600" }}>{cart.total.toLocaleString()} ฿</span>
+                  <span style={{ color: "#2d5016", fontWeight: "600" }}>
+                    {cart.total.toLocaleString()} ฿
+                  </span>
                 </div>
                 <div className="d-flex justify-content-between mb-2">
                   <span style={{ color: "#5a7c3a" }}>
-                    <Truck size={14} style={{ marginRight: "5px", verticalAlign: "middle" }} />
+                    <Truck
+                      size={14}
+                      style={{ marginRight: "5px", verticalAlign: "middle" }}
+                    />
                     ค่าจัดส่ง:
                   </span>
-                  <span style={{ color: "#4a7c2a", fontWeight: "600" }}>ฟรี</span>
+                  <span style={{ color: "#4a7c2a", fontWeight: "600" }}>
+                    ฟรี
+                  </span>
                 </div>
                 <hr style={{ borderColor: "#d4e6d1", margin: "15px 0" }} />
                 <div className="d-flex justify-content-between">
-                  <span style={{ color: "#2d5016", fontWeight: "700", fontSize: "18px" }}>ยอดรวมทั้งสิ้น:</span>
-                  <span style={{ color: "#2d5016", fontWeight: "700", fontSize: "24px" }}>
-                    {totalAmount.toLocaleString()} ฿
+                  <span
+                    style={{
+                      color: "#2d5016",
+                      fontWeight: "700",
+                      fontSize: "18px",
+                    }}
+                  >
+                    ยอดรวมทั้งสิ้น:
+                  </span>
+                  <span
+                    style={{
+                      color: "#2d5016",
+                      fontWeight: "700",
+                      fontSize: "24px",
+                    }}
+                  >
+                    {totalQuantity.toLocaleString()} ฿
                   </span>
                 </div>
               </div>
@@ -477,11 +663,17 @@ const Checkout = () => {
                   marginTop: "20px",
                 }}
               >
-                <CheckCircle size={20} style={{ marginRight: "8px", verticalAlign: "middle" }} />
+                <CheckCircle
+                  size={20}
+                  style={{ marginRight: "8px", verticalAlign: "middle" }}
+                />
                 ยืนยันการสั่งซื้อ
               </Button>
 
-              <div className="d-flex align-items-center justify-content-center mt-3" style={{ fontSize: "12px", color: "#5a7c3a" }}>
+              <div
+                className="d-flex align-items-center justify-content-center mt-3"
+                style={{ fontSize: "12px", color: "#5a7c3a" }}
+              >
                 <Leaf size={14} style={{ marginRight: "5px" }} />
                 รับประกันคุณภาพสินค้า
               </div>
@@ -494,4 +686,3 @@ const Checkout = () => {
 };
 
 export default Checkout;
-

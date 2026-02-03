@@ -2,24 +2,23 @@ import React, { useEffect, useState } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import alert from "../../utils/alert";
 import { useFormik } from "formik";
-import {
-  Button,
-  Card,
-  Form,
-  Container,
-  Row,
-  Col,
-} from "react-bootstrap";
+import { Button, Card, Form, Container, Row, Col } from "react-bootstrap";
 import { useDispatch } from "react-redux";
-import { onCreateTree, onGetTreeById, onUpdateTree } from "../../redux/slices/treeSlice";
-import { 
-  Sprout, 
-  DollarSign, 
-  Plus, 
+import {
+  onCreateTree,
+  onCreateTreeWithFormData,
+  onGetTreeById,
+  onUpdateTree,
+} from "../../redux/slices/treeSlice";
+import {
+  Sprout,
+  DollarSign,
+  Plus,
   ArrowLeft,
   Leaf,
   Hash,
-  Save
+  Save,
+  ImagePlus,
 } from "lucide-react";
 
 function AddTree() {
@@ -28,15 +27,16 @@ function AddTree() {
   const { id } = useParams(); // Get ID from URL if editing
   const [loading, setLoading] = useState(false);
   const [treeData, setTreeData] = useState(null);
+  const [imageFiles, setImageFiles] = useState([]);
 
   const isEditMode = !!id;
 
   const initialValues = {
     name: "",
     species: "",
-    price_old: 0,
-    price_new: 0,
-    amount: 0,
+    buy_price: 0,
+    sell_price: 0,
+    quantity: 0,
   };
 
   const formik = useFormik({
@@ -49,36 +49,38 @@ function AddTree() {
   useEffect(() => {
     if (isEditMode && id) {
       setLoading(true);
-      dispatch(onGetTreeById(id)).then((response) => {
-        console.log("onGetTreeById response: ", response?.payload);
-        if (response?.payload) {
-          const data = response.payload;
-          setTreeData(data);
-          // Update formik values with fetched data
-          formik.setValues({
-            name: data.name || "",
-            species: data.species || "",
-            price_old: data.price_old || 0,
-            price_new: data.price_new || 0,
-            amount: data.amount || 0,
+      dispatch(onGetTreeById(id))
+        .then((response) => {
+          console.log("onGetTreeById response: ", response?.payload);
+          if (response?.payload) {
+            const data = response.payload;
+            setTreeData(data);
+            // Update formik values with fetched data
+            formik.setValues({
+              name: data.name || "",
+              species: data.species || "",
+              buy_price: data.buy_price || 0,
+              sell_price: data.sell_price || 0,
+              quantity: data.quantity || 0,
+            });
+          }
+          setLoading(false);
+        })
+        .catch((error) => {
+          console.error("Error fetching tree data: ", error);
+          setLoading(false);
+          alert.custom.fire({
+            icon: "error",
+            title: "เกิดข้อผิดพลาด",
+            text: "ไม่สามารถโหลดข้อมูลต้นไม้ได้",
+            confirmButtonText: "ตกลง",
           });
-        }
-        setLoading(false);
-      }).catch((error) => {
-        console.error("Error fetching tree data: ", error);
-        setLoading(false);
-        alert.custom.fire({
-          icon: "error",
-          title: "เกิดข้อผิดพลาด",
-          text: "ไม่สามารถโหลดข้อมูลต้นไม้ได้",
-          confirmButtonText: "ตกลง",
         });
-      });
     }
   }, [id, isEditMode, dispatch, formik]);
 
   const handleBackClick = () => {
-    history.push("/admin/tree2");
+    history.push("/admin/tree");
   };
 
   const handleSubmitData = (values) => {
@@ -93,16 +95,17 @@ function AddTree() {
       return;
     }
 
-    // Convert string numbers to actual numbers
-    const submitValues = {
-      ...values,
-      price_old: parseFloat(values.price_old) || 0,
-      price_new: parseFloat(values.price_new) || 0,
-      amount: parseInt(values.amount) || 0,
-    };
+    const buy_price = parseFloat(values.buy_price) || 0;
+    const sell_price = parseFloat(values.sell_price) || 0;
+    const quantity = parseInt(values.quantity) || 0;
 
     if (isEditMode) {
-      // Update existing tree
+      const submitValues = {
+        ...values,
+        buy_price,
+        sell_price,
+        quantity,
+      };
       dispatch(onUpdateTree({ id, ...submitValues })).then((response) => {
         console.log("onUpdateTree response: ", response);
         if (response.payload) {
@@ -115,7 +118,7 @@ function AddTree() {
             })
             .then((result) => {
               if (result.isConfirmed) {
-                history.push("/admin/tree2");
+                history.push("/admin/tree");
               }
             });
         } else {
@@ -128,9 +131,19 @@ function AddTree() {
         }
       });
     } else {
-      // Create new tree
-      dispatch(onCreateTree(submitValues)).then((response) => {
-        console.log("onCreateTree response: ", response);
+      // สร้างต้นไม้ใหม่ (รวมรูปภาพ) ส่งไปที่ POST http://localhost:3000/trees
+      const formData = new FormData();
+      formData.append("name", values.name);
+      formData.append("species", values.species);
+      formData.append("buy_price", String(buy_price));
+      formData.append("sell_price", String(sell_price));
+      formData.append("quantity", String(quantity));
+      imageFiles.forEach((file) => {
+        formData.append("images", file);
+      });
+
+      dispatch(onCreateTreeWithFormData(formData)).then((response) => {
+        console.log("onCreateTreeWithFormData response: ", response);
         if (response.payload) {
           alert.custom
             .fire({
@@ -141,10 +154,11 @@ function AddTree() {
             })
             .then((result) => {
               if (result.isConfirmed) {
-                history.push("/admin/tree2");
+                history.push("/admin/tree");
               }
             });
-        } else {
+          setImageFiles([]);
+        } else if (!response.error) {
           alert.custom.fire({
             icon: "error",
             title: "เกิดข้อผิดพลาด",
@@ -179,7 +193,9 @@ function AddTree() {
                         {isEditMode ? "แก้ไขต้นไม้" : "เพิ่มต้นไม้ใหม่"}
                       </Card.Title>
                       <p className="add-tree-subtitle mb-0">
-                        {isEditMode ? "แก้ไขข้อมูลต้นไม้" : "กรอกข้อมูลต้นไม้ที่ต้องการเพิ่ม"}
+                        {isEditMode
+                          ? "แก้ไขข้อมูลต้นไม้"
+                          : "กรอกข้อมูลต้นไม้ที่ต้องการเพิ่ม"}
                       </p>
                     </div>
                   </div>
@@ -204,136 +220,169 @@ function AddTree() {
                     <p className="mt-3 text-muted">กำลังโหลดข้อมูล...</p>
                   </div>
                 ) : (
-                <Form onSubmit={formik.handleSubmit} className="add-tree-form">
-                  <Row>
-                    <Col md="6" className="mb-3">
-                      <Form.Group className="form-group-plant">
-                        <Form.Label className="form-label-plant">
-                          <Leaf size={18} className="label-icon" />
-                          ชื่อต้นไม้ <span className="text-danger">*</span>
-                        </Form.Label>
-                        <Form.Control
-                          placeholder="เช่น ต้นมะม่วง"
-                          name="name"
-                          id="name"
-                          value={formik.values.name}
-                          onChange={formik.handleChange}
-                          type="text"
-                          className="form-control-plant"
-                          required
-                        />
-                      </Form.Group>
-                    </Col>
-                    <Col md="6" className="mb-3">
-                      <Form.Group className="form-group-plant">
-                        <Form.Label className="form-label-plant">
-                          <Sprout size={18} className="label-icon" />
-                          พันธุ์ <span className="text-danger">*</span>
-                        </Form.Label>
-                        <Form.Control
-                          placeholder="เช่น มะม่วงน้ำดอกไม้"
-                          name="species"
-                          id="species"
-                          value={formik.values.species}
-                          onChange={formik.handleChange}
-                          type="text"
-                          className="form-control-plant"
-                          required
-                        />
-                      </Form.Group>
-                    </Col>
-                  </Row>
+                  <Form
+                    onSubmit={formik.handleSubmit}
+                    className="add-tree-form"
+                  >
+                    <Row>
+                      <Col md="6" className="mb-3">
+                        <Form.Group className="form-group-plant">
+                          <Form.Label className="form-label-plant">
+                            <Leaf size={18} className="label-icon" />
+                            ชื่อต้นไม้ <span className="text-danger">*</span>
+                          </Form.Label>
+                          <Form.Control
+                            placeholder="เช่น ต้นมะม่วง"
+                            name="name"
+                            id="name"
+                            value={formik.values.name}
+                            onChange={formik.handleChange}
+                            type="text"
+                            className="form-control-plant"
+                            required
+                          />
+                        </Form.Group>
+                      </Col>
+                      <Col md="6" className="mb-3">
+                        <Form.Group className="form-group-plant">
+                          <Form.Label className="form-label-plant">
+                            <Sprout size={18} className="label-icon" />
+                            พันธุ์ <span className="text-danger">*</span>
+                          </Form.Label>
+                          <Form.Control
+                            placeholder="เช่น มะม่วงน้ำดอกไม้"
+                            name="species"
+                            id="species"
+                            value={formik.values.species}
+                            onChange={formik.handleChange}
+                            type="text"
+                            className="form-control-plant"
+                            required
+                          />
+                        </Form.Group>
+                      </Col>
+                    </Row>
 
-                  <Row>
-                    <Col md="6" className="mb-3">
-                      <Form.Group className="form-group-plant">
-                        <Form.Label className="form-label-plant">
-                          <DollarSign size={18} className="label-icon" />
-                          ราคาซื้อ (บาท)
-                        </Form.Label>
-                        <Form.Control
-                          placeholder="0"
-                          name="price_old"
-                          id="price_old"
-                          value={formik.values.price_old}
-                          onChange={formik.handleChange}
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          className="form-control-plant"
-                        />
-                      </Form.Group>
-                    </Col>
-                    <Col md="6" className="mb-3">
-                      <Form.Group className="form-group-plant">
-                        <Form.Label className="form-label-plant">
-                          <DollarSign size={18} className="label-icon" />
-                          ราคาขาย (บาท)
-                        </Form.Label>
-                        <Form.Control
-                          placeholder="0"
-                          name="price_new"
-                          id="price_new"
-                          value={formik.values.price_new}
-                          onChange={formik.handleChange}
-                          type="number"
-                          min="0"
-                          step="0.01"
-                          className="form-control-plant"
-                        />
-                      </Form.Group>
-                    </Col>
-                  </Row>
+                    <Row>
+                      <Col md="6" className="mb-3">
+                        <Form.Group className="form-group-plant">
+                          <Form.Label className="form-label-plant">
+                            <DollarSign size={18} className="label-icon" />
+                            ราคาซื้อ (บาท)
+                          </Form.Label>
+                          <Form.Control
+                            placeholder="0"
+                            name="buy_price"
+                            id="buy_price"
+                            value={formik.values.buy_price}
+                            onChange={formik.handleChange}
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            className="form-control-plant"
+                          />
+                        </Form.Group>
+                      </Col>
+                      <Col md="6" className="mb-3">
+                        <Form.Group className="form-group-plant">
+                          <Form.Label className="form-label-plant">
+                            <DollarSign size={18} className="label-icon" />
+                            ราคาขาย (บาท)
+                          </Form.Label>
+                          <Form.Control
+                            placeholder="0"
+                            name="sell_price"
+                            id="sell_price"
+                            value={formik.values.sell_price}
+                            onChange={formik.handleChange}
+                            type="number"
+                            min="0"
+                            step="0.01"
+                            className="form-control-plant"
+                          />
+                        </Form.Group>
+                      </Col>
+                    </Row>
 
-                  <Row>
-                    <Col md="6" className="mb-4">
-                      <Form.Group className="form-group-plant">
-                        <Form.Label className="form-label-plant">
-                          <Hash size={18} className="label-icon" />
-                          จำนวน (ต้น)
-                        </Form.Label>
-                        <Form.Control
-                          placeholder="0"
-                          name="amount"
-                          id="amount"
-                          value={formik.values.amount}
-                          onChange={formik.handleChange}
-                          type="number"
-                          min="0"
-                          className="form-control-plant"
-                        />
-                      </Form.Group>
-                    </Col>
-                  </Row>
+                    <Row>
+                      <Col md="6" className="mb-3">
+                        <Form.Group className="form-group-plant">
+                          <Form.Label className="form-label-plant">
+                            <Hash size={18} className="label-icon" />
+                            จำนวน (ต้น)
+                          </Form.Label>
+                          <Form.Control
+                            placeholder="0"
+                            name="quantity"
+                            id="quantity"
+                            value={formik.values.quantity}
+                            onChange={formik.handleChange}
+                            type="number"
+                            min="0"
+                            className="form-control-plant"
+                          />
+                        </Form.Group>
+                      </Col>
+                    </Row>
 
-                  <div className="d-flex justify-content-end mt-4">
-                    <Button
-                      variant="outline-secondary"
-                      className="btn-cancel-plant mr-3"
-                      onClick={handleBackClick}
-                      size="lg"
-                    >
-                      ยกเลิก
-                    </Button>
-                    <Button
-                      className="btn-submit-plant"
-                      type="submit"
-                      size="lg"
-                    >
-                      {isEditMode ? (
-                        <>
-                          <Save size={20} className="mr-2" />
-                          บันทึก
-                        </>
-                      ) : (
-                        <>
-                          <Plus size={20} className="mr-2" />
-                          เพิ่มต้นไม้
-                        </>
-                      )}
-                    </Button>
-                  </div>
-                </Form>
+                    {!isEditMode && (
+                      <Row>
+                        <Col className="mb-4">
+                          <Form.Group className="form-group-plant">
+                            <Form.Label className="form-label-plant">
+                              <ImagePlus size={18} className="label-icon" />
+                              รูปภาพต้นไม้
+                            </Form.Label>
+                            <Form.Control
+                              type="file"
+                              accept="image/*"
+                              multiple
+                              onChange={(e) => {
+                                const files = e.target.files;
+                                if (files?.length) {
+                                  setImageFiles(Array.from(files));
+                                }
+                              }}
+                              className="form-control-plant"
+                            />
+                            {imageFiles.length > 0 && (
+                              <Form.Text className="text-muted d-block mt-1">
+                                เลือกแล้ว {imageFiles.length} ไฟล์
+                              </Form.Text>
+                            )}
+                          </Form.Group>
+                        </Col>
+                      </Row>
+                    )}
+
+                    <div className="d-flex justify-content-end mt-4">
+                      <Button
+                        variant="outline-secondary"
+                        className="btn-cancel-plant mr-3"
+                        onClick={handleBackClick}
+                        size="lg"
+                      >
+                        ยกเลิก
+                      </Button>
+                      <Button
+                        className="btn-submit-plant"
+                        type="submit"
+                        size="lg"
+                      >
+                        {isEditMode ? (
+                          <>
+                            <Save size={20} className="mr-2" />
+                            บันทึก
+                          </>
+                        ) : (
+                          <>
+                            <Plus size={20} className="mr-2" />
+                            เพิ่มต้นไม้
+                          </>
+                        )}
+                      </Button>
+                    </div>
+                  </Form>
                 )}
               </Card.Body>
 

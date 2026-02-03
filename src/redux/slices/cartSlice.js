@@ -26,18 +26,18 @@ const cartSlice = createSlice({
 
       if (existingItem) {
         existingItem.quantity += quantity;
-        if (existingItem.quantity > tree.amount) {
-          existingItem.quantity = tree.amount;
+        if (existingItem.quantity > tree.quantity) {
+          existingItem.quantity = tree.quantity;
         }
       } else {
         state.items.push({
           id: tree.id,
           name: tree.name,
           species: tree.species,
-          price: tree.price_new,
+          price: tree.sell_price,
           image: tree.images?.[0] || "",
-          quantity: Math.min(quantity, tree.amount),
-          maxAmount: tree.amount,
+          quantity: Math.min(quantity, tree.quantity),
+          maxQuantity: tree.quantity,
           location: tree.location,
         });
       }
@@ -63,7 +63,7 @@ const cartSlice = createSlice({
       const { id, quantity } = action.payload;
       const item = state.items.find((item) => item.id === id);
       if (item) {
-        item.quantity = Math.max(1, Math.min(quantity, item.maxAmount));
+        item.quantity = Math.max(1, Math.min(quantity, item.maxQuantity));
         state.total = state.items.reduce(
           (sum, item) => sum + item.price * item.quantity,
           0
@@ -82,4 +82,3 @@ const cartSlice = createSlice({
 export const { addToCart, removeFromCart, updateQuantity, clearCart } =
   cartSlice.actions;
 export default cartSlice.reducer;
-

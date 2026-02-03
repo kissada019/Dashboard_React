@@ -1,5 +1,13 @@
 import React from "react";
-import { Container, Row, Col, Card, Button, Badge, Table } from "react-bootstrap";
+import {
+  Container,
+  Row,
+  Col,
+  Card,
+  Button,
+  Badge,
+  Table,
+} from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import {
@@ -11,7 +19,11 @@ import {
   Leaf,
   CreditCard,
 } from "lucide-react";
-import { removeFromCart, updateQuantity, clearCart } from "../../redux/slices/cartSlice";
+import {
+  removeFromCart,
+  updateQuantity,
+  clearCart,
+} from "../../redux/slices/cartSlice";
 import alert from "../../utils/alert";
 
 const Cart = () => {
@@ -20,26 +32,28 @@ const Cart = () => {
   const cart = useSelector((state) => state.cart);
 
   const handleRemoveItem = (id) => {
-    alert.custom.fire({
-      icon: "warning",
-      title: "ยืนยันการลบ",
-      text: "คุณต้องการลบสินค้านี้ออกจากตะกร้าหรือไม่?",
-      showCancelButton: true,
-      confirmButtonText: "ลบ",
-      cancelButtonText: "ยกเลิก",
-      confirmButtonColor: "#d33",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(removeFromCart(id));
-        alert.custom.fire({
-          icon: "success",
-          title: "ลบสำเร็จ",
-          text: "ลบสินค้าออกจากตะกร้าแล้ว",
-          timer: 1500,
-          showConfirmButton: false,
-        });
-      }
-    });
+    alert.custom
+      .fire({
+        icon: "warning",
+        title: "ยืนยันการลบ",
+        text: "คุณต้องการลบสินค้านี้ออกจากตะกร้าหรือไม่?",
+        showCancelButton: true,
+        confirmButtonText: "ลบ",
+        cancelButtonText: "ยกเลิก",
+        confirmButtonColor: "#d33",
+      })
+      .then((result) => {
+        if (result.isConfirmed) {
+          dispatch(removeFromCart(id));
+          alert.custom.fire({
+            icon: "success",
+            title: "ลบสำเร็จ",
+            text: "ลบสินค้าออกจากตะกร้าแล้ว",
+            timer: 1500,
+            showConfirmButton: false,
+          });
+        }
+      });
   };
 
   const handleQuantityChange = (id, newQuantity) => {
@@ -64,11 +78,27 @@ const Cart = () => {
 
   if (cart.items.length === 0) {
     return (
-      <Container fluid className="p-4" style={{ backgroundColor: "#f8f9f6", minHeight: "100vh" }}>
-        <Card style={{ borderRadius: "16px", border: "1px solid #d4e6d1", boxShadow: "0 4px 12px rgba(45, 80, 22, 0.08)" }}>
+      <Container
+        fluid
+        className="p-4"
+        style={{ backgroundColor: "#f8f9f6", minHeight: "100vh" }}
+      >
+        <Card
+          style={{
+            borderRadius: "16px",
+            border: "1px solid #d4e6d1",
+            boxShadow: "0 4px 12px rgba(45, 80, 22, 0.08)",
+          }}
+        >
           <Card.Body className="text-center p-5">
-            <ShoppingCart size={80} color="#d4e6d1" style={{ marginBottom: "20px" }} />
-            <h3 style={{ color: "#2d5016", marginBottom: "15px" }}>ตะกร้าของคุณว่างเปล่า</h3>
+            <ShoppingCart
+              size={80}
+              color="#d4e6d1"
+              style={{ marginBottom: "20px" }}
+            />
+            <h3 style={{ color: "#2d5016", marginBottom: "15px" }}>
+              ตะกร้าของคุณว่างเปล่า
+            </h3>
             <p style={{ color: "#5a7c3a", marginBottom: "30px" }}>
               ยังไม่มีสินค้าในตะกร้า กรุณาเลือกสินค้าที่คุณต้องการ
             </p>
@@ -80,9 +110,17 @@ const Cart = () => {
                 borderRadius: "10px",
                 padding: "12px 30px",
                 fontWeight: "600",
+                color: "#fff",
               }}
             >
-              <Leaf size={18} style={{ marginRight: "8px", verticalAlign: "middle" }} />
+              <Leaf
+                size={18}
+                style={{
+                  marginRight: "8px",
+                  verticalAlign: "middle",
+                  color: "#fff",
+                }}
+              />
               เลือกซื้อต้นไม้
             </Button>
           </Card.Body>
@@ -92,7 +130,11 @@ const Cart = () => {
   }
 
   return (
-    <Container fluid className="p-4" style={{ backgroundColor: "#f8f9f6", minHeight: "100vh" }}>
+    <Container
+      fluid
+      className="p-4"
+      style={{ backgroundColor: "#f8f9f6", minHeight: "100vh" }}
+    >
       {/* Header */}
       <div className="d-flex align-items-center justify-content-between mb-4">
         <div className="d-flex align-items-center">
@@ -108,10 +150,16 @@ const Cart = () => {
               marginRight: "15px",
             }}
           >
-            <ArrowLeft size={18} style={{ marginRight: "8px", verticalAlign: "middle" }} />
+            <ArrowLeft
+              size={18}
+              style={{ marginRight: "8px", verticalAlign: "middle" }}
+            />
             กลับ
           </Button>
-          <h2 style={{ margin: 0, color: "#2d5016", fontWeight: "700" }} className="d-flex align-items-center">
+          <h2
+            style={{ margin: 0, color: "#2d5016", fontWeight: "700" }}
+            className="d-flex align-items-center"
+          >
             <ShoppingCart size={28} style={{ marginRight: "10px" }} />
             ตะกร้าสินค้า
           </h2>
@@ -132,7 +180,13 @@ const Cart = () => {
       <Row>
         {/* Cart Items */}
         <Col lg={8} md={12} className="mb-4">
-          <Card style={{ borderRadius: "16px", border: "1px solid #d4e6d1", boxShadow: "0 4px 12px rgba(45, 80, 22, 0.08)" }}>
+          <Card
+            style={{
+              borderRadius: "16px",
+              border: "1px solid #d4e6d1",
+              boxShadow: "0 4px 12px rgba(45, 80, 22, 0.08)",
+            }}
+          >
             <Card.Header
               style={{
                 backgroundColor: "#e8f5e3",
@@ -141,25 +195,66 @@ const Cart = () => {
                 padding: "20px",
               }}
             >
-              <h5 style={{ margin: 0, fontWeight: "700", color: "#2d5016" }}>รายการสินค้า</h5>
+              <h5 style={{ margin: 0, fontWeight: "700", color: "#2d5016" }}>
+                รายการสินค้า
+              </h5>
             </Card.Header>
             <Card.Body className="p-0">
               <Table hover style={{ margin: 0 }}>
                 <thead style={{ backgroundColor: "#f0f5ee" }}>
                   <tr>
-                    <th style={{ padding: "15px", color: "#2d5016", fontWeight: "600", borderColor: "#d4e6d1" }}>
+                    <th
+                      style={{
+                        padding: "15px",
+                        color: "#2d5016",
+                        fontWeight: "600",
+                        borderColor: "#d4e6d1",
+                      }}
+                    >
                       สินค้า
                     </th>
-                    <th style={{ padding: "15px", color: "#2d5016", fontWeight: "600", borderColor: "#d4e6d1", textAlign: "center" }}>
+                    <th
+                      style={{
+                        padding: "15px",
+                        color: "#2d5016",
+                        fontWeight: "600",
+                        borderColor: "#d4e6d1",
+                        textAlign: "center",
+                      }}
+                    >
                       ราคา
                     </th>
-                    <th style={{ padding: "15px", color: "#2d5016", fontWeight: "600", borderColor: "#d4e6d1", textAlign: "center" }}>
+                    <th
+                      style={{
+                        padding: "15px",
+                        color: "#2d5016",
+                        fontWeight: "600",
+                        borderColor: "#d4e6d1",
+                        textAlign: "center",
+                      }}
+                    >
                       จำนวน
                     </th>
-                    <th style={{ padding: "15px", color: "#2d5016", fontWeight: "600", borderColor: "#d4e6d1", textAlign: "center" }}>
+                    <th
+                      style={{
+                        padding: "15px",
+                        color: "#2d5016",
+                        fontWeight: "600",
+                        borderColor: "#d4e6d1",
+                        textAlign: "center",
+                      }}
+                    >
                       รวม
                     </th>
-                    <th style={{ padding: "15px", color: "#2d5016", fontWeight: "600", borderColor: "#d4e6d1", textAlign: "center" }}>
+                    <th
+                      style={{
+                        padding: "15px",
+                        color: "#2d5016",
+                        fontWeight: "600",
+                        borderColor: "#d4e6d1",
+                        textAlign: "center",
+                      }}
+                    >
                       จัดการ
                     </th>
                   </tr>
@@ -170,7 +265,10 @@ const Cart = () => {
                       <td style={{ padding: "20px", borderColor: "#d4e6d1" }}>
                         <div className="d-flex align-items-center">
                           <img
-                            src={item.image || "https://via.placeholder.com/80x80?text=Tree"}
+                            src={
+                              item.image ||
+                              "https://via.placeholder.com/80x80?text=Tree"
+                            }
                             alt={item.name}
                             style={{
                               width: "80px",
@@ -181,11 +279,19 @@ const Cart = () => {
                               border: "1px solid #d4e6d1",
                             }}
                             onError={(e) => {
-                              e.target.src = "https://via.placeholder.com/80x80?text=Tree";
+                              e.target.src =
+                                "https://via.placeholder.com/80x80?text=Tree";
                             }}
                           />
                           <div>
-                            <h6 style={{ margin: 0, color: "#2d5016", fontWeight: "600", marginBottom: "5px" }}>
+                            <h6
+                              style={{
+                                margin: 0,
+                                color: "#2d5016",
+                                fontWeight: "600",
+                                marginBottom: "5px",
+                              }}
+                            >
                               {item.name}
                             </h6>
                             <Badge
@@ -199,23 +305,46 @@ const Cart = () => {
                             >
                               {item.species}
                             </Badge>
-                            <div style={{ fontSize: "12px", color: "#5a7c3a", marginTop: "5px" }}>
+                            <div
+                              style={{
+                                fontSize: "12px",
+                                color: "#5a7c3a",
+                                marginTop: "5px",
+                              }}
+                            >
                               สถานที่: {item.location}
                             </div>
                           </div>
                         </div>
                       </td>
-                      <td style={{ padding: "20px", borderColor: "#d4e6d1", textAlign: "center" }}>
+                      <td
+                        style={{
+                          padding: "20px",
+                          borderColor: "#d4e6d1",
+                          textAlign: "center",
+                        }}
+                      >
                         <span style={{ color: "#2d5016", fontWeight: "600" }}>
                           {item.price.toLocaleString()} ฿
                         </span>
                       </td>
-                      <td style={{ padding: "20px", borderColor: "#d4e6d1", textAlign: "center" }}>
-                        <div className="d-flex align-items-center justify-content-center" style={{ gap: "10px" }}>
+                      <td
+                        style={{
+                          padding: "20px",
+                          borderColor: "#d4e6d1",
+                          textAlign: "center",
+                        }}
+                      >
+                        <div
+                          className="d-flex align-items-center justify-content-center"
+                          style={{ gap: "10px" }}
+                        >
                           <Button
                             variant="outline-secondary"
                             size="sm"
-                            onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                            onClick={() =>
+                              handleQuantityChange(item.id, item.quantity - 1)
+                            }
                             disabled={item.quantity <= 1}
                             style={{
                               borderRadius: "8px",
@@ -240,8 +369,10 @@ const Cart = () => {
                           <Button
                             variant="outline-secondary"
                             size="sm"
-                            onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                            disabled={item.quantity >= item.maxAmount}
+                            onClick={() =>
+                              handleQuantityChange(item.id, item.quantity + 1)
+                            }
+                            disabled={item.quantity >= item.maxQuantity}
                             style={{
                               borderRadius: "8px",
                               width: "36px",
@@ -253,18 +384,42 @@ const Cart = () => {
                             <Plus size={16} />
                           </Button>
                         </div>
-                        {item.quantity >= item.maxAmount && (
-                          <div style={{ fontSize: "11px", color: "#c97d60", marginTop: "5px" }}>
-                            สูงสุด {item.maxAmount} ต้น
+                        {item.quantity >= item.maxQuantity && (
+                          <div
+                            style={{
+                              fontSize: "11px",
+                              color: "#c97d60",
+                              marginTop: "5px",
+                            }}
+                          >
+                            สูงสุด {item.maxQuantity} ต้น
                           </div>
                         )}
                       </td>
-                      <td style={{ padding: "20px", borderColor: "#d4e6d1", textAlign: "center" }}>
-                        <span style={{ color: "#2d5016", fontWeight: "700", fontSize: "16px" }}>
+                      <td
+                        style={{
+                          padding: "20px",
+                          borderColor: "#d4e6d1",
+                          textAlign: "center",
+                        }}
+                      >
+                        <span
+                          style={{
+                            color: "#2d5016",
+                            fontWeight: "700",
+                            fontSize: "16px",
+                          }}
+                        >
                           {(item.price * item.quantity).toLocaleString()} ฿
                         </span>
                       </td>
-                      <td style={{ padding: "20px", borderColor: "#d4e6d1", textAlign: "center" }}>
+                      <td
+                        style={{
+                          padding: "20px",
+                          borderColor: "#d4e6d1",
+                          textAlign: "center",
+                        }}
+                      >
                         <Button
                           variant="outline-danger"
                           size="sm"
@@ -288,7 +443,13 @@ const Cart = () => {
 
         {/* Order Summary */}
         <Col lg={4} md={12}>
-          <Card style={{ borderRadius: "16px", border: "1px solid #d4e6d1", boxShadow: "0 4px 12px rgba(45, 80, 22, 0.08)" }}>
+          <Card
+            style={{
+              borderRadius: "16px",
+              border: "1px solid #d4e6d1",
+              boxShadow: "0 4px 12px rgba(45, 80, 22, 0.08)",
+            }}
+          >
             <Card.Header
               style={{
                 backgroundColor: "#e8f5e3",
@@ -297,24 +458,43 @@ const Cart = () => {
                 padding: "20px",
               }}
             >
-              <h5 style={{ margin: 0, fontWeight: "700", color: "#2d5016" }}>สรุปคำสั่งซื้อ</h5>
+              <h5 style={{ margin: 0, fontWeight: "700", color: "#2d5016" }}>
+                สรุปคำสั่งซื้อ
+              </h5>
             </Card.Header>
             <Card.Body className="p-4">
               <div className="mb-3">
                 <div className="d-flex justify-content-between mb-2">
                   <span style={{ color: "#5a7c3a" }}>จำนวนรายการ:</span>
-                  <span style={{ color: "#2d5016", fontWeight: "600" }}>{cart.items.length} รายการ</span>
+                  <span style={{ color: "#2d5016", fontWeight: "600" }}>
+                    {cart.items.length} รายการ
+                  </span>
                 </div>
                 <div className="d-flex justify-content-between mb-2">
                   <span style={{ color: "#5a7c3a" }}>จำนวนต้นไม้:</span>
                   <span style={{ color: "#2d5016", fontWeight: "600" }}>
-                    {cart.items.reduce((sum, item) => sum + item.quantity, 0)} ต้น
+                    {cart.items.reduce((sum, item) => sum + item.quantity, 0)}{" "}
+                    ต้น
                   </span>
                 </div>
                 <hr style={{ borderColor: "#d4e6d1", margin: "15px 0" }} />
                 <div className="d-flex justify-content-between">
-                  <span style={{ color: "#2d5016", fontWeight: "600", fontSize: "18px" }}>ยอดรวม:</span>
-                  <span style={{ color: "#2d5016", fontWeight: "700", fontSize: "24px" }}>
+                  <span
+                    style={{
+                      color: "#2d5016",
+                      fontWeight: "600",
+                      fontSize: "18px",
+                    }}
+                  >
+                    ยอดรวม:
+                  </span>
+                  <span
+                    style={{
+                      color: "#2d5016",
+                      fontWeight: "700",
+                      fontSize: "24px",
+                    }}
+                  >
                     {cart.total.toLocaleString()} ฿
                   </span>
                 </div>
@@ -332,7 +512,10 @@ const Cart = () => {
                   marginBottom: "15px",
                 }}
               >
-                <CreditCard size={20} style={{ marginRight: "8px", verticalAlign: "middle" }} />
+                <CreditCard
+                  size={20}
+                  style={{ marginRight: "8px", verticalAlign: "middle" }}
+                />
                 ดำเนินการชำระเงิน
               </Button>
 
@@ -358,4 +541,3 @@ const Cart = () => {
 };
 
 export default Cart;
-
