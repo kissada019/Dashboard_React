@@ -108,7 +108,7 @@ const sessionExpired = () => {
   let checkSession = common.checkSession();
   if (checkSession === false) {
     userInfoStorage.remove();
-    window.location.href = "/auth/login";
+    window.location.href = "/admin/login";
   } else {
     SwalWithBootstrap.fire({
       icon: "error",
@@ -123,7 +123,7 @@ const sessionExpired = () => {
         (result.isDismissed === true && result.dismiss === "close")
       ) {
         userInfoStorage.remove();
-        window.location.href = "/auth/login";
+        window.location.href = "/admin/login";
       }
     });
   }

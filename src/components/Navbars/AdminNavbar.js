@@ -15,10 +15,11 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React, { Component } from "react";
+import React, { useEffect } from "react";
 import { useLocation, useHistory } from "react-router-dom";
 import { Navbar, Container, Nav, Dropdown, Button } from "react-bootstrap";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import { onGetCart } from "../../redux/slices/cartSlice";
 import userInfoStorage from "../../storage/userInfoStorage";
 import AdminNavbarLoggedIn from "./AdminNavbarLoggedIn";
 import AdminNavbarGuest from "./AdminNavbarGuest";
@@ -28,14 +29,28 @@ import routes from "routes.js";
 function Header() {
   const location = useLocation();
   const history = useHistory();
+  const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart);
-  const cartItemCount = cart.items.reduce(
-    (sum, item) => sum + item.quantity,
-    0
-  );
+
   const userInfo = userInfoStorage.get() || {};
-    const token = userInfo?.token || "";
-    const isLoggedIn = Boolean(token);
+  const token = userInfo?.token || "";
+  const isLoggedIn = Boolean(token);
+  const userRole = String(userInfo?.role || "").toLowerCase();
+  const isAdmin = userRole === "admin";
+
+  // ดึงข้อมูลตะกร้าจาก API เมื่อ login แล้ว
+  useEffect(() => {
+    if (isLoggedIn && !isAdmin) {
+      dispatch(onGetCart());
+    }
+  }, [isLoggedIn, isAdmin, dispatch]);
+
+  // ใช้ข้อมูลจาก API (apiItems) ถ้ามี
+  const apiItems = cart.apiItems || [];
+  const localItems = cart.items || [];
+  const cartItemCount = apiItems.length > 0
+    ? apiItems.reduce((sum, item) => sum + Number(item.quantity ?? 0), 0)
+    : localItems.reduce((sum, item) => sum + Number(item.quantity ?? 0), 0);
   const decodeTokenPayload = (jwt) => {
     if (!jwt || typeof jwt !== "string") return {};
     const parts = jwt.split(".");
@@ -207,6 +222,7 @@ function Header() {
                 username={username}
                 email={email}
                 handleLogout={handleLogout}
+                showCart={!isAdmin}
               />
             ) : (
               <AdminNavbarGuest />

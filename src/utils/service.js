@@ -103,16 +103,16 @@ const put = (path, request, isLoading = true, isAlert = true) => {
   });
 };
 
-const deleted = (path, request, isLoading = true, isAlert = true) => {
+const patch = (path, request, isLoading = true, isAlert = true) => {
   const userInfoStore = userInfoStorage.get();
   const accessToken = userInfoStore && userInfoStore.token;
   const token = accessToken ? "Bearer " + accessToken : "";
   layout.loading.show(isLoading);
   return new Promise((resolve, reject) => {
     axios
-      .delete(
+      .patch(
         _apiURL + path,
-        request, // Directly passing request instead of wrapping it
+        request,
         {
           headers: {
             "Content-Type": "application/json; charset=utf-8",
@@ -120,6 +120,35 @@ const deleted = (path, request, isLoading = true, isAlert = true) => {
           },
         }
       )
+      .then((result) => {
+        layout.loading.hide(isLoading);
+        resolve(result.data);
+      })
+      .catch((error) => {
+        layout.loading.hide(isLoading);
+        if (isAlert && path) {
+          let lastPath = path.split("/").slice(-1)[0];
+          alert.error(error.message, constantCase(lastPath));
+        }
+        reject(error);
+      });
+  });
+};
+
+const deleted = (path, request, isLoading = true, isAlert = true) => {
+  const userInfoStore = userInfoStorage.get();
+  const accessToken = userInfoStore && userInfoStore.token;
+  const token = accessToken ? "Bearer " + accessToken : "";
+  layout.loading.show(isLoading);
+  return new Promise((resolve, reject) => {
+    axios
+      .delete(_apiURL + path, {
+        headers: {
+          "Content-Type": "application/json; charset=utf-8",
+          Authorization: token,
+        },
+        data: request, // axios.delete ใส่ body ผ่าน config.data
+      })
       .then((result) => {
         layout.loading.hide(isLoading);
         resolve(result.data);
@@ -145,7 +174,6 @@ const postFormData = (path, formData, isLoading = true, isAlert = true) => {
       .post(_apiURL + path, formData, {
         headers: {
           Authorization: token,
-          // ไม่ตั้ง Content-Type เพื่อให้ axios ใส่ boundary ให้ FormData
         },
       })
       .then((result) => {
@@ -153,7 +181,33 @@ const postFormData = (path, formData, isLoading = true, isAlert = true) => {
         resolve(result.data);
       })
       .catch((error) => {
-        console.log("post : ");
+        layout.loading.hide(isLoading);
+        if (isAlert && path) {
+          let lastPath = path.split("/").slice(-1)[0];
+          alert.error(error.message, constantCase(lastPath));
+        }
+        reject(error);
+      });
+  });
+};
+
+const putFormData = (path, formData, isLoading = true, isAlert = true) => {
+  const userInfoStore = userInfoStorage.get();
+  const accessToken = userInfoStore && userInfoStore.token;
+  const token = accessToken ? "Bearer " + accessToken : "";
+  layout.loading.show(isLoading);
+  return new Promise((resolve, reject) => {
+    axios
+      .put(_apiURL + path, formData, {
+        headers: {
+          Authorization: token,
+        },
+      })
+      .then((result) => {
+        layout.loading.hide(isLoading);
+        resolve(result.data);
+      })
+      .catch((error) => {
         layout.loading.hide(isLoading);
         if (isAlert && path) {
           let lastPath = path.split("/").slice(-1)[0];
@@ -169,8 +223,10 @@ const service = {
     get,
     post,
     put,
+    patch,
     deleted,
     postFormData,
+    putFormData,
   },
 };
 

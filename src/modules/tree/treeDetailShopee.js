@@ -27,7 +27,7 @@ import {
   Calendar,
   CheckCircle,
 } from "lucide-react";
-import { addToCart } from "../../redux/slices/cartSlice";
+import { addToCart, onAddToCartAPI } from "../../redux/slices/cartSlice";
 import { onGetTreeById } from "../../redux/slices/treeSlice";
 import alert from "../../utils/alert";
 
@@ -90,27 +90,51 @@ const TreeDetailShopee = () => {
   const totalPrice = priceNew * quantityTree; // ราคารวมตามจำนวนที่เลือก
 
   const handleAddToCart = () => {
-    dispatch(addToCart({ tree: treeData, quantity: quantityTree }));
-    alert.custom
-      .fire({
-        icon: "success",
-        title: "เพิ่มลงตะกร้าเรียบร้อย",
-        text: `${treeData.name} จำนวน ${quantityTree} ต้น`,
-        confirmButtonText: "ตกลง",
-        showCancelButton: true,
-        cancelButtonText: "ปิด",
-        confirmButtonText: "ไปที่ตะกร้า",
-      })
-      .then((result) => {
-        if (result.isConfirmed) {
-          history.push("/admin/cart");
+    dispatch(onAddToCartAPI({ tree_id: treeData.id, quantity: quantityTree }))
+      .then((response) => {
+        if (response?.payload && !response.error) {
+          // เพิ่มลง local state ด้วย
+          dispatch(addToCart({ tree: treeData, quantity: quantityTree }));
+          alert.custom
+            .fire({
+              icon: "success",
+              title: "เพิ่มลงตะกร้าเรียบร้อย",
+              text: `${treeData.name} จำนวน ${quantityTree} ต้น`,
+              showCancelButton: true,
+              cancelButtonText: "ปิด",
+              confirmButtonText: "ไปที่ตะกร้า",
+            })
+            .then((result) => {
+              if (result.isConfirmed) {
+                history.push("/admin/cart");
+              }
+            });
+        } else {
+          alert.custom.fire({
+            icon: "error",
+            title: "เกิดข้อผิดพลาด",
+            text: response?.payload || "ไม่สามารถเพิ่มสินค้าลงตะกร้าได้",
+            confirmButtonText: "ตกลง",
+          });
         }
       });
   };
 
   const handleBuyNow = () => {
-    dispatch(addToCart({ tree: treeData, quantity: quantityTree }));
-    history.push("/admin/checkout");
+    dispatch(onAddToCartAPI({ tree_id: treeData.id, quantity: quantityTree }))
+      .then((response) => {
+        if (response?.payload && !response.error) {
+          dispatch(addToCart({ tree: treeData, quantity: quantityTree }));
+          history.push("/admin/checkout");
+        } else {
+          alert.custom.fire({
+            icon: "error",
+            title: "เกิดข้อผิดพลาด",
+            text: response?.payload || "ไม่สามารถเพิ่มสินค้าลงตะกร้าได้",
+            confirmButtonText: "ตกลง",
+          });
+        }
+      });
   };
 
   const handleFavorite = () => {

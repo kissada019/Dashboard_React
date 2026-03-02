@@ -7,55 +7,58 @@ const AdminNavbarLoggedIn = ({
   username,
   email,
   handleLogout,
+  showCart = true,
 }) => {
   return (
     <>
       {/* Cart Icon */}
-      <Nav.Item>
-        <Nav.Link
-          className="m-0"
-          href="#pablo"
-          onClick={handleCartClick}
-          style={{
-            position: "relative",
-            cursor: "pointer",
-            padding: "10px 15px",
-          }}
-        >
-          <div style={{ position: "relative", display: "inline-block" }}>
-            <i
-              className="nc-icon nc-cart-simple"
-              style={{ fontSize: "20px", color: "#2d5016" }}
-            ></i>
-            {cartItemCount > 0 && (
-              <Badge
-                style={{
-                  position: "absolute",
-                  top: "-8px",
-                  right: "-8px",
-                  backgroundColor: "#c97d60",
-                  color: "#fff",
-                  borderRadius: "50%",
-                  minWidth: "20px",
-                  height: "20px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "11px",
-                  fontWeight: "700",
-                  padding: "0 5px",
-                  border: "2px solid #fff",
-                }}
-              >
-                {cartItemCount > 99 ? "99+" : cartItemCount}
-              </Badge>
-            )}
-          </div>
-          <span className="d-lg-none ml-2" style={{ color: "#2d5016" }}>
-            ตะกร้า {cartItemCount > 0 && `(${cartItemCount})`}
-          </span>
-        </Nav.Link>
-      </Nav.Item>
+      {showCart && (
+        <Nav.Item>
+          <Nav.Link
+            className="m-0"
+            href="#pablo"
+            onClick={handleCartClick}
+            style={{
+              position: "relative",
+              cursor: "pointer",
+              padding: "10px 15px",
+            }}
+          >
+            <div style={{ position: "relative", display: "inline-block" }}>
+              <i
+                className="nc-icon nc-cart-simple"
+                style={{ fontSize: "20px", color: "#2d5016" }}
+              ></i>
+              {cartItemCount > 0 && (
+                <Badge
+                  style={{
+                    position: "absolute",
+                    top: "-8px",
+                    right: "-8px",
+                    backgroundColor: "#c97d60",
+                    color: "#fff",
+                    borderRadius: "50%",
+                    minWidth: "20px",
+                    height: "20px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "11px",
+                    fontWeight: "700",
+                    padding: "0 5px",
+                    border: "2px solid #fff",
+                  }}
+                >
+                  {cartItemCount > 99 ? "99+" : cartItemCount}
+                </Badge>
+              )}
+            </div>
+            <span className="d-lg-none ml-2" style={{ color: "#2d5016" }}>
+              ตะกร้า {cartItemCount > 0 && `(${cartItemCount})`}
+            </span>
+          </Nav.Link>
+        </Nav.Item>
+      )}
 
       <Dropdown as={Nav.Item}>
         <Dropdown.Toggle

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Container,
   Row,
@@ -18,20 +18,50 @@ import {
   ArrowLeft,
   Leaf,
   CreditCard,
+  Loader,
 } from "lucide-react";
 import {
+  onGetCart,
+  onDeleteCartItem,
+  onUpdateCartQuantity,
   removeFromCart,
   updateQuantity,
   clearCart,
 } from "../../redux/slices/cartSlice";
 import alert from "../../utils/alert";
 
+const PLACEHOLDER_IMAGE =
+  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80'%3E%3Crect fill='%23e8f5e3' width='80' height='80'/%3E%3Ctext fill='%234a7c2a' x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='10'%3ETree%3C/text%3E%3C/svg%3E";
+
+const toImageSrc = (path) => {
+  if (!path) return null;
+  if (typeof path !== "string") return null;
+  if (path.startsWith("http")) return path;
+  return path.startsWith("/") ? path : "/" + path;
+};
+
 const Cart = () => {
   const history = useHistory();
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart);
 
-  const handleRemoveItem = (id) => {
+  // ดึงข้อมูลตะกร้าจาก API เมื่อเปิดหน้า
+  useEffect(() => {
+    dispatch(onGetCart());
+  }, [dispatch]);
+
+  // ใช้ข้อมูลจาก API (apiItems) ถ้ามี, ไม่งั้น fallback ไปใช้ local items
+  const cartItems = cart.apiItems || cart.items || [];
+  const cartTotal =
+    cart.apiTotal != null
+      ? cart.apiTotal
+      : cartItems.reduce((sum, item) => {
+          const price = Number(item.sell_price ?? item.price ?? 0);
+          const qty = Number(item.quantity ?? 0);
+          return sum + price * qty;
+        }, 0);
+
+  const handleRemoveItem = (treeId) => {
     alert.custom
       .fire({
         icon: "warning",
@@ -44,24 +74,44 @@ const Cart = () => {
       })
       .then((result) => {
         if (result.isConfirmed) {
-          dispatch(removeFromCart(id));
-          alert.custom.fire({
-            icon: "success",
-            title: "ลบสำเร็จ",
-            text: "ลบสินค้าออกจากตะกร้าแล้ว",
-            timer: 1500,
-            showConfirmButton: false,
+          dispatch(onDeleteCartItem(treeId)).then((response) => {
+            if (response?.payload && !response.error) {
+              dispatch(removeFromCart(treeId));
+              // โหลดข้อมูลตะกร้าใหม่จาก API
+              dispatch(onGetCart());
+              alert.custom.fire({
+                icon: "success",
+                title: "ลบสำเร็จ",
+                text: "ลบสินค้าออกจากตะกร้าแล้ว",
+                timer: 1500,
+                showConfirmButton: false,
+              });
+            } else {
+              alert.custom.fire({
+                icon: "error",
+                title: "เกิดข้อผิดพลาด",
+                text: "ไม่สามารถลบสินค้าออกจากตะกร้าได้",
+                confirmButtonText: "ตกลง",
+              });
+            }
           });
         }
       });
   };
 
-  const handleQuantityChange = (id, newQuantity) => {
-    dispatch(updateQuantity({ id, quantity: newQuantity }));
+  const handleQuantityChange = (treeId, action) => {
+    dispatch(onUpdateCartQuantity({ tree_id: treeId, action })).then(
+      (response) => {
+        if (response?.payload && !response.error) {
+          // โหลดข้อมูลตะกร้าใหม่จาก API
+          dispatch(onGetCart());
+        }
+      }
+    );
   };
 
   const handleCheckout = () => {
-    if (cart.items.length === 0) {
+    if (cartItems.length === 0) {
       alert.custom.fire({
         icon: "warning",
         title: "ตะกร้าว่าง",
@@ -73,10 +123,41 @@ const Cart = () => {
   };
 
   const handleContinueShopping = () => {
-    history.push("/admin/tree");
+    history.push("/admin/shop");
   };
 
-  if (cart.items.length === 0) {
+  // แสดง loading ระหว่างโหลดข้อมูลจาก API
+  if (cart.loading) {
+    return (
+      <Container
+        fluid
+        className="p-4"
+        style={{ backgroundColor: "#f8f9f6", minHeight: "100vh" }}
+      >
+        <Card
+          style={{
+            borderRadius: "16px",
+            border: "1px solid #d4e6d1",
+            boxShadow: "0 4px 12px rgba(45, 80, 22, 0.08)",
+          }}
+        >
+          <Card.Body className="text-center p-5">
+            <Loader
+              size={48}
+              color="#4a7c2a"
+              style={{
+                marginBottom: "20px",
+                animation: "spin 1s linear infinite",
+              }}
+            />
+            <h4 style={{ color: "#2d5016" }}>กำลังโหลดตะกร้า...</h4>
+          </Card.Body>
+        </Card>
+      </Container>
+    );
+  }
+
+  if (cartItems.length === 0) {
     return (
       <Container
         fluid
@@ -173,7 +254,7 @@ const Cart = () => {
             borderRadius: "20px",
           }}
         >
-          {cart.items.length} รายการ
+          {cartItems.length} รายการ
         </Badge>
       </div>
 
@@ -200,241 +281,263 @@ const Cart = () => {
               </h5>
             </Card.Header>
             <Card.Body className="p-0">
-              <Table hover style={{ margin: 0 }}>
+              <Table hover style={{ margin: 0, tableLayout: "fixed" }}>
+                <colgroup>
+                  <col style={{ width: "30%" }} />
+                  <col style={{ width: "17%" }} />
+                  <col style={{ width: "20%" }} />
+                  <col style={{ width: "17%" }} />
+                  <col style={{ width: "16%" }} />
+                </colgroup>
                 <thead style={{ backgroundColor: "#f0f5ee" }}>
                   <tr>
-                    <th
-                      style={{
-                        padding: "15px",
-                        color: "#2d5016",
-                        fontWeight: "600",
-                        borderColor: "#d4e6d1",
-                      }}
-                    >
-                      สินค้า
-                    </th>
-                    <th
-                      style={{
-                        padding: "15px",
-                        color: "#2d5016",
-                        fontWeight: "600",
-                        borderColor: "#d4e6d1",
-                        textAlign: "center",
-                      }}
-                    >
-                      ราคา
-                    </th>
-                    <th
-                      style={{
-                        padding: "15px",
-                        color: "#2d5016",
-                        fontWeight: "600",
-                        borderColor: "#d4e6d1",
-                        textAlign: "center",
-                      }}
-                    >
-                      จำนวน
-                    </th>
-                    <th
-                      style={{
-                        padding: "15px",
-                        color: "#2d5016",
-                        fontWeight: "600",
-                        borderColor: "#d4e6d1",
-                        textAlign: "center",
-                      }}
-                    >
-                      รวม
-                    </th>
-                    <th
-                      style={{
-                        padding: "15px",
-                        color: "#2d5016",
-                        fontWeight: "600",
-                        borderColor: "#d4e6d1",
-                        textAlign: "center",
-                      }}
-                    >
-                      จัดการ
-                    </th>
+                    {["สินค้า", "ราคา", "จำนวน", "รวม", "จัดการ"].map(
+                      (title) => (
+                        <th
+                          key={title}
+                          style={{
+                            padding: "15px",
+                            color: "#2d5016",
+                            fontWeight: "600",
+                            borderColor: "#d4e6d1",
+                          }}
+                        >
+                          <div style={{ textAlign: "center", width: "100%" }}>
+                            {title}
+                          </div>
+                        </th>
+                      ),
+                    )}
                   </tr>
                 </thead>
                 <tbody>
-                  {cart.items.map((item) => (
-                    <tr key={item.id} style={{ borderColor: "#d4e6d1" }}>
-                      <td style={{ padding: "20px", borderColor: "#d4e6d1" }}>
-                        <div className="d-flex align-items-center">
-                          <img
-                            src={
-                              item.image ||
-                              "https://via.placeholder.com/80x80?text=Tree"
-                            }
-                            alt={item.name}
-                            style={{
-                              width: "80px",
-                              height: "80px",
-                              objectFit: "cover",
-                              borderRadius: "10px",
-                              marginRight: "15px",
-                              border: "1px solid #d4e6d1",
-                            }}
-                            onError={(e) => {
-                              e.target.src =
-                                "https://via.placeholder.com/80x80?text=Tree";
-                            }}
-                          />
-                          <div>
-                            <h6
+                  {cartItems.map((item) => {
+                    // รองรับ field จาก API (tree_id, sell_price, image_url, tree.name ฯลฯ)
+                    const itemId = item.id || item.tree_id;
+                    const treeId = item.tree_id || item.id;
+                    const itemName =
+                      item.name || item.tree_name || item.tree?.name || "-";
+                    const itemSpecies =
+                      item.species ||
+                      item.tree_species ||
+                      item.tree?.species ||
+                      "";
+                    const itemLocation =
+                      item.location ||
+                      item.tree_location ||
+                      item.tree?.location ||
+                      "";
+                    const itemPrice = Number(
+                      item.sell_price ??
+                        item.price ??
+                        item.tree?.sell_price ??
+                        0,
+                    );
+                    const itemQty = Number(item.quantity ?? 0);
+                    const itemMaxQty = Number(
+                      item.maxQuantity ??
+                        item.tree?.quantity ??
+                        item.stock ??
+                        9999,
+                    );
+                    const rawImage =
+                      item.image_url ||
+                      item.imageUrl ||
+                      item.image ||
+                      item.tree?.image_url ||
+                      "";
+                    const itemImage = toImageSrc(rawImage);
+
+                    return (
+                      <tr key={itemId} style={{ borderColor: "#d4e6d1" }}>
+                        <td
+                          style={{
+                            padding: "20px",
+                            borderColor: "#d4e6d1",
+                            textAlign: "center",
+                            verticalAlign: "middle",
+                          }}
+                        >
+                          <div className="d-flex align-items-center justify-content-center">
+                            <img
+                              src={itemImage || PLACEHOLDER_IMAGE}
+                              alt={itemName}
                               style={{
-                                margin: 0,
+                                width: "80px",
+                                height: "80px",
+                                objectFit: "cover",
+                                borderRadius: "10px",
+                                marginRight: "15px",
+                                border: "1px solid #d4e6d1",
+                              }}
+                              onError={(e) => {
+                                if (e.target.src !== PLACEHOLDER_IMAGE) {
+                                  e.target.src = PLACEHOLDER_IMAGE;
+                                }
+                              }}
+                            />
+                            <div style={{ textAlign: "left" }}>
+                              <h6
+                                style={{
+                                  margin: 0,
+                                  color: "#2d5016",
+                                  fontWeight: "600",
+                                  marginBottom: "5px",
+                                }}
+                              >
+                                {itemName}
+                              </h6>
+                              {itemSpecies && (
+                                <Badge
+                                  style={{
+                                    backgroundColor: "#e8f5e3",
+                                    color: "#fff",
+                                    fontSize: "12px",
+                                    padding: "4px 10px",
+                                    borderRadius: "12px",
+                                  }}
+                                >
+                                  {itemSpecies}
+                                </Badge>
+                              )}
+                              {itemLocation && (
+                                <div
+                                  style={{
+                                    fontSize: "12px",
+                                    color: "#5a7c3a",
+                                    marginTop: "5px",
+                                  }}
+                                >
+                                  สถานที่: {itemLocation}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </td>
+                        <td
+                          style={{
+                            padding: "20px",
+                            borderColor: "#d4e6d1",
+                            textAlign: "center",
+                            verticalAlign: "middle",
+                          }}
+                        >
+                          <span style={{ color: "#2d5016", fontWeight: "600" }}>
+                            {itemPrice.toLocaleString()} ฿
+                          </span>
+                        </td>
+                        <td
+                          style={{
+                            padding: "20px",
+                            borderColor: "#d4e6d1",
+                            textAlign: "center",
+                            verticalAlign: "middle",
+                          }}
+                        >
+                          <div
+                            className="d-flex align-items-center justify-content-center"
+                            style={{ gap: "10px" }}
+                          >
+                            <Button
+                              variant="outline-secondary"
+                              size="sm"
+                              onClick={() =>
+                                itemQty <= 1
+                                  ? handleRemoveItem(treeId)
+                                  : handleQuantityChange(treeId, "decrement")
+                              }
+                              style={{
+                                borderRadius: "8px",
+                                width: "36px",
+                                height: "36px",
+                                borderColor: "#d4e6d1",
                                 color: "#2d5016",
+                              }}
+                            >
+                              <Minus size={16} />
+                            </Button>
+                            <span
+                              style={{
+                                minWidth: "50px",
+                                textAlign: "center",
                                 fontWeight: "600",
-                                marginBottom: "5px",
-                              }}
-                            >
-                              {item.name}
-                            </h6>
-                            <Badge
-                              style={{
-                                backgroundColor: "#e8f5e3",
                                 color: "#2d5016",
-                                fontSize: "12px",
-                                padding: "4px 10px",
-                                borderRadius: "12px",
                               }}
                             >
-                              {item.species}
-                            </Badge>
+                              {itemQty}
+                            </span>
+                            <Button
+                              variant="outline-secondary"
+                              size="sm"
+                              onClick={() =>
+                                handleQuantityChange(treeId, "increment")
+                              }
+                              disabled={itemQty >= itemMaxQty}
+                              style={{
+                                borderRadius: "8px",
+                                width: "36px",
+                                height: "36px",
+                                borderColor: "#d4e6d1",
+                                color: "#2d5016",
+                              }}
+                            >
+                              <Plus size={16} />
+                            </Button>
+                          </div>
+                          {itemQty >= itemMaxQty && itemMaxQty < 9999 && (
                             <div
                               style={{
-                                fontSize: "12px",
-                                color: "#5a7c3a",
+                                fontSize: "11px",
+                                color: "#c97d60",
                                 marginTop: "5px",
                               }}
                             >
-                              สถานที่: {item.location}
+                              สูงสุด {itemMaxQty} ต้น
                             </div>
-                          </div>
-                        </div>
-                      </td>
-                      <td
-                        style={{
-                          padding: "20px",
-                          borderColor: "#d4e6d1",
-                          textAlign: "center",
-                        }}
-                      >
-                        <span style={{ color: "#2d5016", fontWeight: "600" }}>
-                          {item.price.toLocaleString()} ฿
-                        </span>
-                      </td>
-                      <td
-                        style={{
-                          padding: "20px",
-                          borderColor: "#d4e6d1",
-                          textAlign: "center",
-                        }}
-                      >
-                        <div
-                          className="d-flex align-items-center justify-content-center"
-                          style={{ gap: "10px" }}
+                          )}
+                        </td>
+                        <td
+                          style={{
+                            padding: "20px",
+                            borderColor: "#d4e6d1",
+                            textAlign: "center",
+                            verticalAlign: "middle",
+                          }}
                         >
-                          <Button
-                            variant="outline-secondary"
-                            size="sm"
-                            onClick={() =>
-                              handleQuantityChange(item.id, item.quantity - 1)
-                            }
-                            disabled={item.quantity <= 1}
-                            style={{
-                              borderRadius: "8px",
-                              width: "36px",
-                              height: "36px",
-                              borderColor: "#d4e6d1",
-                              color: "#2d5016",
-                            }}
-                          >
-                            <Minus size={16} />
-                          </Button>
                           <span
                             style={{
-                              minWidth: "50px",
-                              textAlign: "center",
-                              fontWeight: "600",
                               color: "#2d5016",
+                              fontWeight: "700",
+                              fontSize: "16px",
                             }}
                           >
-                            {item.quantity}
+                            {(itemPrice * itemQty).toLocaleString()} ฿
                           </span>
+                        </td>
+                        <td
+                          style={{
+                            padding: "20px",
+                            borderColor: "#d4e6d1",
+                            textAlign: "center",
+                            verticalAlign: "middle",
+                          }}
+                        >
                           <Button
-                            variant="outline-secondary"
+                            variant="outline-danger"
                             size="sm"
-                            onClick={() =>
-                              handleQuantityChange(item.id, item.quantity + 1)
-                            }
-                            disabled={item.quantity >= item.maxQuantity}
+                            onClick={() => handleRemoveItem(treeId)}
                             style={{
                               borderRadius: "8px",
-                              width: "36px",
-                              height: "36px",
-                              borderColor: "#d4e6d1",
-                              color: "#2d5016",
-                            }}
-                          >
-                            <Plus size={16} />
-                          </Button>
-                        </div>
-                        {item.quantity >= item.maxQuantity && (
-                          <div
-                            style={{
-                              fontSize: "11px",
+                              borderColor: "#c97d60",
                               color: "#c97d60",
-                              marginTop: "5px",
                             }}
                           >
-                            สูงสุด {item.maxQuantity} ต้น
-                          </div>
-                        )}
-                      </td>
-                      <td
-                        style={{
-                          padding: "20px",
-                          borderColor: "#d4e6d1",
-                          textAlign: "center",
-                        }}
-                      >
-                        <span
-                          style={{
-                            color: "#2d5016",
-                            fontWeight: "700",
-                            fontSize: "16px",
-                          }}
-                        >
-                          {(item.price * item.quantity).toLocaleString()} ฿
-                        </span>
-                      </td>
-                      <td
-                        style={{
-                          padding: "20px",
-                          borderColor: "#d4e6d1",
-                          textAlign: "center",
-                        }}
-                      >
-                        <Button
-                          variant="outline-danger"
-                          size="sm"
-                          onClick={() => handleRemoveItem(item.id)}
-                          style={{
-                            borderRadius: "8px",
-                            borderColor: "#c97d60",
-                            color: "#c97d60",
-                          }}
-                        >
-                          <Trash2 size={16} />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
+                            <Trash2 size={16} />
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })}
                 </tbody>
               </Table>
             </Card.Body>
@@ -467,13 +570,16 @@ const Cart = () => {
                 <div className="d-flex justify-content-between mb-2">
                   <span style={{ color: "#5a7c3a" }}>จำนวนรายการ:</span>
                   <span style={{ color: "#2d5016", fontWeight: "600" }}>
-                    {cart.items.length} รายการ
+                    {cartItems.length} รายการ
                   </span>
                 </div>
                 <div className="d-flex justify-content-between mb-2">
                   <span style={{ color: "#5a7c3a" }}>จำนวนต้นไม้:</span>
                   <span style={{ color: "#2d5016", fontWeight: "600" }}>
-                    {cart.items.reduce((sum, item) => sum + item.quantity, 0)}{" "}
+                    {cartItems.reduce(
+                      (sum, item) => sum + Number(item.quantity ?? 0),
+                      0,
+                    )}{" "}
                     ต้น
                   </span>
                 </div>
@@ -495,7 +601,7 @@ const Cart = () => {
                       fontSize: "24px",
                     }}
                   >
-                    {cart.total.toLocaleString()} ฿
+                    {cartTotal.toLocaleString()} ฿
                   </span>
                 </div>
               </div>
@@ -508,13 +614,18 @@ const Cart = () => {
                   borderColor: "#4a7c2a",
                   borderRadius: "10px",
                   padding: "14px",
+                  color: "#fff",
                   fontWeight: "600",
                   marginBottom: "15px",
                 }}
               >
                 <CreditCard
                   size={20}
-                  style={{ marginRight: "8px", verticalAlign: "middle" }}
+                  style={{
+                    marginRight: "8px",
+                    verticalAlign: "middle",
+                    color: "#fff",
+                  }}
                 />
                 ดำเนินการชำระเงิน
               </Button>

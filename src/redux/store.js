@@ -4,6 +4,7 @@ import catSlice from "./slices/catSlice";
 import treeSlice from "./slices/treeSlice";
 import cartSlice from "./slices/cartSlice";
 import authSlice from "./slices/authSlice";
+import orderSlice from "./slices/orderSlice";
 
 export const store = configureStore({
   reducer: {
@@ -11,6 +12,7 @@ export const store = configureStore({
     treeSlice: treeSlice,
     cart: cartSlice,
     auth: authSlice,
+    orderSlice: orderSlice,
   },
 });
 

@@ -9,6 +9,7 @@ import {
   onCreateTreeWithFormData,
   onGetTreeById,
   onUpdateTree,
+  onUpdateTreeWithFormData,
 } from "../../redux/slices/treeSlice";
 import {
   Sprout,
@@ -45,39 +46,37 @@ function AddTree() {
     onSubmit: (values) => handleSubmitData(values),
   });
 
-  // Fetch tree data if in edit mode
+  // Fetch tree data if in edit mode (ไม่ใส่ formik ใน dependency เพื่อไม่ให้ effect วิ่งซ้ำแล้วค้าง)
   useEffect(() => {
-    if (isEditMode && id) {
-      setLoading(true);
-      dispatch(onGetTreeById(id))
-        .then((response) => {
-          console.log("onGetTreeById response: ", response?.payload);
-          if (response?.payload) {
-            const data = response.payload;
-            setTreeData(data);
-            // Update formik values with fetched data
-            formik.setValues({
-              name: data.name || "",
-              species: data.species || "",
-              buy_price: data.buy_price || 0,
-              sell_price: data.sell_price || 0,
-              quantity: data.quantity || 0,
-            });
-          }
-          setLoading(false);
-        })
-        .catch((error) => {
-          console.error("Error fetching tree data: ", error);
-          setLoading(false);
-          alert.custom.fire({
-            icon: "error",
-            title: "เกิดข้อผิดพลาด",
-            text: "ไม่สามารถโหลดข้อมูลต้นไม้ได้",
-            confirmButtonText: "ตกลง",
+    if (!id) return;
+    setLoading(true);
+    dispatch(onGetTreeById(id))
+      .then((response) => {
+        if (response?.payload) {
+          const raw = response.payload;
+          const data = raw?.data !== undefined ? raw.data : raw;
+          setTreeData(data);
+          formik.setValues({
+            name: data.name || "",
+            species: data.species || "",
+            buy_price: data.buy_price ?? data.price_old ?? 0,
+            sell_price: data.sell_price ?? data.price_new ?? 0,
+            quantity: data.quantity ?? data.amount ?? 0,
           });
+        }
+        setLoading(false);
+      })
+      .catch((error) => {
+        console.error("Error fetching tree data: ", error);
+        setLoading(false);
+        alert.custom.fire({
+          icon: "error",
+          title: "เกิดข้อผิดพลาด",
+          text: "ไม่สามารถโหลดข้อมูลต้นไม้ได้",
+          confirmButtonText: "ตกลง",
         });
-    }
-  }, [id, isEditMode, dispatch, formik]);
+      });
+  }, [id]);
 
   const handleBackClick = () => {
     history.push("/admin/tree");
@@ -106,30 +105,59 @@ function AddTree() {
         sell_price,
         quantity,
       };
-      dispatch(onUpdateTree({ id, ...submitValues })).then((response) => {
-        console.log("onUpdateTree response: ", response);
-        if (response.payload) {
-          alert.custom
-            .fire({
-              icon: "success",
-              title: "อัพเดทเรียบร้อย!",
-              text: "ข้อมูลต้นไม้ถูกอัพเดทเรียบร้อยแล้ว",
-              confirmButtonText: "ตกลง",
-            })
-            .then((result) => {
-              if (result.isConfirmed) {
-                history.push("/admin/tree");
-              }
-            });
-        } else {
-          alert.custom.fire({
-            icon: "error",
-            title: "เกิดข้อผิดพลาด",
-            text: "ไม่สามารถอัพเดทข้อมูลต้นไม้ได้ กรุณาลองใหม่อีกครั้ง",
+      const handleUpdateSuccess = () => {
+        alert.custom
+          .fire({
+            icon: "success",
+            title: "อัพเดทเรียบร้อย!",
+            text: "ข้อมูลต้นไม้ถูกอัพเดทเรียบร้อยแล้ว",
             confirmButtonText: "ตกลง",
+          })
+          .then((result) => {
+            if (result.isConfirmed) {
+              history.push("/admin/tree");
+            }
           });
-        }
-      });
+        setImageFiles([]);
+      };
+      const handleUpdateError = () => {
+        alert.custom.fire({
+          icon: "error",
+          title: "เกิดข้อผิดพลาด",
+          text: "ไม่สามารถอัพเดทข้อมูลต้นไม้ได้ กรุณาลองใหม่อีกครั้ง",
+          confirmButtonText: "ตกลง",
+        });
+      };
+
+      if (imageFiles.length > 0) {
+        // อัปเดตพร้อมรูปภาพ (FormData) ส่งไปที่ PUT /trees/:id
+        const formData = new FormData();
+        formData.append("name", values.name);
+        formData.append("species", values.species);
+        formData.append("buy_price", String(buy_price));
+        formData.append("sell_price", String(sell_price));
+        formData.append("quantity", String(quantity));
+        imageFiles.forEach((file) => {
+          formData.append("images", file);
+        });
+        dispatch(onUpdateTreeWithFormData({ id, formData })).then(
+          (response) => {
+            if (response.payload) {
+              handleUpdateSuccess();
+            } else if (!response.error) {
+              handleUpdateError();
+            }
+          }
+        );
+      } else {
+        dispatch(onUpdateTree({ id, ...submitValues })).then((response) => {
+          if (response.payload) {
+            handleUpdateSuccess();
+          } else {
+            handleUpdateError();
+          }
+        });
+      }
     } else {
       // สร้างต้นไม้ใหม่ (รวมรูปภาพ) ส่งไปที่ POST http://localhost:3000/trees
       const formData = new FormData();
@@ -325,35 +353,38 @@ function AddTree() {
                       </Col>
                     </Row>
 
-                    {!isEditMode && (
-                      <Row>
-                        <Col className="mb-4">
-                          <Form.Group className="form-group-plant">
-                            <Form.Label className="form-label-plant">
-                              <ImagePlus size={18} className="label-icon" />
-                              รูปภาพต้นไม้
-                            </Form.Label>
-                            <Form.Control
-                              type="file"
-                              accept="image/*"
-                              multiple
-                              onChange={(e) => {
-                                const files = e.target.files;
-                                if (files?.length) {
-                                  setImageFiles(Array.from(files));
-                                }
-                              }}
-                              className="form-control-plant"
-                            />
-                            {imageFiles.length > 0 && (
-                              <Form.Text className="text-muted d-block mt-1">
-                                เลือกแล้ว {imageFiles.length} ไฟล์
+                    <Row>
+                      <Col className="mb-4">
+                        <Form.Group className="form-group-plant">
+                          <Form.Label className="form-label-plant">
+                            <ImagePlus size={18} className="label-icon" />
+                            รูปภาพต้นไม้
+                            {isEditMode && (
+                              <Form.Text className="text-muted ml-2">
+                                (เลือกไฟล์ใหม่ถ้าต้องการเปลี่ยนรูป)
                               </Form.Text>
                             )}
-                          </Form.Group>
-                        </Col>
-                      </Row>
-                    )}
+                          </Form.Label>
+                          <Form.Control
+                            type="file"
+                            accept="image/*"
+                            multiple
+                            onChange={(e) => {
+                              const files = e.target.files;
+                              if (files?.length) {
+                                setImageFiles(Array.from(files));
+                              }
+                            }}
+                            className="form-control-plant"
+                          />
+                          {imageFiles.length > 0 && (
+                            <Form.Text className="text-muted d-block mt-1">
+                              เลือกแล้ว {imageFiles.length} ไฟล์
+                            </Form.Text>
+                          )}
+                        </Form.Group>
+                      </Col>
+                    </Row>
 
                     <div className="d-flex justify-content-end mt-4">
                       <Button

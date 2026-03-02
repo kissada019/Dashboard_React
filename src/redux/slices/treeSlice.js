@@ -95,19 +95,32 @@ export const onCreateTreeWithFormData = createAsyncThunk(
 );
 
 export const onUpdateTree = createAsyncThunk(
-  "treeSlice/api/trees",
-  async (treeData) => {
+  "treeSlice/api/updateTree",
+  async (treeData, { rejectWithValue }) => {
     try {
-      // console.log("treeData : ", treeData);
-      let response = null;
-      if (_apiURL === "DEV") {
-        response = await service.api.put("api/Tree/Update", treeData);
-      } else if (_apiURL === "PRE") {
-        response = await service.api.post("api/trees", treeData);
+      const { id, ...payload } = treeData || {};
+      if (!id) {
+        throw new Error("Missing tree id for update");
       }
+      // ใช้ PUT /trees/:id ตามที่ต้องการ
+      const response = await service.api.put(`trees/${id}`, payload);
       return response;
     } catch (error) {
-      alert.error("Failed to create tree: " + error.message);
+      alert.error("Failed to update tree: " + error.message);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+/* อัปเดตต้นไม้ด้วย FormData (รวมรูปภาพ) ส่งไปที่ PUT /trees/:id */
+export const onUpdateTreeWithFormData = createAsyncThunk(
+  "treeSlice/api/updateTreeWithFormData",
+  async ({ id, formData }, { rejectWithValue }) => {
+    try {
+      const response = await service.api.putFormData(`trees/${id}`, formData);
+      return response;
+    } catch (error) {
+      alert.error("ไม่สามารถอัพเดทต้นไม้ได้: " + (error.message || error));
       return rejectWithValue(error.message);
     }
   }
@@ -191,6 +204,18 @@ export const treeSlice = createSlice({
         }
       })
       .addCase(onCreateTreeWithFormData.rejected, (state) => {
+        state.loading = false;
+      });
+
+    /* Update Tree with FormData (รูปภาพ) */
+    builder
+      .addCase(onUpdateTreeWithFormData.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(onUpdateTreeWithFormData.fulfilled, (state) => {
+        state.loading = false;
+      })
+      .addCase(onUpdateTreeWithFormData.rejected, (state) => {
         state.loading = false;
       });
   },

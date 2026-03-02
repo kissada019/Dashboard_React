@@ -20,6 +20,8 @@ import Login from "pages/auth/login";
 import Register from "pages/register";
 import Edit from "pages/tree/edit";
 import Tree from "pages/tree";
+import Shop from "pages/shop";
+import Sale from "pages/sale";
 import TreeDetailShopee from "pages/tree/treeDetailShopee";
 import Cart from "pages/cart";
 import Checkout from "pages/checkout";
@@ -33,10 +35,25 @@ const dashboardRoutes = [
     layout: "/admin",
   },
   {
-    path: "/tree/:id",
+    path: "/shop",
+    name: "ร้านต้นไม้",
+    icon: "nc-icon nc-notes",
+    component: Shop,
+    layout: "/admin",
+  },
+  {
+    path: "/sale",
+    name: "ขายต้นไม้",
+    icon: "nc-icon nc-money-coins",
+    component: Sale,
+    layout: "/admin",
+    roles: ["admin"],
+  },
+  {
+    path: "/tree/edit/:id",
     name: "แก้ไขต้นไม้",
     icon: "nc-icon nc-single-copy-04",
-    component: Edit, // Use Register component for both add and edit
+    component: Edit,
     layout: "/admin",
     hidden: true,
   },
@@ -46,6 +63,7 @@ const dashboardRoutes = [
     icon: "nc-icon nc-notes",
     component: Tree,
     layout: "/admin",
+    roles: ["admin"],
   },
   {
     path: "/tree-detail/:id",
@@ -61,6 +79,7 @@ const dashboardRoutes = [
     icon: "nc-icon nc-paper-2",
     component: Register,
     layout: "/admin",
+    roles: ["admin"],
   },
   {
     path: "/login",

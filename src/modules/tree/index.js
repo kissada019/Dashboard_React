@@ -12,7 +12,11 @@ import {
 } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 import alert from "../../utils/alert";
-import { onGetAllTree, onGetTreeById } from "../../redux/slices/treeSlice";
+import {
+  onGetAllTree,
+  onGetTreeById,
+  onUpdateTree,
+} from "../../redux/slices/treeSlice";
 import {
   Pencil,
   Trash,
@@ -46,6 +50,7 @@ const TreePage = () => {
 
   const filteredData = data?.filter(
     (item) =>
+      (item.id && item.id.toLowerCase().includes(searchTerm)) ||
       item.name.toLowerCase().includes(searchTerm) ||
       item.species.toLowerCase().includes(searchTerm) ||
       item.buy_price.toString().includes(searchTerm) ||
@@ -53,22 +58,39 @@ const TreePage = () => {
       item.quantity.toString().includes(searchTerm)
   );
 
-  const handleDeleteTree = (id) => {
+  const handleDeleteTree = (tree) => {
+    const { id, name } = tree || {};
     alert.custom
       .fire({
         icon: "warning",
-        title: "คุณต้องการลบข้อมูลต้นไม้ id = " + id,
+        title: name
+          ? `คุณต้องการลบข้อมูล "${name}" หรือไม่?`
+          : `คุณต้องการลบข้อมูลต้นไม้ id = ${id}`,
         showCancelButton: true,
         confirmButtonText: "ยืนยัน",
         cancelButtonText: "ยกเลิก",
       })
       .then((result) => {
         if (result.isConfirmed) {
-          alert.custom.fire({
-            icon: "success",
-            title: "ลบข้อมูลเรียบร้อย",
-            confirmButtonText: "ยืนยัน",
-          });
+          dispatch(onUpdateTree({ id, status: "inactive" })).then(
+            (response) => {
+              if (response?.payload) {
+                alert.custom.fire({
+                  icon: "success",
+                  title: "ปิดการใช้งานเรียบร้อย",
+                  confirmButtonText: "ยืนยัน",
+                });
+                dispatch(onGetAllTree());
+              } else {
+                alert.custom.fire({
+                  icon: "error",
+                  title: "เกิดข้อผิดพลาด",
+                  text: "ไม่สามารถปิดการใช้งานต้นไม้ได้",
+                  confirmButtonText: "ตกลง",
+                });
+              }
+            }
+          );
         } else if (result.dismiss === alert.custom.DismissReason.cancel) {
           console.log("ยกเลิกการลบ");
         }
@@ -80,7 +102,7 @@ const TreePage = () => {
   };
 
   const handleEditClick = (id) => {
-    history.push(`/admin/tree/${id}`);
+    history.push(`/admin/tree/edit/${id}`);
   };
 
   const handleViewDetail = (id) => {
@@ -606,7 +628,7 @@ const TreePage = () => {
                           <Button
                             variant="outline-danger"
                             size="sm"
-                            onClick={() => handleDeleteTree(item.id)}
+                            onClick={() => handleDeleteTree(item)}
                             style={{
                               borderRadius: "6px",
                               padding: "5px 12px",

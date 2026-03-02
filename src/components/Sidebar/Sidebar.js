@@ -15,19 +15,32 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import React, { Component } from "react";
+import React from "react";
 import { useLocation, NavLink } from "react-router-dom";
 
 import { Nav } from "react-bootstrap";
 
 import logo from "assets/img/reactlogo.png";
+import userInfoStorage from "../../storage/userInfoStorage";
 
 function Sidebar({ color, image, routes }) {
   const location = useLocation();
   const activeRoute = (routeName) => {
     return location.pathname.indexOf(routeName) > -1 ? "active" : "";
   };
-  const route = routes.filter((route) => !route.hidden);
+
+  // ดึง role จาก localStorage
+  const userInfo = userInfoStorage.get() || {};
+  const userRole = (userInfo.role || "").toLowerCase();
+
+  // กรองเมนู: ไม่แสดง hidden และเช็ค roles (ถ้า route ไม่ได้ตั้ง roles = เข้าถึงได้ทุก role)
+  const route = routes.filter((r) => {
+    if (r.hidden) return false;
+    if (r.roles && r.roles.length > 0) {
+      return r.roles.map((role) => role.toLowerCase()).includes(userRole);
+    }
+    return true;
+  });
 
   return (
     <div className="sidebar" data-image={image} data-color={color}>
