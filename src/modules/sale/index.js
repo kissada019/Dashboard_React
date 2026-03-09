@@ -157,11 +157,40 @@ const pageStyles = `
   .sale-page input[type=number] { -moz-appearance: textfield; }
 
   @media (max-width: 576px) {
+    .sale-page {
+      padding: 12px !important;
+    }
     .sale-hero { border-radius: 14px; }
     .sale-card { border-radius: 14px; }
     .sale-stat { border-radius: 14px; }
     .sale-statValue { font-size: 18px; }
     .sale-search { height: 40px; }
+    .sale-tableWrap {
+      overflow-x: auto;
+    }
+    .sale-tableWrap table {
+      min-width: 680px;
+    }
+    .sale-table thead th,
+    .sale-table tbody td {
+      font-size: 13px;
+      padding-top: 10px;
+      padding-bottom: 10px;
+      white-space: nowrap;
+    }
+    .sale-footer-main {
+      flex-direction: column;
+      align-items: flex-start !important;
+      gap: 10px;
+    }
+    .sale-footer-actions {
+      width: 100%;
+      justify-content: flex-start;
+    }
+    .sale-note-control {
+      max-width: 100% !important;
+      width: 100%;
+    }
     .sale-qtyBtn { width: 34px; height: 34px; }
     .sale-qtyInput { height: 34px !important; }
   }
@@ -603,7 +632,7 @@ const Sale = () => {
                                 style={{
                                   fontWeight: 900,
                                   color: "var(--sale-primary)",
-                                  fontSize: 30,
+                                  fontSize: 18,
                                 }}
                               >
                                 {item?.name || "-"}
@@ -634,7 +663,7 @@ const Sale = () => {
                               {String(key || "").length > 10 ? "..." : ""}
                             </div>
                           </td>
-                          <td style={{ verticalAlign: "middle", fontSize: 30 }}>
+                          <td style={{ verticalAlign: "middle", fontSize: 18 }}>
                             {item?.species || item?.category || "-"}
                           </td>
                           <td
@@ -642,7 +671,7 @@ const Sale = () => {
                               textAlign: "right",
                               verticalAlign: "middle",
                               fontWeight: 900,
-                              fontSize: 30,
+                              fontSize: 18,
                             }}
                           >
                             {price.toLocaleString()} ฿
@@ -651,7 +680,7 @@ const Sale = () => {
                             style={{
                               textAlign: "center",
                               verticalAlign: "middle",
-                              fontSize: 30,
+                              fontSize: 18,
                             }}
                           >
                             <Badge
@@ -782,7 +811,7 @@ const Sale = () => {
                             style={{
                               fontWeight: 900,
                               color: "var(--sale-primary)",
-                              fontSize: 30,
+                              fontSize: 18,
                             }}
                           >
                             {item.name}
@@ -794,7 +823,7 @@ const Sale = () => {
                             verticalAlign: "middle",
                           }}
                         >
-                          <Badge bg="success" pill style={{ fontSize: 30 }}>
+                          <Badge bg="success" pill style={{ fontSize: 14 }}>
                             {item.stock}
                           </Badge>
                         </td>
@@ -850,7 +879,7 @@ const Sale = () => {
                           style={{
                             textAlign: "right",
                             verticalAlign: "middle",
-                            fontSize: 30,
+                            fontSize: 18,
                           }}
                         >
                           {item.price.toLocaleString()} ฿
@@ -860,7 +889,7 @@ const Sale = () => {
                             textAlign: "right",
                             verticalAlign: "middle",
                             fontWeight: "900",
-                            fontSize: 30,
+                            fontSize: 18,
                           }}
                         >
                           {item.subtotal.toLocaleString()} ฿
@@ -888,7 +917,7 @@ const Sale = () => {
                         <td
                           colSpan={6}
                           className="text-center py-4"
-                          style={{ color: "#6c757d", fontSize: 30 }}
+                          style={{ color: "#6c757d", fontSize: 18 }}
                         >
                           ยังไม่มีรายการสั่งซื้อ
                           (คลิกแถวจากตารางด้านบนเพื่อเพิ่ม)
@@ -900,17 +929,17 @@ const Sale = () => {
               </div>
             </Card.Body>
             <Card.Footer className="p-3">
-              <div className="d-flex justify-content-between align-items-center flex-wrap">
+              <div className="d-flex justify-content-between align-items-center flex-wrap sale-footer-main">
                 <div
                   style={{
                     color: "var(--sale-primary)",
                     fontWeight: 900,
-                    fontSize: 30,
+                    fontSize: 22,
                   }}
                 >
                   ราคารวมทั้งหมด: {totalPrice.toLocaleString()} บาท
                 </div>
-                <div className="d-flex mt-2 mt-md-0" style={{ gap: "8px" }}>
+                <div className="d-flex mt-2 mt-md-0 sale-footer-actions" style={{ gap: "8px" }}>
                   <Button
                     variant="outline-secondary"
                     onClick={handleReset}
@@ -944,7 +973,7 @@ const Sale = () => {
                   style={{
                     color: "var(--sale-primary)",
                     fontWeight: 900,
-                    fontSize: 30,
+                    fontSize: 22,
                   }}
                 >
                   แก้ไขราคารวม:
@@ -958,7 +987,7 @@ const Sale = () => {
                   style={{
                     borderRadius: 12,
                     maxWidth: "220px",
-                    fontSize: 30,
+                    fontSize: 22,
                     fontWeight: 900,
                     height: "54px",
                     color: "var(--sale-primary)",
@@ -968,7 +997,7 @@ const Sale = () => {
                   style={{
                     color: "var(--sale-primary)",
                     fontWeight: 900,
-                    fontSize: 30,
+                    fontSize: 22,
                   }}
                 >
                   บาท
@@ -983,7 +1012,7 @@ const Sale = () => {
                   style={{
                     color: "var(--sale-primary)",
                     fontWeight: 900,
-                    fontSize: 30,
+                    fontSize: 22,
                   }}
                 >
                   ยอดสุทธิ: {editedTotalPrice.toLocaleString()} บาท
@@ -992,7 +1021,7 @@ const Sale = () => {
                   style={{
                     color: "var(--sale-subtext)",
                     fontWeight: 800,
-                    fontSize: 24,
+                    fontSize: 16,
                     marginLeft: 8,
                   }}
                 >
@@ -1002,7 +1031,7 @@ const Sale = () => {
                   style={{
                     color: "var(--sale-subtext)",
                     fontWeight: 800,
-                    fontSize: 24,
+                    fontSize: 16,
                     marginLeft: 8,
                   }}
                 >
@@ -1012,7 +1041,7 @@ const Sale = () => {
                   style={{
                     color: "var(--sale-subtext)",
                     fontWeight: 800,
-                    fontSize: 24,
+                    fontSize: 16,
                     marginLeft: 8,
                   }}
                 >
@@ -1028,7 +1057,7 @@ const Sale = () => {
                   style={{
                     color: "var(--sale-primary)",
                     fontWeight: 900,
-                    fontSize: 30,
+                    fontSize: 22,
                   }}
                 >
                   note:
@@ -1039,6 +1068,7 @@ const Sale = () => {
                   value={orderNote}
                   onChange={(e) => setOrderNote(e.target.value)}
                   placeholder="หมายเหตุคำสั่งซื้อ เช่น ซื้อปลูกหน้าบ้าน"
+                  className="sale-note-control"
                   style={{ borderRadius: 12, maxWidth: "520px" }}
                 />
               </div>
