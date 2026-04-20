@@ -8,6 +8,7 @@ import {
   Button,
   Form,
   Badge,
+  Modal,
 } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -156,6 +157,50 @@ const pageStyles = `
   }
   .sale-page input[type=number] { -moz-appearance: textfield; }
 
+  .sale-payment-modal.modal {
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    padding: 0 !important;
+  }
+  .sale-payment-modal .modal-dialog {
+    margin: 0 auto !important;
+    width: min(520px, calc(100% - 24px));
+    transform: translate(0, 0) !important;
+  }
+  .sale-payment-modal .modal-content {
+    border-radius: 16px;
+    border: 1px solid var(--sale-border);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
+  }
+  .sale-payment-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 8px;
+  }
+  .sale-payment-option-btn {
+    border-radius: 12px !important;
+    padding: 12px 10px !important;
+    font-size: 18px !important;
+    font-weight: 900 !important;
+    border: 3px solid #5f7f4a !important;
+    outline: 3px solid rgba(45, 80, 22, 0.28);
+    outline-offset: 0;
+  }
+  .sale-payment-option-btn--active {
+    background: linear-gradient(180deg, #245f43 0%, #194531 100%) !important;
+    border-color: #143827 !important;
+    outline: 2px solid rgba(20, 56, 39, 0.55);
+    color: #fff !important;
+    box-shadow: 0 10px 18px rgba(20, 56, 39, 0.30);
+  }
+  .sale-payment-option-btn--inactive {
+    background: #edf4ea !important;
+    color: #1f3a14 !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  }
+
   @media (max-width: 576px) {
     .sale-page {
       padding: 12px !important;
@@ -193,6 +238,9 @@ const pageStyles = `
     }
     .sale-qtyBtn { width: 34px; height: 34px; }
     .sale-qtyInput { height: 34px !important; }
+    .sale-payment-options {
+      grid-template-columns: 1fr;
+    }
   }
 `;
 
@@ -207,6 +255,8 @@ const Sale = () => {
   const [selectedQty, setSelectedQty] = useState({});
   const [orderNote, setOrderNote] = useState("");
   const [customTotalPrice, setCustomTotalPrice] = useState("");
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [paymentMethod, setPaymentMethod] = useState("cash");
   const itemsPerPage = 10;
 
   useEffect(() => {
@@ -366,9 +416,10 @@ const Sale = () => {
     setSelectedQty({});
     setOrderNote("");
     setCustomTotalPrice("");
+    setPaymentMethod("cash");
   };
 
-  const handleConfirmSale = async () => {
+  const handleOpenPaymentModal = () => {
     if (selectedItems.length === 0) {
       alert.custom.fire({
         icon: "warning",
@@ -377,6 +428,10 @@ const Sale = () => {
       });
       return;
     }
+    setShowPaymentModal(true);
+  };
+
+  const handleConfirmSale = async () => {
     const totalPriceBeforeDiscount = Number(totalPrice);
     const finalTotalNet = Number(editedTotalPrice);
     const discountAmount = Number(discount);
@@ -394,6 +449,7 @@ const Sale = () => {
       total_price: totalPriceBeforeDiscount, // ราคารวมเดิม
       final_total: finalTotalNet, // ยอดสุทธิหลังลด
       discount_amount: discountAmount, // ส่วนลด
+      payment_method: paymentMethod, // cash | transfer
     };
 
     console.log("payload : ", payload);
@@ -402,6 +458,7 @@ const Sale = () => {
       await dispatch(onCreateOrder(payload)).unwrap();
       await dispatch(onGetAllTree());
       handleReset();
+      setShowPaymentModal(false);
 
       alert.custom.fire({
         icon: "success",
@@ -413,6 +470,7 @@ const Sale = () => {
             <div>ราคารวมเดิม: <strong>${totalPrice.toLocaleString()} บาท</strong></div>
             <div>ส่วนลด: <strong>${discount.toLocaleString()} บาท</strong></div>
             <div>ยอดสุทธิ: <strong>${editedTotalPrice.toLocaleString()} บาท</strong></div>
+            <div>ชำระเงิน: <strong>${paymentMethod === "cash" ? "เงินสด" : "โอน"}</strong></div>
           </div>
         `,
         confirmButtonText: "ตกลง",
@@ -939,7 +997,10 @@ const Sale = () => {
                 >
                   ราคารวมทั้งหมด: {totalPrice.toLocaleString()} บาท
                 </div>
-                <div className="d-flex mt-2 mt-md-0 sale-footer-actions" style={{ gap: "8px" }}>
+                <div
+                  className="d-flex mt-2 mt-md-0 sale-footer-actions"
+                  style={{ gap: "8px" }}
+                >
                   <Button
                     variant="outline-secondary"
                     onClick={handleReset}
@@ -950,7 +1011,7 @@ const Sale = () => {
                     ล้างรายการ
                   </Button>
                   <Button
-                    onClick={handleConfirmSale}
+                    onClick={handleOpenPaymentModal}
                     disabled={orderLoading}
                     style={{
                       backgroundColor: "var(--sale-accent)",
@@ -1076,6 +1137,74 @@ const Sale = () => {
           </Card>
         </Col>
       </Row>
+
+      <Modal
+        show={showPaymentModal}
+        onHide={() => setShowPaymentModal(false)}
+        centered
+        className="sale-payment-modal"
+        backdrop="static"
+      >
+        <Modal.Header closeButton>
+          <Modal.Title
+            style={{ fontWeight: 900, color: "var(--sale-primary)" }}
+          >
+            เลือกวิธีชำระเงิน
+          </Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          <div style={{ color: "var(--sale-muted)", marginBottom: 10 }}>
+            กรุณาเลือกวิธีรับชำระก่อนบันทึกการขาย
+          </div>
+          <div className="sale-payment-options">
+            <Button
+              type="button"
+              className={`sale-payment-option-btn ${paymentMethod === "cash" ? "sale-payment-option-btn--active" : "sale-payment-option-btn--inactive"}`}
+              onClick={() => setPaymentMethod("cash")}
+            >
+              เงินสด
+            </Button>
+            <Button
+              type="button"
+              className={`sale-payment-option-btn ${paymentMethod === "transfer" ? "sale-payment-option-btn--active" : "sale-payment-option-btn--inactive"}`}
+              onClick={() => setPaymentMethod("transfer")}
+            >
+              โอน
+            </Button>
+          </div>
+          <div
+            style={{
+              marginTop: 14,
+              color: "var(--sale-subtext)",
+              fontWeight: 700,
+            }}
+          >
+            ยอดสุทธิ: {editedTotalPrice.toLocaleString()} บาท
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button
+            variant="outline-secondary"
+            onClick={() => setShowPaymentModal(false)}
+            disabled={orderLoading}
+            style={{ borderRadius: 10, fontWeight: 800 }}
+          >
+            ยกเลิก
+          </Button>
+          <Button
+            onClick={handleConfirmSale}
+            disabled={orderLoading}
+            style={{
+              backgroundColor: "var(--sale-accent)",
+              borderColor: "var(--sale-accent)",
+              borderRadius: 10,
+              fontWeight: 900,
+            }}
+          >
+            {orderLoading ? "กำลังบันทึก..." : "ยืนยันการขาย"}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </Container>
   );
 };

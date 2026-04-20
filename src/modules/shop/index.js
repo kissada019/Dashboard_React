@@ -32,32 +32,213 @@ const toImageSrc = (path) => {
   return path.startsWith("/") ? path : "/" + path;
 };
 
-/* ---------- inline responsive CSS ---------- */
-const mobileStyles = `
+const shopStyles = `
+  .shop-modern {
+    --shop-bg: #f3f7f3;
+    --shop-card: #ffffff;
+    --shop-text: #1f3a14;
+    --shop-muted: #6f8667;
+    --shop-border: #d8e6d2;
+    --shop-brand: #2f7d57;
+    --shop-brand-dark: #245f43;
+    --shop-brand-soft: #e8f5ee;
+    background: radial-gradient(1200px 500px at 10% -10%, rgba(74,124,42,0.15), transparent 60%), var(--shop-bg);
+  }
+  .shop-header {
+    border: 1px solid #3f7a34;
+    border-radius: 18px;
+    padding: 26px 24px;
+    color: #fff;
+    background: linear-gradient(135deg, #1f4f18 0%, #2d6f27 45%, #2f7d57 100%);
+    box-shadow: 0 16px 34px rgba(31, 79, 24, 0.32);
+  }
+  .shop-header-title {
+    margin: 0;
+    font-weight: 900;
+    font-size: 28px;
+    letter-spacing: .2px;
+  }
+  .shop-header-subtitle {
+    margin: 8px 0 0;
+    opacity: .92;
+    font-size: 14px;
+  }
+  .shop-header-badge {
+    border: 1px solid rgba(255,255,255,.45);
+    border-radius: 999px;
+    background: rgba(255,255,255,.18);
+    font-size: 12px;
+    font-weight: 800;
+    padding: 6px 12px;
+    backdrop-filter: blur(3px);
+  }
+  .shop-filter-card {
+    border: 1px solid var(--shop-border) !important;
+    border-radius: 16px !important;
+    box-shadow: 0 8px 22px rgba(45, 80, 22, 0.08) !important;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(8px);
+  }
+  .search-input, .sort-select {
+    border-radius: 12px !important;
+    border: 1px solid var(--shop-border) !important;
+    height: 44px !important;
+    font-size: 14px !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,.7);
+  }
+  .search-input { padding-left: 38px !important; }
+  .search-input:focus, .sort-select:focus {
+    border-color: var(--shop-brand) !important;
+    box-shadow: 0 0 0 3px rgba(47, 125, 87, 0.16) !important;
+  }
+  .shop-count-badge {
+    background: linear-gradient(135deg, #2f7d57 0%, #245f43 100%) !important;
+    border-radius: 999px !important;
+    font-size: 13px !important;
+    font-weight: 800 !important;
+    padding: 8px 14px !important;
+    box-shadow: 0 8px 16px rgba(36,95,67,.25);
+  }
+  .tree-card-modern {
+    border-radius: 16px !important;
+    border: 1px solid #dce9d6 !important;
+    box-shadow: 0 8px 20px rgba(45, 80, 22, 0.08) !important;
+    overflow: hidden;
+    transition: transform .2s ease, box-shadow .25s ease;
+  }
+  .tree-card-modern:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 14px 28px rgba(45, 80, 22, 0.18) !important;
+  }
+  .tree-card-img {
+    position: relative;
+    width: 100%;
+    height: 210px;
+    overflow: hidden;
+    background: #eaf3e8;
+  }
+  .tree-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform .35s ease;
+  }
+  .tree-card-modern:hover .tree-card-img img {
+    transform: scale(1.06);
+  }
+  .tree-species-badge {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #fff;
+    background: rgba(31, 58, 20, 0.82);
+    border: 1px solid rgba(255,255,255,.28);
+  }
+  .tree-low-stock-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 800;
+    color: #fff;
+    background: rgba(201, 125, 96, 0.92);
+  }
+  .tree-out-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.48);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 1px;
+  }
+  .tree-card-body { padding: 15px 16px !important; }
+  .tree-card-name {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 900;
+    color: var(--shop-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    cursor: pointer;
+  }
+  .tree-card-desc {
+    margin: 6px 0 10px;
+    font-size: 13px;
+    color: var(--shop-muted);
+    line-height: 1.45;
+    min-height: 38px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  .tree-card-price {
+    font-size: 22px;
+    font-weight: 900;
+    color: #245f43;
+  }
+  .tree-card-price-unit {
+    font-size: 13px;
+    color: #78956f;
+    margin-left: 4px;
+  }
+  .tree-card-stock {
+    margin: 4px 0 12px;
+    font-size: 12px;
+    font-weight: 700;
+  }
+  .tree-card-btn {
+    border-radius: 10px !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    padding: 8px 8px !important;
+  }
+  .tree-card-btn-primary {
+    background: linear-gradient(135deg, #2f7d57 0%, #245f43 100%) !important;
+    border-color: #245f43 !important;
+    color: #fff !important;
+  }
+  .tree-card-btn-secondary {
+    border-color: #2f7d57 !important;
+    color: #2f7d57 !important;
+    background: #fff !important;
+  }
+  .shop-empty {
+    border: 1px dashed #c6dbc1 !important;
+    border-radius: 16px !important;
+    box-shadow: none !important;
+    background: #fbfefb;
+  }
+  .shop-pagination-btn, .shop-pagination-num {
+    border-radius: 10px !important;
+    border-color: #2f7d57 !important;
+    color: #2f7d57 !important;
+    font-weight: 700 !important;
+  }
+  .shop-pagination-num.active {
+    background: #2f7d57 !important;
+    color: #fff !important;
+  }
   @media (max-width: 576px) {
-    .shop-header { padding: 20px 16px !important; border-radius: 12px !important; }
-    .shop-header h2 { font-size: 20px !important; }
-    .shop-header p  { font-size: 13px !important; }
-    .shop-header .leaf-icon { width: 24px; height: 24px; }
-
-    .shop-filter-card .card-body { padding: 12px !important; }
-    .shop-filter-card .search-input { height: 40px !important; font-size: 13px !important; }
-    .shop-filter-card .sort-select  { height: 40px !important; font-size: 13px !important; }
-
     .shop-container { padding: 12px !important; }
-
-    .tree-card-img { height: 180px !important; }
-    .tree-card-body { padding: 12px 14px !important; }
-    .tree-card-name { font-size: 15px !important; }
-    .tree-card-desc { font-size: 12px !important; }
-    .tree-card-price { font-size: 18px !important; }
-    .tree-card-price-unit { font-size: 12px !important; }
-    .tree-card-stock { font-size: 12px !important; margin-bottom: 10px !important; }
+    .shop-header { padding: 18px 14px; border-radius: 14px; }
+    .shop-header-title { font-size: 21px; }
+    .shop-header-subtitle { font-size: 12px; }
+    .tree-card-img { height: 180px; }
+    .tree-card-body { padding: 12px !important; }
+    .tree-card-price { font-size: 18px; }
     .tree-card-btn { font-size: 12px !important; padding: 7px 6px !important; }
-    .tree-card-btn svg { width: 13px; height: 13px; }
-
-    .shop-pagination-btn { padding: 6px 12px !important; font-size: 13px !important; }
-    .shop-pagination-num { min-width: 32px !important; height: 32px !important; font-size: 13px !important; }
   }
 `;
 
@@ -147,55 +328,37 @@ const ShopPage = () => {
   return (
     <>
       {/* inject responsive CSS */}
-      <style>{mobileStyles}</style>
+      <style>{shopStyles}</style>
 
       <Container
         fluid
-        className="shop-container"
-        style={{ padding: "16px", backgroundColor: "#f8f9f6" }}
+        className="shop-container shop-modern"
+        style={{ padding: "16px" }}
       >
         {/* Header */}
-        <div
-          className="shop-header mb-3"
-          style={{
-            background: "linear-gradient(135deg, #2d5016 0%, #4a7c2a 100%)",
-            borderRadius: "16px",
-            padding: "28px 24px",
-            color: "#fff",
-            boxShadow: "0 8px 24px rgba(45, 80, 22, 0.3)",
-          }}
-        >
-          <div className="d-flex align-items-center mb-1">
-            <Leaf
-              className="leaf-icon"
-              size={28}
-              style={{ marginRight: "10px", flexShrink: 0 }}
-            />
-            <h2 style={{ margin: 0, fontWeight: "700", fontSize: "24px" }}>
-              ร้านต้นไม้
-            </h2>
+        <div className="shop-header mb-3">
+          <div className="d-flex align-items-center justify-content-between flex-wrap" style={{ gap: 10 }}>
+            <div>
+              <div className="d-flex align-items-center mb-1">
+                <Leaf
+                  className="leaf-icon"
+                  size={28}
+                  style={{ marginRight: "10px", flexShrink: 0 }}
+                />
+                <h2 className="shop-header-title">ร้านต้นไม้</h2>
+              </div>
+              <p className="shop-header-subtitle">
+                เลือกซื้อต้นไม้คุณภาพดี หลากหลายสายพันธุ์
+              </p>
+            </div>
+            <div className="shop-header-badge">
+              {loading ? "กำลังโหลด..." : `${filteredData.length.toLocaleString()} ต้นไม้พร้อมขาย`}
+            </div>
           </div>
-          <p
-            style={{
-              margin: 0,
-              opacity: 0.85,
-              fontSize: "14px",
-              marginTop: "6px",
-            }}
-          >
-            เลือกซื้อต้นไม้คุณภาพดี หลากหลายสายพันธุ์
-          </p>
         </div>
 
         {/* Search & Filter */}
-        <Card
-          className="shop-filter-card mb-3"
-          style={{
-            border: "none",
-            borderRadius: "12px",
-            boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-          }}
-        >
+        <Card className="shop-filter-card mb-3">
           <Card.Body style={{ padding: "14px 16px" }}>
             <Row className="align-items-center g-2">
               {/* Search */}
@@ -218,15 +381,6 @@ const ShopPage = () => {
                     placeholder="ค้นหาต้นไม้..."
                     value={searchTerm}
                     onChange={handleSearchChange}
-                    style={{
-                      paddingLeft: "36px",
-                      borderRadius: "10px",
-                      border: "2px solid #d4e6d1",
-                      fontSize: "14px",
-                      height: "42px",
-                    }}
-                    onFocus={(e) => (e.target.style.borderColor = "#4a7c2a")}
-                    onBlur={(e) => (e.target.style.borderColor = "#d4e6d1")}
                   />
                 </div>
               </Col>
@@ -246,12 +400,6 @@ const ShopPage = () => {
                     className="sort-select"
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value)}
-                    style={{
-                      borderRadius: "10px",
-                      border: "2px solid #d4e6d1",
-                      fontSize: "14px",
-                      height: "42px",
-                    }}
                   >
                     <option value="name">เรียงตามชื่อ</option>
                     <option value="price_low">ราคา: น้อย → มาก</option>
@@ -262,15 +410,7 @@ const ShopPage = () => {
 
               {/* Count badge */}
               <Col xs={5} sm={5} md={3} lg={4} className="text-end">
-                <Badge
-                  bg="success"
-                  style={{
-                    padding: "6px 14px",
-                    fontSize: "13px",
-                    borderRadius: "20px",
-                    backgroundColor: "#4a7c2a",
-                  }}
-                >
+                <Badge bg="success" className="shop-count-badge">
                   <Sprout
                     size={13}
                     style={{ marginRight: "5px", verticalAlign: "middle" }}
@@ -292,27 +432,7 @@ const ShopPage = () => {
 
               return (
                 <Col key={item.id} xs={12} sm={6} md={6} lg={4} xl={3}>
-                  <Card
-                    style={{
-                      borderRadius: "14px",
-                      border: "1px solid #e4ede0",
-                      boxShadow: "0 2px 10px rgba(45, 80, 22, 0.06)",
-                      overflow: "hidden",
-                      transition: "all 0.3s ease",
-                      cursor: "pointer",
-                      height: "100%",
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.transform = "translateY(-4px)";
-                      e.currentTarget.style.boxShadow =
-                        "0 12px 28px rgba(45, 80, 22, 0.15)";
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.transform = "translateY(0)";
-                      e.currentTarget.style.boxShadow =
-                        "0 2px 10px rgba(45, 80, 22, 0.06)";
-                    }}
-                  >
+                  <Card className="tree-card-modern h-100">
                     {/* Image */}
                     <div
                       className="tree-card-img"
@@ -342,65 +462,18 @@ const ShopPage = () => {
                       />
                       {/* Species Badge */}
                       {item.species && (
-                        <Badge
-                          style={{
-                            position: "absolute",
-                            top: "10px",
-                            left: "10px",
-                            fontSize: "11px",
-                            padding: "4px 10px",
-                            borderRadius: "14px",
-                            backgroundColor: "rgba(45, 80, 22, 0.85)",
-                            color: "#fff",
-                            fontWeight: "500",
-                          }}
-                        >
+                        <Badge className="tree-species-badge">
                           {item.species}
                         </Badge>
                       )}
                       {/* Stock Badge */}
                       {stock <= 5 && stock > 0 && (
-                        <Badge
-                          style={{
-                            position: "absolute",
-                            top: "10px",
-                            right: "10px",
-                            fontSize: "11px",
-                            padding: "4px 10px",
-                            borderRadius: "14px",
-                            backgroundColor: "rgba(201, 125, 96, 0.9)",
-                            color: "#fff",
-                            fontWeight: "500",
-                          }}
-                        >
+                        <Badge className="tree-low-stock-badge">
                           เหลือ {stock} ต้น
                         </Badge>
                       )}
                       {stock === 0 && (
-                        <div
-                          style={{
-                            position: "absolute",
-                            top: 0,
-                            left: 0,
-                            right: 0,
-                            bottom: 0,
-                            backgroundColor: "rgba(0,0,0,0.45)",
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "center",
-                          }}
-                        >
-                          <span
-                            style={{
-                              color: "#fff",
-                              fontSize: "16px",
-                              fontWeight: "700",
-                              letterSpacing: "2px",
-                            }}
-                          >
-                            สินค้าหมด
-                          </span>
-                        </div>
+                        <div className="tree-out-overlay">สินค้าหมด</div>
                       )}
                     </div>
 
@@ -490,16 +563,10 @@ const ShopPage = () => {
                         <Button
                           variant="outline-success"
                           size="sm"
-                          className="tree-card-btn"
+                          className="tree-card-btn tree-card-btn-secondary"
                           onClick={() => handleViewDetail(item.id)}
                           style={{
                             flex: 1,
-                            borderRadius: "8px",
-                            borderColor: "#4a7c2a",
-                            color: "#4a7c2a",
-                            fontWeight: "500",
-                            fontSize: "13px",
-                            padding: "8px 8px",
                             whiteSpace: "nowrap",
                           }}
                         >
@@ -514,18 +581,11 @@ const ShopPage = () => {
                         </Button>
                         <Button
                           size="sm"
-                          className="tree-card-btn"
+                          className="tree-card-btn tree-card-btn-primary"
                           onClick={() => handleAddToCart(item)}
                           disabled={stock === 0}
                           style={{
                             flex: 1,
-                            borderRadius: "8px",
-                            backgroundColor: "#4a7c2a",
-                            borderColor: "#4a7c2a",
-                            color: "#fff",
-                            fontWeight: "500",
-                            fontSize: "13px",
-                            padding: "8px 8px",
                             whiteSpace: "nowrap",
                             opacity: stock === 0 ? 0.5 : 1,
                           }}
@@ -547,13 +607,7 @@ const ShopPage = () => {
             })}
           </Row>
         ) : (
-          <Card
-            style={{
-              border: "none",
-              borderRadius: "14px",
-              boxShadow: "0 2px 8px rgba(0,0,0,0.06)",
-            }}
-          >
+          <Card className="shop-empty">
             <Card.Body
               style={{
                 padding: "50px 20px",
@@ -592,11 +646,7 @@ const ShopPage = () => {
               variant="outline-success"
               size="sm"
               style={{
-                borderRadius: "8px",
                 padding: "7px 16px",
-                borderColor: "#4a7c2a",
-                color: "#4a7c2a",
-                fontWeight: "500",
                 fontSize: "14px",
               }}
             >
@@ -607,22 +657,16 @@ const ShopPage = () => {
               (page) => (
                 <Button
                   key={page}
-                  className="shop-pagination-num"
+                  className={`shop-pagination-num ${page === currentPage ? "active" : ""}`}
                   onClick={() => setCurrentPage(page)}
                   variant={
                     page === currentPage ? "success" : "outline-success"
                   }
                   size="sm"
                   style={{
-                    borderRadius: "8px",
                     minWidth: "36px",
                     height: "36px",
-                    fontWeight: "600",
                     fontSize: "14px",
-                    backgroundColor:
-                      page === currentPage ? "#4a7c2a" : "transparent",
-                    borderColor: "#4a7c2a",
-                    color: page === currentPage ? "#fff" : "#4a7c2a",
                   }}
                 >
                   {page}
@@ -639,11 +683,7 @@ const ShopPage = () => {
               variant="outline-success"
               size="sm"
               style={{
-                borderRadius: "8px",
                 padding: "7px 16px",
-                borderColor: "#4a7c2a",
-                color: "#4a7c2a",
-                fontWeight: "500",
                 fontSize: "14px",
               }}
             >

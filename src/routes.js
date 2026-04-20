@@ -15,7 +15,7 @@
 * The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
 */
-import Dashboard from "pages/Dashboard.js";
+import Dashboard from "pages/dashboard";
 import Login from "pages/auth/login";
 import Register from "pages/register";
 import Edit from "pages/tree/edit";

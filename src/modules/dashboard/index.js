@@ -10,7 +10,7 @@ import {
   Leaf,
   MoreVertical,
 } from "lucide-react";
-import { onGetDashboardSummary } from "../redux/slices/dashboardSlice";
+import { onGetDashboardSummary } from "../../redux/slices/dashboardSlice";
 
 const dashboardStyles = `
   .plant-dash {
@@ -277,6 +277,32 @@ const dashboardStyles = `
     border-radius: 999px;
     font-size: 13px;
     font-weight: 700;
+  }
+  .pd-pay-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 70px;
+    padding: 5px 10px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 800;
+    border: 1px solid transparent;
+  }
+  .pd-pay-transfer {
+    background: #dbeafe;
+    color: #1d4ed8;
+    border-color: #bfdbfe;
+  }
+  .pd-pay-cash {
+    background: #dcfce7;
+    color: #166534;
+    border-color: #bbf7d0;
+  }
+  .pd-pay-unknown {
+    background: #f1f5f9;
+    color: #475569;
+    border-color: #e2e8f0;
   }
   .pd-tag-success { background: #dcfce7; color: #166534; }
   .pd-tag-warning { background: #fef3c7; color: #92400e; }
@@ -807,6 +833,7 @@ function Dashboard() {
                 <tr>
                   <th>รหัสสั่งซื้อ</th>
                   <th>วันที่</th>
+                  <th>วิธีการชำระเงิน</th>
                   <th>สถานะ</th>
                   <th style={{ textAlign: "right" }}>ยอดสุทธิ</th>
                 </tr>
@@ -821,12 +848,32 @@ function Dashboard() {
                       order?.status || "unknown",
                     ).toLowerCase();
                     const isCompleted = status === "completed";
+                    const paymentMethod = String(
+                      order?.payment_method || "",
+                    ).toLowerCase();
+                    const paymentText =
+                      paymentMethod === "transfer"
+                        ? "โอน"
+                        : paymentMethod === "cash"
+                          ? "เงินสด"
+                          : "-";
+                    const paymentClass =
+                      paymentMethod === "transfer"
+                        ? "pd-pay-transfer"
+                        : paymentMethod === "cash"
+                          ? "pd-pay-cash"
+                          : "pd-pay-unknown";
                     return (
                       <tr key={order.id}>
                         <td style={{ fontWeight: 700 }}>
                           {String(order.id || "").slice(0, 8)}...
                         </td>
                         <td>{dateText}</td>
+                        <td>
+                          <span className={`pd-pay-badge ${paymentClass}`}>
+                            {paymentText}
+                          </span>
+                        </td>
                         <td>
                           <span
                             className={`pd-tag ${isCompleted ? "pd-tag-success" : "pd-tag-warning"}`}
@@ -843,7 +890,7 @@ function Dashboard() {
                 ) : (
                   <tr>
                     <td
-                      colSpan={4}
+                      colSpan={5}
                       style={{
                         textAlign: "center",
                         color: "#94a3b8",
