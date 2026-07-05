@@ -5,7 +5,7 @@ export const onGetDashboardSummary = createAsyncThunk(
   "dashboard/api/summary",
   async ({ from, to }, { rejectWithValue }) => {
     try {
-      const query = `dashboard/summary?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
+      const query = `api/dashboard/summary?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}`;
       const response = await service.api.get(query);
       return response;
     } catch (error) {

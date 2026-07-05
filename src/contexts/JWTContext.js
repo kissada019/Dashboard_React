@@ -58,7 +58,7 @@ const AuthContext = createContext({
 
 });
 
-const LOGIN_URL = "http://localhost:3000/auth/login";
+const LOGIN_URL = "http://localhost:3000/api/auth/login";
 
 /* provider */
 function AuthProvider({ children }) {
@@ -183,7 +183,7 @@ function AuthProvider({ children }) {
 
     const newPassword = async (request) => {
         return new Promise(async (resolve, reject) => {
-            await service.api.post('Criteria/ResetPasswordPMS', request, false, false).then((response) => {
+            await service.api.post('api/Criteria/ResetPasswordPMS', request, false, false).then((response) => {
                 resolve(response);
             }).catch((error) => {
                 reject(error);

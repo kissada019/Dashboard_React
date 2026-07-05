@@ -30,7 +30,7 @@ const pre = {
   ENV_DESC: "สำหรับทดสอบ Pre-Production",
   CONSOLE_LOG: true,
   SESSION_EXPIRED_MINUTES: 720 /* minutes */,
-  API_URL: "/", // ใช้ relative path ให้ผ่าน proxy (package.json) หลีกเลี่ยง CORS
+  API_URL: "http://localhost:3000/",
   DEVELOPMENT_DOCUMENTS_URL: "http://10.0.0.202:8060/",
 };
 

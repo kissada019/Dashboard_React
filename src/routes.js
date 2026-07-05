@@ -25,6 +25,10 @@ import Sale from "pages/sale";
 import TreeDetailShopee from "pages/tree/treeDetailShopee";
 import Cart from "pages/cart";
 import Checkout from "pages/checkout";
+import OnlineOrders from "pages/onlineOrders";
+import AddressPage from "pages/address";
+import SignupPage from "pages/signup";
+import RegisterAdminPage from "pages/registerAdmin";
 
 const dashboardRoutes = [
   {
@@ -33,6 +37,7 @@ const dashboardRoutes = [
     icon: "nc-icon nc-chart-pie-35",
     component: Dashboard,
     layout: "/admin",
+    roles: ["superadmin"],
   },
   {
     path: "/tree/edit/:id",
@@ -48,7 +53,7 @@ const dashboardRoutes = [
     icon: "nc-icon nc-money-coins",
     component: Sale,
     layout: "/admin",
-    roles: ["admin"],
+    roles: ["superadmin", "admin"],
   },
   {
     path: "/tree",
@@ -56,7 +61,7 @@ const dashboardRoutes = [
     icon: "nc-icon nc-notes",
     component: Tree,
     layout: "/admin",
-    roles: ["admin"],
+    roles: ["superadmin", "admin"],
   },
   {
     path: "/shop",
@@ -64,6 +69,22 @@ const dashboardRoutes = [
     icon: "nc-icon nc-notes",
     component: Shop,
     layout: "/admin",
+  },
+  {
+    path: "/online-orders",
+    name: "คำสั่งซื้อออนไลน์",
+    icon: "nc-icon nc-delivery-fast",
+    component: OnlineOrders,
+    layout: "/admin",
+    roles: ["superadmin", "admin", "user"],
+  },
+  {
+    path: "/address",
+    name: "ข้อมูลที่อยู่",
+    icon: "nc-icon nc-pin-3",
+    component: AddressPage,
+    layout: "/admin",
+    hidden: true,
   },
   {
     path: "/tree-detail/:id",
@@ -79,13 +100,29 @@ const dashboardRoutes = [
     icon: "nc-icon nc-paper-2",
     component: Register,
     layout: "/admin",
-    roles: ["admin"],
+    roles: ["superadmin", "admin"],
+  },
+  {
+    path: "/register-admin",
+    name: "เพิ่มผู้ดูแล",
+    icon: "nc-icon nc-badge",
+    component: RegisterAdminPage,
+    layout: "/admin",
+    roles: ["superadmin"],
   },
   {
     path: "/login",
     name: "Login",
     icon: "nc-icon nc-single-02",
     component: Login,
+    layout: "/admin",
+    hidden: true,
+  },
+  {
+    path: "/signup",
+    name: "สมัครสมาชิก",
+    icon: "nc-icon nc-single-02",
+    component: SignupPage,
     layout: "/admin",
     hidden: true,
   },

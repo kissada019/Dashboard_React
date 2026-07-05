@@ -6,7 +6,7 @@ export const onCreateOrder = createAsyncThunk(
   async (payload, { rejectWithValue }) => {
     try {
       console.log("payload : ", payload);
-      const response = await service.api.post("orders", payload);
+      const response = await service.api.post("api/orders", payload);
       return response;
     } catch (error) {
       return rejectWithValue(error?.message || "ไม่สามารถบันทึกคำสั่งซื้อได้");

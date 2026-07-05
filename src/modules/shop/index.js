@@ -8,6 +8,7 @@ import {
   Button,
   Badge,
   Form,
+  Modal,
 } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 import {
@@ -21,6 +22,7 @@ import {
 import { onGetAllTree } from "../../redux/slices/treeSlice";
 import { addToCart, onAddToCartAPI } from "../../redux/slices/cartSlice";
 import alert from "../../utils/alert";
+import userInfoStorage from "../../storage/userInfoStorage";
 
 const PLACEHOLDER_IMAGE =
   "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect fill='%23e8f5e3' width='400' height='300'/%3E%3Ctext fill='%234a7c2a' x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-size='18'%3ETree Image%3C/text%3E%3C/svg%3E";
@@ -104,6 +106,9 @@ const shopStyles = `
     border: 1px solid #dce9d6 !important;
     box-shadow: 0 8px 20px rgba(45, 80, 22, 0.08) !important;
     overflow: hidden;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
     transition: transform .2s ease, box-shadow .25s ease;
   }
   .tree-card-modern:hover {
@@ -113,14 +118,16 @@ const shopStyles = `
   .tree-card-img {
     position: relative;
     width: 100%;
-    height: 210px;
+    aspect-ratio: 4 / 3;
     overflow: hidden;
     background: #eaf3e8;
+    flex: 0 0 auto;
   }
   .tree-card-img img {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    display: block;
     transition: transform .35s ease;
   }
   .tree-card-modern:hover .tree-card-img img {
@@ -161,7 +168,10 @@ const shopStyles = `
     font-weight: 900;
     letter-spacing: 1px;
   }
-  .tree-card-body { padding: 15px 16px !important; }
+  .tree-card-body {
+    padding: 15px 16px !important;
+    flex: 1 1 auto;
+  }
   .tree-card-name {
     margin: 0;
     font-size: 16px;
@@ -177,7 +187,6 @@ const shopStyles = `
     font-size: 13px;
     color: var(--shop-muted);
     line-height: 1.45;
-    min-height: 38px;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -230,14 +239,38 @@ const shopStyles = `
     background: #2f7d57 !important;
     color: #fff !important;
   }
+  .modal-dialog.shop-cart-modal-up {
+    margin-top: 42px !important;
+    margin-bottom: 16px !important;
+  }
   @media (max-width: 576px) {
     .shop-container { padding: 12px !important; }
     .shop-header { padding: 18px 14px; border-radius: 14px; }
     .shop-header-title { font-size: 21px; }
     .shop-header-subtitle { font-size: 12px; }
-    .tree-card-img { height: 180px; }
+    .tree-card-img { aspect-ratio: 1 / 0.86; }
     .tree-card-body { padding: 12px !important; }
+    .tree-card-name {
+      white-space: normal;
+      display: -webkit-box;
+      -webkit-line-clamp: 2;
+      -webkit-box-orient: vertical;
+    }
     .tree-card-price { font-size: 18px; }
+    .tree-card-btn { font-size: 12px !important; padding: 7px 6px !important; }
+    .tree-card-actions {
+      flex-direction: column;
+      gap: 7px !important;
+    }
+    .modal-dialog.shop-cart-modal-up {
+      margin-top: 24px !important;
+      margin-bottom: 12px !important;
+      margin-left: 12px;
+      margin-right: 12px;
+    }
+  }
+  @media (min-width: 577px) and (max-width: 991px) {
+    .tree-card-body { padding: 13px !important; }
     .tree-card-btn { font-size: 12px !important; padding: 7px 6px !important; }
   }
 `;
@@ -251,7 +284,11 @@ const ShopPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [sortBy, setSortBy] = useState("name");
   const [currentPage, setCurrentPage] = useState(1);
+  const [cartTarget, setCartTarget] = useState(null);
+  const [cartQuantity, setCartQuantity] = useState(1);
   const itemsPerPage = 12;
+  const userInfo = userInfoStorage.get() || {};
+  const isLoggedIn = Boolean(userInfo.token);
 
   useEffect(() => {
     dispatch(onGetAllTree());
@@ -292,18 +329,59 @@ const ShopPage = () => {
     history.push(`/admin/tree-detail/${id}`);
   };
 
-  const handleAddToCart = (item) => {
-    dispatch(onAddToCartAPI({ tree_id: item.id, quantity: 1 })).then(
+  const handleOpenAddToCart = (item) => {
+    if (!isLoggedIn) {
+      alert.custom.fire({
+        icon: "warning",
+        title: "กรุณาเข้าสู่ระบบก่อนซื้อ",
+        text: "คุณสามารถดูรายการต้นไม้ได้ แต่ต้องเข้าสู่ระบบก่อนใส่ตะกร้า",
+        showCancelButton: true,
+        confirmButtonText: "เข้าสู่ระบบ",
+        cancelButtonText: "ปิด",
+        confirmButtonColor: "#4a7c2a",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          history.push("/admin/login");
+        }
+      });
+      return;
+    }
+
+    setCartTarget(item);
+    setCartQuantity(1);
+  };
+
+  const handleCloseAddToCart = () => {
+    setCartTarget(null);
+    setCartQuantity(1);
+  };
+
+  const handleQuantityChange = (e) => {
+    const stock = Number(cartTarget?.quantity ?? cartTarget?.amount ?? 1);
+    const nextQuantity = Number(e.target.value);
+    if (Number.isNaN(nextQuantity)) {
+      setCartQuantity(1);
+      return;
+    }
+    setCartQuantity(Math.max(1, Math.min(nextQuantity, stock)));
+  };
+
+  const handleAddToCart = () => {
+    if (!cartTarget) return;
+
+    const quantity = Number(cartQuantity);
+    dispatch(onAddToCartAPI({ tree_id: cartTarget.id, quantity })).then(
       (response) => {
         if (response?.payload && !response.error) {
-          dispatch(addToCart({ tree: item, quantity: 1 }));
+          dispatch(addToCart({ tree: cartTarget, quantity }));
           alert.custom.fire({
             icon: "success",
             title: "เพิ่มลงตะกร้าเรียบร้อย",
-            text: `${item.name} จำนวน 1 ต้น`,
+            text: `${cartTarget.name} จำนวน ${quantity} ต้น`,
             timer: 1500,
             showConfirmButton: false,
           });
+          handleCloseAddToCart();
         } else {
           alert.custom.fire({
             icon: "error",
@@ -431,14 +509,13 @@ const ShopPage = () => {
               const stock = Number(item.quantity ?? item.amount ?? 0);
 
               return (
-                <Col key={item.id} xs={12} sm={6} md={6} lg={4} xl={3}>
-                  <Card className="tree-card-modern h-100">
+                <Col key={item.id} xs={6} sm={6} md={6} lg={4} xl={3}>
+                  <Card className="tree-card-modern">
                     {/* Image */}
                     <div
                       className="tree-card-img"
                       style={{
                         width: "100%",
-                        height: "200px",
                         backgroundColor: "#f0f5ee",
                         overflow: "hidden",
                         position: "relative",
@@ -452,6 +529,7 @@ const ShopPage = () => {
                           width: "100%",
                           height: "100%",
                           objectFit: "cover",
+                          display: "block",
                           transition: "transform 0.3s ease",
                         }}
                         onError={(e) => {
@@ -493,7 +571,6 @@ const ShopPage = () => {
                           lineHeight: "1.4",
                           overflow: "hidden",
                           textOverflow: "ellipsis",
-                          whiteSpace: "nowrap",
                         }}
                         onClick={() => handleViewDetail(item.id)}
                         title={item.name}
@@ -559,7 +636,7 @@ const ShopPage = () => {
                       </div>
 
                       {/* Action Buttons */}
-                      <div className="d-flex" style={{ gap: "8px" }}>
+                      <div className="tree-card-actions d-flex" style={{ gap: "8px" }}>
                         <Button
                           variant="outline-success"
                           size="sm"
@@ -582,7 +659,7 @@ const ShopPage = () => {
                         <Button
                           size="sm"
                           className="tree-card-btn tree-card-btn-primary"
-                          onClick={() => handleAddToCart(item)}
+                          onClick={() => handleOpenAddToCart(item)}
                           disabled={stock === 0}
                           style={{
                             flex: 1,
@@ -597,7 +674,7 @@ const ShopPage = () => {
                               verticalAlign: "middle",
                             }}
                           />
-                          ใส่ตะกร้า
+                          {isLoggedIn ? "ใส่ตะกร้า" : "เข้าสู่ระบบเพื่อซื้อ"}
                         </Button>
                       </div>
                     </Card.Body>
@@ -691,6 +768,101 @@ const ShopPage = () => {
             </Button>
           </div>
         )}
+
+        <Modal
+          show={!!cartTarget}
+          onHide={handleCloseAddToCart}
+          dialogClassName="shop-cart-modal-up"
+        >
+          <Modal.Header closeButton>
+            <Modal.Title style={{ color: "#2d5016", fontWeight: 800 }}>
+              เลือกจำนวนต้นไม้
+            </Modal.Title>
+          </Modal.Header>
+          <Modal.Body>
+            {cartTarget ? (
+              <>
+                <div className="d-flex align-items-center mb-3" style={{ gap: 12 }}>
+                  <img
+                    src={getImageUrl(cartTarget) || PLACEHOLDER_IMAGE}
+                    alt={cartTarget.name}
+                    style={{
+                      width: 72,
+                      height: 72,
+                      objectFit: "cover",
+                      borderRadius: 8,
+                      border: "1px solid #d8e6d2",
+                    }}
+                    onError={(e) => {
+                      if (e.target.src !== PLACEHOLDER_IMAGE) {
+                        e.target.src = PLACEHOLDER_IMAGE;
+                      }
+                    }}
+                  />
+                  <div>
+                    <div style={{ color: "#2d5016", fontWeight: 800 }}>
+                      {cartTarget.name}
+                    </div>
+                    <div style={{ color: "#6f8667", fontSize: 13 }}>
+                      {Number(cartTarget.sell_price ?? 0).toLocaleString()} บาท / ต้น
+                    </div>
+                    <div style={{ color: "#6f8667", fontSize: 13 }}>
+                      คงเหลือ {Number(cartTarget.quantity ?? cartTarget.amount ?? 0)} ต้น
+                    </div>
+                  </div>
+                </div>
+
+                <Form.Group>
+                  <Form.Label style={{ color: "#2d5016", fontWeight: 700 }}>
+                    จำนวนที่ต้องการ
+                  </Form.Label>
+                  <Form.Control
+                    type="number"
+                    min={1}
+                    max={Number(cartTarget.quantity ?? cartTarget.amount ?? 1)}
+                    value={cartQuantity}
+                    onChange={handleQuantityChange}
+                    style={{
+                      borderRadius: 10,
+                      borderColor: "#d8e6d2",
+                      height: 44,
+                      fontWeight: 700,
+                    }}
+                  />
+                </Form.Group>
+
+                <div
+                  className="mt-3"
+                  style={{
+                    background: "#f3f7f3",
+                    border: "1px solid #d8e6d2",
+                    borderRadius: 8,
+                    color: "#2d5016",
+                    fontWeight: 800,
+                    padding: "10px 12px",
+                  }}
+                >
+                  รวม {(
+                    Number(cartTarget.sell_price ?? 0) * Number(cartQuantity || 0)
+                  ).toLocaleString()} บาท
+                </div>
+              </>
+            ) : null}
+          </Modal.Body>
+          <Modal.Footer>
+            <Button variant="light" onClick={handleCloseAddToCart}>
+              ยกเลิก
+            </Button>
+            <Button
+              className="tree-card-btn-primary"
+              onClick={handleAddToCart}
+              disabled={!cartTarget || Number(cartQuantity) < 1}
+            >
+              <ShoppingCart size={16} style={{ marginRight: 6 }} />
+              ยืนยันใส่ตะกร้า
+            </Button>
+          </Modal.Footer>
+        </Modal>
       </Container>
     </>
   );

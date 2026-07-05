@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Container,
   Row,
@@ -6,6 +6,7 @@ import {
   Card,
   Button,
   Badge,
+  Form,
   Table,
 } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
@@ -25,8 +26,6 @@ import {
   onDeleteCartItem,
   onUpdateCartQuantity,
   removeFromCart,
-  updateQuantity,
-  clearCart,
 } from "../../redux/slices/cartSlice";
 import alert from "../../utils/alert";
 
@@ -40,10 +39,39 @@ const toImageSrc = (path) => {
   return path.startsWith("/") ? path : "/" + path;
 };
 
+const getCartItemDetails = (item) => {
+  const treeId = item.tree_id || item.tree?.id || item.id;
+  const itemId = item.id || item.cart_id || treeId;
+  const price = Number(item.sell_price ?? item.price ?? item.tree?.sell_price ?? 0);
+  const quantity = Number(item.quantity ?? 0);
+  const rawImage =
+    item.image_url ||
+    item.imageUrl ||
+    item.image ||
+    item.tree?.image_url ||
+    item.tree?.images?.[0] ||
+    "";
+
+  return {
+    itemId,
+    treeId,
+    name: item.name || item.tree_name || item.tree?.name || "-",
+    species: item.species || item.tree_species || item.tree?.species || "",
+    location: item.location || item.tree_location || item.tree?.location || "",
+    price,
+    quantity,
+    maxQuantity: Number(item.maxQuantity ?? item.stock ?? item.tree?.quantity ?? 9999),
+    image: toImageSrc(rawImage),
+  };
+};
+
 const Cart = () => {
   const history = useHistory();
   const dispatch = useDispatch();
   const cart = useSelector((state) => state.cart);
+  const [selectedTreeIds, setSelectedTreeIds] = useState([]);
+  const [orderNote, setOrderNote] = useState("");
+  const paymentMethod = "transfer";
 
   // ดึงข้อมูลตะกร้าจาก API เมื่อเปิดหน้า
   useEffect(() => {
@@ -52,14 +80,51 @@ const Cart = () => {
 
   // ใช้ข้อมูลจาก API (apiItems) ถ้ามี, ไม่งั้น fallback ไปใช้ local items
   const cartItems = cart.apiItems || cart.items || [];
-  const cartTotal =
-    cart.apiTotal != null
-      ? cart.apiTotal
-      : cartItems.reduce((sum, item) => {
-          const price = Number(item.sell_price ?? item.price ?? 0);
-          const qty = Number(item.quantity ?? 0);
-          return sum + price * qty;
-        }, 0);
+  const normalizedItems = useMemo(
+    () => cartItems.map(getCartItemDetails).filter((item) => item.treeId),
+    [cartItems]
+  );
+  const selectedItems = useMemo(
+    () =>
+      normalizedItems.filter((item) =>
+        selectedTreeIds.includes(String(item.treeId))
+      ),
+    [normalizedItems, selectedTreeIds]
+  );
+  const selectedTotal = selectedItems.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
+  const selectedQuantity = selectedItems.reduce(
+    (sum, item) => sum + item.quantity,
+    0
+  );
+  const selectedOverStockItems = selectedItems.filter(
+    (item) => item.maxQuantity < 9999 && item.quantity > item.maxQuantity
+  );
+  const isAllSelected =
+    normalizedItems.length > 0 && selectedTreeIds.length === normalizedItems.length;
+
+  useEffect(() => {
+    const currentIds = normalizedItems.map((item) => String(item.treeId));
+    setSelectedTreeIds((prev) => {
+      if (prev.length === 0) return currentIds;
+      return prev.filter((id) => currentIds.includes(id));
+    });
+  }, [normalizedItems]);
+
+  const handleToggleItem = (treeId) => {
+    const id = String(treeId);
+    setSelectedTreeIds((prev) =>
+      prev.includes(id) ? prev.filter((itemId) => itemId !== id) : [...prev, id]
+    );
+  };
+
+  const handleToggleAll = () => {
+    setSelectedTreeIds(
+      isAllSelected ? [] : normalizedItems.map((item) => String(item.treeId))
+    );
+  };
 
   const handleRemoveItem = (treeId) => {
     alert.custom
@@ -111,7 +176,7 @@ const Cart = () => {
   };
 
   const handleCheckout = () => {
-    if (cartItems.length === 0) {
+    if (normalizedItems.length === 0) {
       alert.custom.fire({
         icon: "warning",
         title: "ตะกร้าว่าง",
@@ -119,7 +184,34 @@ const Cart = () => {
       });
       return;
     }
-    history.push("/admin/checkout");
+    if (selectedItems.length === 0) {
+      alert.custom.fire({
+        icon: "warning",
+        title: "ยังไม่ได้เลือกรายการ",
+        text: "กรุณาเลือกต้นไม้ที่ต้องการซื้ออย่างน้อย 1 รายการ",
+      });
+      return;
+    }
+    if (selectedOverStockItems.length > 0) {
+      alert.custom.fire({
+        icon: "warning",
+        title: "จำนวนสินค้าเกินสต็อก",
+        html: selectedOverStockItems
+          .map(
+            (item) =>
+              `<div style="text-align:left">- ${item.name}: ในตะกร้า ${item.quantity} ต้น / คงเหลือ ${item.maxQuantity} ต้น</div>`
+          )
+          .join(""),
+        confirmButtonText: "ตกลง",
+      });
+      return;
+    }
+
+    history.push("/admin/checkout", {
+      checkoutItems: selectedItems,
+      orderNote: orderNote.trim(),
+      source: "cart",
+    });
   };
 
   const handleContinueShopping = () => {
@@ -157,7 +249,7 @@ const Cart = () => {
     );
   }
 
-  if (cartItems.length === 0) {
+  if (normalizedItems.length === 0) {
     return (
       <Container
         fluid
@@ -254,7 +346,7 @@ const Cart = () => {
             borderRadius: "20px",
           }}
         >
-          {cartItems.length} รายการ
+          {normalizedItems.length} รายการ
         </Badge>
       </div>
 
@@ -283,15 +375,16 @@ const Cart = () => {
             <Card.Body className="p-0">
               <Table hover style={{ margin: 0, tableLayout: "fixed" }}>
                 <colgroup>
-                  <col style={{ width: "30%" }} />
-                  <col style={{ width: "17%" }} />
+                  <col style={{ width: "8%" }} />
+                  <col style={{ width: "28%" }} />
+                  <col style={{ width: "15%" }} />
                   <col style={{ width: "20%" }} />
-                  <col style={{ width: "17%" }} />
-                  <col style={{ width: "16%" }} />
+                  <col style={{ width: "15%" }} />
+                  <col style={{ width: "14%" }} />
                 </colgroup>
                 <thead style={{ backgroundColor: "#f0f5ee" }}>
                   <tr>
-                    {["สินค้า", "ราคา", "จำนวน", "รวม", "จัดการ"].map(
+                    {["เลือก", "สินค้า", "ราคา", "จำนวน", "รวม", "จัดการ"].map(
                       (title) => (
                         <th
                           key={title}
@@ -303,7 +396,21 @@ const Cart = () => {
                           }}
                         >
                           <div style={{ textAlign: "center", width: "100%" }}>
-                            {title}
+                            {title === "เลือก" ? (
+                              <Form.Check
+                                type="checkbox"
+                                checked={isAllSelected}
+                                onChange={handleToggleAll}
+                                aria-label="เลือกรายการทั้งหมด"
+                                style={{
+                                  minHeight: "20px",
+                                  display: "flex",
+                                  justifyContent: "center",
+                                }}
+                              />
+                            ) : (
+                              title
+                            )}
                           </div>
                         </th>
                       ),
@@ -311,45 +418,39 @@ const Cart = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {cartItems.map((item) => {
-                    // รองรับ field จาก API (tree_id, sell_price, image_url, tree.name ฯลฯ)
-                    const itemId = item.id || item.tree_id;
-                    const treeId = item.tree_id || item.id;
-                    const itemName =
-                      item.name || item.tree_name || item.tree?.name || "-";
-                    const itemSpecies =
-                      item.species ||
-                      item.tree_species ||
-                      item.tree?.species ||
-                      "";
-                    const itemLocation =
-                      item.location ||
-                      item.tree_location ||
-                      item.tree?.location ||
-                      "";
-                    const itemPrice = Number(
-                      item.sell_price ??
-                        item.price ??
-                        item.tree?.sell_price ??
-                        0,
+                  {normalizedItems.map((item) => {
+                    const isSelected = selectedTreeIds.includes(
+                      String(item.treeId)
                     );
-                    const itemQty = Number(item.quantity ?? 0);
-                    const itemMaxQty = Number(
-                      item.maxQuantity ??
-                        item.tree?.quantity ??
-                        item.stock ??
-                        9999,
-                    );
-                    const rawImage =
-                      item.image_url ||
-                      item.imageUrl ||
-                      item.image ||
-                      item.tree?.image_url ||
-                      "";
-                    const itemImage = toImageSrc(rawImage);
 
                     return (
-                      <tr key={itemId} style={{ borderColor: "#d4e6d1" }}>
+                      <tr
+                        key={item.itemId}
+                        style={{
+                          borderColor: "#d4e6d1",
+                          backgroundColor: isSelected ? "#fbfef9" : "#fff",
+                        }}
+                      >
+                        <td
+                          style={{
+                            padding: "20px",
+                            borderColor: "#d4e6d1",
+                            textAlign: "center",
+                            verticalAlign: "middle",
+                          }}
+                        >
+                          <Form.Check
+                            type="checkbox"
+                            checked={isSelected}
+                            onChange={() => handleToggleItem(item.treeId)}
+                            aria-label={`เลือก ${item.name}`}
+                            style={{
+                              minHeight: "20px",
+                              display: "flex",
+                              justifyContent: "center",
+                            }}
+                          />
+                        </td>
                         <td
                           style={{
                             padding: "20px",
@@ -360,8 +461,8 @@ const Cart = () => {
                         >
                           <div className="d-flex align-items-center justify-content-center">
                             <img
-                              src={itemImage || PLACEHOLDER_IMAGE}
-                              alt={itemName}
+                              src={item.image || PLACEHOLDER_IMAGE}
+                              alt={item.name}
                               style={{
                                 width: "80px",
                                 height: "80px",
@@ -385,9 +486,9 @@ const Cart = () => {
                                   marginBottom: "5px",
                                 }}
                               >
-                                {itemName}
+                                {item.name}
                               </h6>
-                              {itemSpecies && (
+                              {item.species && (
                                 <Badge
                                   style={{
                                     backgroundColor: "#e8f5e3",
@@ -397,10 +498,10 @@ const Cart = () => {
                                     borderRadius: "12px",
                                   }}
                                 >
-                                  {itemSpecies}
+                                  {item.species}
                                 </Badge>
                               )}
-                              {itemLocation && (
+                              {item.location && (
                                 <div
                                   style={{
                                     fontSize: "12px",
@@ -408,7 +509,7 @@ const Cart = () => {
                                     marginTop: "5px",
                                   }}
                                 >
-                                  สถานที่: {itemLocation}
+                                  สถานที่: {item.location}
                                 </div>
                               )}
                             </div>
@@ -423,7 +524,7 @@ const Cart = () => {
                           }}
                         >
                           <span style={{ color: "#2d5016", fontWeight: "600" }}>
-                            {itemPrice.toLocaleString()} ฿
+                            {item.price.toLocaleString()} ฿
                           </span>
                         </td>
                         <td
@@ -442,9 +543,9 @@ const Cart = () => {
                               variant="outline-secondary"
                               size="sm"
                               onClick={() =>
-                                itemQty <= 1
-                                  ? handleRemoveItem(treeId)
-                                  : handleQuantityChange(treeId, "decrement")
+                                item.quantity <= 1
+                                  ? handleRemoveItem(item.treeId)
+                                  : handleQuantityChange(item.treeId, "decrement")
                               }
                               style={{
                                 borderRadius: "8px",
@@ -464,15 +565,15 @@ const Cart = () => {
                                 color: "#2d5016",
                               }}
                             >
-                              {itemQty}
+                              {item.quantity}
                             </span>
                             <Button
                               variant="outline-secondary"
                               size="sm"
                               onClick={() =>
-                                handleQuantityChange(treeId, "increment")
+                                handleQuantityChange(item.treeId, "increment")
                               }
-                              disabled={itemQty >= itemMaxQty}
+                              disabled={item.quantity >= item.maxQuantity}
                               style={{
                                 borderRadius: "8px",
                                 width: "36px",
@@ -484,7 +585,7 @@ const Cart = () => {
                               <Plus size={16} />
                             </Button>
                           </div>
-                          {itemQty >= itemMaxQty && itemMaxQty < 9999 && (
+                          {item.quantity >= item.maxQuantity && item.maxQuantity < 9999 && (
                             <div
                               style={{
                                 fontSize: "11px",
@@ -492,7 +593,9 @@ const Cart = () => {
                                 marginTop: "5px",
                               }}
                             >
-                              สูงสุด {itemMaxQty} ต้น
+                              {item.quantity > item.maxQuantity
+                                ? `เกินสต็อก คงเหลือ ${item.maxQuantity} ต้น`
+                                : `สูงสุด ${item.maxQuantity} ต้น`}
                             </div>
                           )}
                         </td>
@@ -511,7 +614,7 @@ const Cart = () => {
                               fontSize: "16px",
                             }}
                           >
-                            {(itemPrice * itemQty).toLocaleString()} ฿
+                            {(item.price * item.quantity).toLocaleString()} ฿
                           </span>
                         </td>
                         <td
@@ -525,7 +628,7 @@ const Cart = () => {
                           <Button
                             variant="outline-danger"
                             size="sm"
-                            onClick={() => handleRemoveItem(treeId)}
+                            onClick={() => handleRemoveItem(item.treeId)}
                             style={{
                               borderRadius: "8px",
                               borderColor: "#c97d60",
@@ -568,19 +671,21 @@ const Cart = () => {
             <Card.Body className="p-4">
               <div className="mb-3">
                 <div className="d-flex justify-content-between mb-2">
-                  <span style={{ color: "#5a7c3a" }}>จำนวนรายการ:</span>
+                  <span style={{ color: "#5a7c3a" }}>รายการที่เลือก:</span>
                   <span style={{ color: "#2d5016", fontWeight: "600" }}>
-                    {cartItems.length} รายการ
+                    {selectedItems.length} / {normalizedItems.length} รายการ
                   </span>
                 </div>
                 <div className="d-flex justify-content-between mb-2">
                   <span style={{ color: "#5a7c3a" }}>จำนวนต้นไม้:</span>
                   <span style={{ color: "#2d5016", fontWeight: "600" }}>
-                    {cartItems.reduce(
-                      (sum, item) => sum + Number(item.quantity ?? 0),
-                      0,
-                    )}{" "}
-                    ต้น
+                    {selectedQuantity} ต้น
+                  </span>
+                </div>
+                <div className="d-flex justify-content-between mb-2">
+                  <span style={{ color: "#5a7c3a" }}>ส่วนลด:</span>
+                  <span style={{ color: "#2d5016", fontWeight: "600" }}>
+                    0 ฿
                   </span>
                 </div>
                 <hr style={{ borderColor: "#d4e6d1", margin: "15px 0" }} />
@@ -592,7 +697,7 @@ const Cart = () => {
                       fontSize: "18px",
                     }}
                   >
-                    ยอดรวม:
+                    ยอดสุทธิ:
                   </span>
                   <span
                     style={{
@@ -601,13 +706,65 @@ const Cart = () => {
                       fontSize: "24px",
                     }}
                   >
-                    {cartTotal.toLocaleString()} ฿
+                    {selectedTotal.toLocaleString()} ฿
                   </span>
                 </div>
               </div>
 
+              <Form className="mb-3">
+                <Form.Group className="mb-3">
+                  <Form.Label style={{ color: "#2d5016", fontWeight: "600" }}>
+                    หมายเหตุ
+                  </Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    value={orderNote}
+                    onChange={(e) => setOrderNote(e.target.value)}
+                    // placeholder="เช่น "
+                    style={{
+                      borderRadius: "10px",
+                      borderColor: "#d4e6d1",
+                      color: "#2d5016",
+                    }}
+                  />
+                </Form.Group>
+
+                <Form.Group className="mb-3">
+                  <Form.Label style={{ color: "#2d5016", fontWeight: "600" }}>
+                    วิธีชำระเงิน
+                  </Form.Label>
+                  <div
+                    style={{
+                      borderRadius: "10px",
+                      border: "1px solid #d4e6d1",
+                      backgroundColor: "#f5fbf2",
+                      color: "#2d5016",
+                      fontWeight: "600",
+                      padding: "10px 12px",
+                    }}
+                  >
+                    โอนเงิน
+                  </div>
+                </Form.Group>
+
+                <div
+                  style={{
+                    backgroundColor: "#f5fbf2",
+                    border: "1px solid #d4e6d1",
+                    borderRadius: "10px",
+                    padding: "12px",
+                    color: "#5a7c3a",
+                    fontSize: "13px",
+                  }}
+                >
+                  ช่องทางการขาย: <strong>online</strong>
+                </div>
+              </Form>
+
               <Button
                 onClick={handleCheckout}
+                disabled={selectedItems.length === 0}
                 style={{
                   width: "100%",
                   backgroundColor: "#4a7c2a",
@@ -627,7 +784,7 @@ const Cart = () => {
                     color: "#fff",
                   }}
                 />
-                ดำเนินการชำระเงิน
+                กรอกข้อมูลจัดส่ง
               </Button>
 
               <Button

@@ -26,10 +26,46 @@ import {
   Ruler,
   Calendar,
   CheckCircle,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 import { addToCart, onAddToCartAPI } from "../../redux/slices/cartSlice";
 import { onGetTreeById } from "../../redux/slices/treeSlice";
 import alert from "../../utils/alert";
+import userInfoStorage from "../../storage/userInfoStorage";
+
+// ใช้ path สัมพัทธ์ (/uploads/...) เพื่อให้รูปโหลดผ่าน proxy (หลีกเลี่ยง CORS/CORP)
+const toImageSrc = (path) => {
+  if (!path || typeof path !== "string") return null;
+  if (path.startsWith("http")) return path;
+  return path.startsWith("/") ? path : "/" + path;
+};
+
+const getImageUrl = (image) => {
+  if (typeof image === "string") return image;
+  return image?.image_url || image?.imageUrl || image?.url || image?.src || null;
+};
+
+const getTreeImages = (treeData) => {
+  if (Array.isArray(treeData?.images) && treeData.images.length) {
+    return [...treeData.images]
+      .sort((a, b) => {
+        if (a?.is_primary && !b?.is_primary) return -1;
+        if (!a?.is_primary && b?.is_primary) return 1;
+        return Number(a?.display_order ?? 0) - Number(b?.display_order ?? 0);
+      })
+      .map((image) => toImageSrc(getImageUrl(image)))
+      .filter(Boolean);
+  }
+
+  return [
+    treeData?.image_url,
+    treeData?.imageUrl,
+    treeData?.image,
+  ]
+    .map(toImageSrc)
+    .filter(Boolean);
+};
 
 const TreeDetailShopee = () => {
   const { id } = useParams();
@@ -40,12 +76,20 @@ const TreeDetailShopee = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [quantityTree, setQuantityTree] = useState(1);
   const [isFavorite, setIsFavorite] = useState(false);
+  const userInfo = userInfoStorage.get() || {};
+  const isLoggedIn = Boolean(userInfo.token);
 
   useEffect(() => {
     if (id) {
       dispatch(onGetTreeById(id));
     }
-  }, [id]);
+  }, [dispatch, id]);
+
+  useEffect(() => {
+    setSelectedImageIndex(0);
+  }, [treeData?.id]);
+
+  const images = getTreeImages(treeData);
 
   if (loading || !treeData?.id) {
     return (
@@ -55,25 +99,6 @@ const TreeDetailShopee = () => {
     );
   }
 
-  // รองรับ image_url / imageUrl (เช่น "/uploads/1770029640076-975375148.jpg") และ images (array)
-  // ใช้ path สัมพัทธ์ (/uploads/...) เพื่อให้รูปโหลดผ่าน proxy (หลีกเลี่ยง CORS/CORP)
-  const toImageSrc = (path) => {
-    if (!path) return null;
-    if (typeof path !== "string") return path;
-    if (path.startsWith("http")) return path;
-    return path.startsWith("/") ? path : "/" + path;
-  };
-  const images = [];
-  const singleImage = treeData.image_url || treeData.imageUrl || treeData.image;
-  if (singleImage) {
-    images.push(toImageSrc(singleImage));
-  }
-  if (Array.isArray(treeData.images) && treeData.images.length) {
-    treeData.images.forEach((img) => {
-      const url = toImageSrc(img) || img;
-      if (url) images.push(url);
-    });
-  }
   const mainImageUrl = images[selectedImageIndex] || images[0] || null;
   // ใช้ data URI เป็น placeholder เพื่อไม่พึ่ง external (via.placeholder.com อาจโหลดไม่ได้)
   const PLACEHOLDER_IMAGE =
@@ -89,7 +114,40 @@ const TreeDetailShopee = () => {
   const sold = Number(treeData.sold ?? 0);
   const totalPrice = priceNew * quantityTree; // ราคารวมตามจำนวนที่เลือก
 
+  const handlePreviousImage = () => {
+    if (images.length <= 1) return;
+    setSelectedImageIndex((currentIndex) =>
+      currentIndex === 0 ? images.length - 1 : currentIndex - 1
+    );
+  };
+
+  const handleNextImage = () => {
+    if (images.length <= 1) return;
+    setSelectedImageIndex((currentIndex) =>
+      currentIndex === images.length - 1 ? 0 : currentIndex + 1
+    );
+  };
+
   const handleAddToCart = () => {
+    if (!isLoggedIn) {
+      alert.custom
+        .fire({
+          icon: "warning",
+          title: "กรุณาเข้าสู่ระบบก่อนซื้อ",
+          text: "คุณสามารถดูรายละเอียดต้นไม้ได้ แต่ต้องเข้าสู่ระบบก่อนใส่ตะกร้า",
+          showCancelButton: true,
+          confirmButtonText: "เข้าสู่ระบบ",
+          cancelButtonText: "ปิด",
+          confirmButtonColor: "#4a7c2a",
+        })
+        .then((result) => {
+          if (result.isConfirmed) {
+            history.push("/admin/login");
+          }
+        });
+      return;
+    }
+
     dispatch(onAddToCartAPI({ tree_id: treeData.id, quantity: quantityTree }))
       .then((response) => {
         if (response?.payload && !response.error) {
@@ -121,6 +179,25 @@ const TreeDetailShopee = () => {
   };
 
   const handleBuyNow = () => {
+    if (!isLoggedIn) {
+      alert.custom
+        .fire({
+          icon: "warning",
+          title: "กรุณาเข้าสู่ระบบก่อนซื้อ",
+          text: "คุณสามารถดูรายละเอียดต้นไม้ได้ แต่ต้องเข้าสู่ระบบก่อนสั่งซื้อ",
+          showCancelButton: true,
+          confirmButtonText: "เข้าสู่ระบบ",
+          cancelButtonText: "ปิด",
+          confirmButtonColor: "#4a7c2a",
+        })
+        .then((result) => {
+          if (result.isConfirmed) {
+            history.push("/admin/login");
+          }
+        });
+      return;
+    }
+
     dispatch(onAddToCartAPI({ tree_id: treeData.id, quantity: quantityTree }))
       .then((response) => {
         if (response?.payload && !response.error) {
@@ -212,6 +289,60 @@ const TreeDetailShopee = () => {
                     }
                   }}
                 />
+                {images.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      aria-label="ดูรูปก่อนหน้า"
+                      onClick={handlePreviousImage}
+                      style={{
+                        position: "absolute",
+                        left: "16px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        width: "44px",
+                        height: "44px",
+                        borderRadius: "50%",
+                        border: "1px solid rgba(255, 255, 255, 0.85)",
+                        backgroundColor: "rgba(45, 80, 22, 0.78)",
+                        color: "#fff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+                        zIndex: 2,
+                      }}
+                    >
+                      <ChevronLeft size={26} />
+                    </button>
+                    <button
+                      type="button"
+                      aria-label="ดูรูปถัดไป"
+                      onClick={handleNextImage}
+                      style={{
+                        position: "absolute",
+                        right: "16px",
+                        top: "50%",
+                        transform: "translateY(-50%)",
+                        width: "44px",
+                        height: "44px",
+                        borderRadius: "50%",
+                        border: "1px solid rgba(255, 255, 255, 0.85)",
+                        backgroundColor: "rgba(45, 80, 22, 0.78)",
+                        color: "#fff",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        cursor: "pointer",
+                        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.2)",
+                        zIndex: 2,
+                      }}
+                    >
+                      <ChevronRight size={26} />
+                    </button>
+                  </>
+                )}
                 {/* Natural Badge */}
                 <Badge
                   style={{
@@ -275,8 +406,9 @@ const TreeDetailShopee = () => {
                             objectFit: "cover",
                           }}
                           onError={(e) => {
-                            e.target.src =
-                              "https://via.placeholder.com/80x80?text=Tree";
+                            if (e.target.src !== PLACEHOLDER_IMAGE) {
+                              e.target.src = PLACEHOLDER_IMAGE;
+                            }
                           }}
                         />
                       </div>
@@ -598,7 +730,7 @@ const TreeDetailShopee = () => {
                     size={18}
                     style={{ marginRight: "6px", verticalAlign: "middle" }}
                   />
-                  เพิ่มลงตะกร้า
+                  {isLoggedIn ? "เพิ่มลงตะกร้า" : "เข้าสู่ระบบเพื่อซื้อ"}
                 </Button>
                 <Button
                   size="lg"
@@ -615,7 +747,7 @@ const TreeDetailShopee = () => {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  สั่งซื้อทันที
+                  {isLoggedIn ? "สั่งซื้อทันที" : "เข้าสู่ระบบเพื่อซื้อ"}
                 </Button>
                 <Button
                   variant="outline-secondary"

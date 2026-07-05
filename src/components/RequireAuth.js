@@ -4,8 +4,9 @@ import userInfoStorage from "../storage/userInfoStorage";
 import common from "../utils/common";
 import alert from "../utils/alert";
 import publicRoutes from "../config/publicRoutes";
+import { hasAnyRole } from "../utils/authRole";
 
-const RequireAuth = ({ children }) => {
+const RequireAuth = ({ children, roles = [] }) => {
   const history = useHistory();
   const location = useLocation();
   const [notified, setNotified] = useState(false);
@@ -13,9 +14,15 @@ const RequireAuth = ({ children }) => {
   const isSessionValid = common.checkSession();
   const hasUser =
     userInfo && Object.keys(userInfo).length > 0 && userInfo.token;
+  const isPublic = publicRoutes.some((route) => {
+    if (route.endsWith("/*")) {
+      return location.pathname.startsWith(route.replace("/*", ""));
+    }
+    return route === location.pathname;
+  });
+  const isAuthorized = isPublic || hasAnyRole(userInfo, roles);
 
   useEffect(() => {
-    const isPublic = publicRoutes.includes(location.pathname);
     if (isPublic) return;
     if (!hasUser || !isSessionValid) {
       if (!notified) {
@@ -28,11 +35,27 @@ const RequireAuth = ({ children }) => {
         });
       }
       history.push("/admin/login");
+      return;
     }
-  }, [hasUser, isSessionValid, history, notified, location.pathname]);
 
-  const isPublic = publicRoutes.includes(location.pathname);
+    if (!isAuthorized) {
+      history.push("/admin/shop");
+    }
+  }, [
+    hasUser,
+    isSessionValid,
+    isPublic,
+    isAuthorized,
+    history,
+    notified,
+    location.pathname,
+  ]);
+
   if (!isPublic && (!hasUser || !isSessionValid)) {
+    return null;
+  }
+
+  if (!isAuthorized) {
     return null;
   }
 

@@ -1,5 +1,6 @@
 import React from "react";
 import { Nav, Dropdown, Badge } from "react-bootstrap";
+import { useHistory } from "react-router-dom";
 
 const AdminNavbarLoggedIn = ({
   cartItemCount,
@@ -9,6 +10,13 @@ const AdminNavbarLoggedIn = ({
   handleLogout,
   showCart = true,
 }) => {
+  const history = useHistory();
+
+  const handleAddressClick = (e) => {
+    e.preventDefault();
+    history.push("/admin/address");
+  };
+
   return (
     <>
       {/* Cart Icon */}
@@ -83,11 +91,16 @@ const AdminNavbarLoggedIn = ({
           </span>
         </Dropdown.Toggle>
         <Dropdown.Menu aria-labelledby="navbarDropdownMenuLink">
+          <Dropdown.Item href="#address" onClick={handleAddressClick}>
+            ข้อมูลที่อยู่
+          </Dropdown.Item>
+          <Dropdown.Divider />
           <Dropdown.Item href="#pablo" onClick={handleLogout}>
             ออกจากระบบ
           </Dropdown.Item>
         </Dropdown.Menu>
       </Dropdown>
+
     </>
   );
 };

@@ -10,6 +10,7 @@ import {
   Col,
   Badge,
   Modal,
+  Pagination,
 } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 import alert from "../../utils/alert";
@@ -90,6 +91,111 @@ const stockModalStyles = `
     min-width: 920px;
   }
 
+  .tree-pagination-panel {
+    align-items: center;
+    background: #ffffff;
+    border: 1px solid rgba(74, 124, 42, 0.08);
+    border-radius: 10px;
+    box-shadow: 0 16px 34px rgba(45, 80, 22, 0.13);
+    display: flex;
+    gap: 22px;
+    justify-content: center;
+    margin-left: auto;
+    margin-right: auto;
+    margin-top: 24px;
+    padding: 18px 22px;
+    width: fit-content;
+  }
+
+  .tree-pagination-info {
+    color: #667463;
+    font-size: 14px;
+    font-weight: 600;
+  }
+
+  .tree-pagination-controls {
+    align-items: center;
+    display: flex;
+    gap: 22px;
+  }
+
+  .tree-pagination-controls .pagination {
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+  }
+
+  .tree-pagination-controls .visually-hidden,
+  .tree-pagination-controls .sr-only {
+    display: none !important;
+  }
+
+  .tree-pagination-controls .page-link {
+    align-items: center;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 7px !important;
+    color: #111827;
+    display: inline-flex;
+    font-size: 14px;
+    font-weight: 600;
+    height: 30px;
+    justify-content: center;
+    min-width: 30px;
+    padding: 0 8px;
+    transition: background 140ms ease, border-color 140ms ease, color 140ms ease, box-shadow 140ms ease;
+  }
+
+  .tree-pagination-controls .page-item.active .page-link {
+    background: #ffffff;
+    border-color: #4a7c2a;
+    color: #2d5016;
+    box-shadow: 0 0 0 3px rgba(74, 124, 42, 0.1);
+  }
+
+  .tree-pagination-controls .page-link:hover {
+    background: rgba(74, 124, 42, 0.07);
+    border-color: transparent;
+    color: #2d5016;
+  }
+
+  .tree-pagination-controls .page-item.disabled .page-link {
+    background: transparent;
+    border-color: transparent;
+    color: #a4a9b2;
+    box-shadow: none;
+  }
+
+  .tree-pagination-controls .page-item:first-child .page-link,
+  .tree-pagination-controls .page-item:last-child .page-link {
+    color: #4a7c2a;
+    min-width: auto;
+    padding: 0 4px;
+  }
+
+  .tree-pagination-controls .page-item:first-child.disabled .page-link,
+  .tree-pagination-controls .page-item:last-child.disabled .page-link {
+    color: #a4a9b2;
+  }
+
+  .tree-page-size-select {
+    background: #ffffff;
+    border: 1px solid rgba(74, 124, 42, 0.55);
+    border-radius: 8px;
+    color: #111827;
+    font-size: 14px;
+    font-weight: 600;
+    height: 38px;
+    min-width: 118px;
+    padding: 4px 12px;
+  }
+
+  .tree-page-size-select:focus {
+    border-color: #4a7c2a;
+    box-shadow: 0 0 0 3px rgba(74, 124, 42, 0.12);
+    outline: none;
+  }
+
   @media (max-width: 576px) {
     .tree-main-header {
       gap: 10px;
@@ -114,6 +220,20 @@ const stockModalStyles = `
       max-width: 100%;
       text-align: left !important;
     }
+    .tree-pagination-panel {
+      align-items: stretch;
+      flex-direction: column;
+      width: 100%;
+    }
+    .tree-pagination-controls {
+      align-items: stretch;
+      flex-direction: column;
+    }
+    .tree-pagination-controls .pagination {
+      justify-content: center;
+      overflow-x: auto;
+      padding-bottom: 2px;
+    }
   }
 `;
 
@@ -125,13 +245,12 @@ const TreePage = () => {
   const data = tableTree.data || [];
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [showStockModal, setShowStockModal] = useState(false);
   const [selectedTreeId, setSelectedTreeId] = useState("");
   const [selectedAddQty, setSelectedAddQty] = useState(1);
   const [stockUpdateList, setStockUpdateList] = useState([]);
   const [isSubmittingStockUpdate, setIsSubmittingStockUpdate] = useState(false);
-  const itemsPerPage = 10;
-
   React.useEffect(() => {
     dispatch(onGetAllTree());
   }, [dispatch]);
@@ -326,11 +445,23 @@ const TreePage = () => {
     history.push(`/admin/tree-detail/${id}`);
   };
 
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+  const totalPages = Math.max(1, Math.ceil(filteredData.length / itemsPerPage));
   const paginatedData = filteredData.slice(
     (currentPage - 1) * itemsPerPage,
     currentPage * itemsPerPage,
   );
+  const startItem = filteredData.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+  const endItem = Math.min(currentPage * itemsPerPage, filteredData.length);
+  const visiblePageNumbers = Array.from({ length: totalPages }, (_, index) => index + 1).filter(
+    (page) =>
+      page === 1 ||
+      page === totalPages ||
+      Math.abs(page - currentPage) <= 1,
+  );
+
+  React.useEffect(() => {
+    setCurrentPage((prev) => Math.min(prev, totalPages));
+  }, [totalPages]);
 
   const handlePreviousPage = () => {
     setCurrentPage((prev) => Math.max(prev - 1, 1));
@@ -338,6 +469,11 @@ const TreePage = () => {
 
   const handleNextPage = () => {
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
+  };
+
+  const handleItemsPerPageChange = (event) => {
+    setItemsPerPage(Number(event.target.value));
+    setCurrentPage(1);
   };
 
   // Calculate statistics
@@ -947,50 +1083,57 @@ const TreePage = () => {
           </div>
 
           {/* Pagination */}
-          {totalPages > 1 && (
-            <div
-              className="d-flex justify-content-between align-items-center mt-4"
-              style={{
-                padding: "15px",
-                background: "#f8f9fa",
-                borderRadius: "10px",
-              }}
-            >
-              <Button
-                onClick={handlePreviousPage}
-                disabled={currentPage === 1}
-                variant="outline-primary"
-                style={{
-                  borderRadius: "8px",
-                  padding: "8px 20px",
-                  borderWidth: "2px",
-                  fontWeight: "500",
-                }}
-              >
-                ก่อนหน้า
-              </Button>
-              <span
-                style={{
-                  fontSize: "14px",
-                  fontWeight: "500",
-                  color: "#666",
-                }}
-              >
-                หน้า {currentPage} จาก {totalPages}
-              </span>
-              <Button
-                onClick={handleNextPage}
-                disabled={currentPage === totalPages}
-                variant="outline-primary"
-                style={{
-                  borderRadius: "8px",
-                  padding: "8px 20px",
-                  borderWidth: "2px",
-                  fontWeight: "500",
-                }}
-              >
-                ถัดไป
-              </Button>
+          {filteredData.length > 0 && (
+            <div className="tree-pagination-panel">
+              <div className="tree-pagination-controls">
+                <Pagination>
+                  <Pagination.Item
+                    onClick={handlePreviousPage}
+                    disabled={currentPage === 1}
+                    aria-label="หน้าก่อนหน้า"
+                  >
+                    {"Previous"}
+                  </Pagination.Item>
+
+                  {visiblePageNumbers.map((page, index) => {
+                    const previousPage = visiblePageNumbers[index - 1];
+                    const showGap = previousPage && page - previousPage > 1;
+
+                    return (
+                      <React.Fragment key={page}>
+                        {showGap ? <Pagination.Ellipsis disabled /> : null}
+                        <Pagination.Item
+                          active={page === currentPage}
+                          onClick={() => setCurrentPage(page)}
+                        >
+                          {page}
+                        </Pagination.Item>
+                      </React.Fragment>
+                    );
+                  })}
+
+                  <Pagination.Item
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    aria-label="หน้าถัดไป"
+                  >
+                    {"Next"}
+                  </Pagination.Item>
+                </Pagination>
+
+                <select
+                  className="tree-page-size-select"
+                  value={itemsPerPage}
+                  onChange={handleItemsPerPageChange}
+                  aria-label="จำนวนรายการต่อหน้า"
+                >
+                  {[10, 20, 50].map((pageSize) => (
+                    <option key={pageSize} value={pageSize}>
+                      {pageSize} / page
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
           )}
         </Card.Body>

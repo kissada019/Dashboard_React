@@ -23,6 +23,7 @@ import { onGetCart } from "../../redux/slices/cartSlice";
 import userInfoStorage from "../../storage/userInfoStorage";
 import AdminNavbarLoggedIn from "./AdminNavbarLoggedIn";
 import AdminNavbarGuest from "./AdminNavbarGuest";
+import { getUserRoles } from "../../utils/authRole";
 
 import routes from "routes.js";
 
@@ -35,15 +36,15 @@ function Header() {
   const userInfo = userInfoStorage.get() || {};
   const token = userInfo?.token || "";
   const isLoggedIn = Boolean(token);
-  const userRole = String(userInfo?.role || "").toLowerCase();
-  const isAdmin = userRole === "admin";
+  const userRoles = getUserRoles(userInfo);
+  const isStaff = userRoles.includes("superadmin") || userRoles.includes("admin");
 
   // ดึงข้อมูลตะกร้าจาก API เมื่อ login แล้ว
   useEffect(() => {
-    if (isLoggedIn && !isAdmin) {
+    if (isLoggedIn && !isStaff) {
       dispatch(onGetCart());
     }
-  }, [isLoggedIn, isAdmin, dispatch]);
+  }, [isLoggedIn, isStaff, dispatch]);
 
   // ใช้ข้อมูลจาก API (apiItems) ถ้ามี
   const apiItems = cart.apiItems || [];
@@ -222,7 +223,7 @@ function Header() {
                 username={username}
                 email={email}
                 handleLogout={handleLogout}
-                showCart={!isAdmin}
+                showCart={!isStaff}
               />
             ) : (
               <AdminNavbarGuest />

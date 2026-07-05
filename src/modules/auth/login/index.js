@@ -160,7 +160,7 @@ function LayoutPage() {
                   </Button>
 
                   <div className="text-center">
-                    <a href={`kanban`} className="register-link">
+                    <a href="/admin/signup" className="register-link">
                       ยังไม่มีบัญชี? สมัครสมาชิก
                     </a>
                   </div>

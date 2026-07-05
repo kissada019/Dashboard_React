@@ -16,12 +16,12 @@ const saveCartToStorage = (cart) => {
   localStorage.set(CART_STORAGE_KEY, cart);
 };
 
-/* Async Thunk: ดึงข้อมูลตะกร้าจาก API GET /cart (ส่ง token ไปด้วย) */
+/* Async Thunk: ดึงข้อมูลตะกร้าจาก API GET /api/cart (ส่ง token ไปด้วย) */
 export const onGetCart = createAsyncThunk(
   "cart/api/getCart",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await service.api.get("cart");
+      const response = await service.api.get("api/cart");
       return response;
     } catch (error) {
       return rejectWithValue(error.message || "ไม่สามารถดึงข้อมูลตะกร้าได้");
@@ -29,12 +29,12 @@ export const onGetCart = createAsyncThunk(
   }
 );
 
-/* Async Thunk: ลบสินค้าออกจากตะกร้าผ่าน API DELETE /cart/<tree_id> (ส่ง token ไปด้วย) */
+/* Async Thunk: ลบสินค้าออกจากตะกร้าผ่าน API DELETE /api/cart/<tree_id> (ส่ง token ไปด้วย) */
 export const onDeleteCartItem = createAsyncThunk(
   "cart/api/deleteCartItem",
   async (tree_id, { rejectWithValue }) => {
     try {
-      const response = await service.api.deleted(`cart/${tree_id}`);
+      const response = await service.api.deleted(`api/cart/${tree_id}`);
       return response;
     } catch (error) {
       return rejectWithValue(error.message || "ไม่สามารถลบสินค้าออกจากตะกร้าได้");
@@ -42,12 +42,12 @@ export const onDeleteCartItem = createAsyncThunk(
   }
 );
 
-/* Async Thunk: อัปเดตจำนวนสินค้าในตะกร้า PATCH /cart/<tree_id> { action: "increment" | "decrement" } */
+/* Async Thunk: อัปเดตจำนวนสินค้าในตะกร้า PATCH /api/cart/<tree_id> { action: "increment" | "decrement" } */
 export const onUpdateCartQuantity = createAsyncThunk(
   "cart/api/updateCartQuantity",
   async ({ tree_id, action }, { rejectWithValue }) => {
     try {
-      const response = await service.api.patch(`cart/${tree_id}`, { action });
+      const response = await service.api.patch(`api/cart/${tree_id}`, { action });
       return response;
     } catch (error) {
       return rejectWithValue(error.message || "ไม่สามารถอัปเดตจำนวนสินค้าได้");
@@ -55,12 +55,12 @@ export const onUpdateCartQuantity = createAsyncThunk(
   }
 );
 
-/* Async Thunk: เพิ่มสินค้าลงตะกร้าผ่าน API POST /cart (ส่ง token ไปด้วย) */
+/* Async Thunk: เพิ่มสินค้าลงตะกร้าผ่าน API POST /api/cart (ส่ง token ไปด้วย) */
 export const onAddToCartAPI = createAsyncThunk(
   "cart/api/addToCart",
   async ({ tree_id, quantity }, { rejectWithValue }) => {
     try {
-      const response = await service.api.post("cart", { tree_id, quantity });
+      const response = await service.api.post("api/cart", { tree_id, quantity });
       return response;
     } catch (error) {
       return rejectWithValue(error.message || "ไม่สามารถเพิ่มสินค้าลงตะกร้าได้");
@@ -132,7 +132,7 @@ const cartSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    /* GET /cart */
+    /* GET /api/cart */
     builder
       .addCase(onGetCart.pending, (state) => {
         state.loading = true;
@@ -164,7 +164,7 @@ const cartSlice = createSlice({
         state.apiItems = [];
         state.apiTotal = 0;
       });
-    /* POST /cart */
+    /* POST /api/cart */
     builder
       .addCase(onAddToCartAPI.pending, (state) => {
         state.loading = true;
@@ -175,7 +175,7 @@ const cartSlice = createSlice({
       .addCase(onAddToCartAPI.rejected, (state) => {
         state.loading = false;
       });
-    /* PUT /cart/:tree_id (increment/decrement) */
+    /* PUT /api/cart/:tree_id (increment/decrement) */
     builder
       .addCase(onUpdateCartQuantity.pending, (state) => {
         state.loading = true;
@@ -186,7 +186,7 @@ const cartSlice = createSlice({
       .addCase(onUpdateCartQuantity.rejected, (state) => {
         state.loading = false;
       });
-    /* DELETE /cart/:tree_id */
+    /* DELETE /api/cart/:tree_id */
     builder
       .addCase(onDeleteCartItem.pending, (state) => {
         state.loading = true;

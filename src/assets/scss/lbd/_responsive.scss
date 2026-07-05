@@ -83,23 +83,24 @@
 @media (max-width: 991px){
 
     .sidebar{
-        right: 0 !important;
-        left: auto;
-        position: absolute;
-        @include transform-translate-3d(262px);
+        left: 0 !important;
+        right: auto !important;
+        position: fixed;
+        z-index: 10000;
+        @include transform-translate-3d(-262px);
         @include transition (0.5s, cubic-bezier(0.685, 0.0473, 0.346, 1));
     }
 
     .nav-open{
         .main-panel{
-            position: absolute;
+            position: relative;
             left: 0;
-            @include transform-translate-3d(-250px);
+            @include transform-translate-3d(0px);
             @include transition (0.5s, cubic-bezier(0.685, 0.0473, 0.346, 1));
         }
 
         .sidebar{
-            @include transform-translate-3d(10px);
+            @include transform-translate-3d(0px);
             @include transition (0.5s, cubic-bezier(0.685, 0.0473, 0.346, 1));
         }
     }
@@ -379,8 +380,8 @@
         position: fixed;
         opacity: 0;
         top: 0;
-        left: auto;
-        right: 250px;
+        left: 260px;
+        right: 0;
         content: "";
         z-index: 9999;
         overflow-x: hidden;

@@ -19,9 +19,11 @@ import React from "react";
 import { useLocation, NavLink } from "react-router-dom";
 
 import { Nav } from "react-bootstrap";
+import { ChevronLeft } from "lucide-react";
 
 import logo from "assets/img/reactlogo.png";
 import userInfoStorage from "../../storage/userInfoStorage";
+import { hasAnyRole } from "../../utils/authRole";
 
 function Sidebar({ color, image, routes }) {
   const location = useLocation();
@@ -29,15 +31,22 @@ function Sidebar({ color, image, routes }) {
     return location.pathname.indexOf(routeName) > -1 ? "active" : "";
   };
 
+  const closeMobileSidebar = () => {
+    document.documentElement.classList.remove("nav-open");
+    const bodyClick = document.getElementById("bodyClick");
+    if (bodyClick) {
+      bodyClick.parentElement.removeChild(bodyClick);
+    }
+  };
+
   // ดึง role จาก localStorage
   const userInfo = userInfoStorage.get() || {};
-  const userRole = (userInfo.role || "").toLowerCase();
 
   // กรองเมนู: ไม่แสดง hidden และเช็ค roles (ถ้า route ไม่ได้ตั้ง roles = เข้าถึงได้ทุก role)
   const route = routes.filter((r) => {
     if (r.hidden) return false;
     if (r.roles && r.roles.length > 0) {
-      return r.roles.map((role) => role.toLowerCase()).includes(userRole);
+      return hasAnyRole(userInfo, r.roles);
     }
     return true;
   });
@@ -51,12 +60,20 @@ function Sidebar({ color, image, routes }) {
         }}
       />
       <div className="sidebar-wrapper">
-        <div className="logo d-flex align-items-center justify-content-start">
+        <div className="logo d-flex align-items-center justify-content-between">
           <a
             href="https://www.creative-tim.com?ref=lbd-sidebar"
             className="simple-text logo-mini mx-1"
           ></a>
           <a className="simple-text">กฤษดา พันธุ์ไม้</a>
+          <button
+            type="button"
+            className="sidebar-collapse-btn"
+            onClick={closeMobileSidebar}
+            aria-label="พับเมนู"
+          >
+            <ChevronLeft size={20} />
+          </button>
         </div>
         <Nav>
           {route.map((prop, key) => {

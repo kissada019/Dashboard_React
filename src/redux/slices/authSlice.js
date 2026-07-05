@@ -23,7 +23,7 @@ export const onLogin = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     console.log("credentials : ", credentials);
     try {
-      const response = await service.api.post("auth/Login", credentials);
+      const response = await service.api.post("api/auth/login", credentials);
       return response;
     } catch (error) {
       const message =

@@ -29,10 +29,10 @@ export const onGetAllTree = createAsyncThunk(
     try {
       let response = null;
       if (_apiURL === "DEV") {
-        response = await service.api.get("trees");
+        response = await service.api.get("api/trees");
         console.log("response : ", response);
       } else if (_apiURL === "PRE") {
-        response = await service.api.get("trees");
+        response = await service.api.get("api/trees");
       }
       return response;
     } catch (error) {
@@ -47,9 +47,9 @@ export const onGetTreeById = createAsyncThunk(
     try {
       let response = null;
       if (_apiURL === "DEV") {
-        response = await service.api.get(`trees/${id}`);
+        response = await service.api.get(`api/trees/${id}`);
       } else if (_apiURL === "PRE") {
-        response = await service.api.get(`trees/${id}`);
+        response = await service.api.get(`api/trees/${id}`);
       }
       return response;
     } catch (error) {
@@ -85,7 +85,7 @@ export const onCreateTreeWithFormData = createAsyncThunk(
   "treeSlice/api/treesWithFormData",
   async (formData, { rejectWithValue }) => {
     try {
-      const response = await service.api.postFormData("trees", formData);
+      const response = await service.api.postFormData("api/trees", formData);
       return response;
     } catch (error) {
       alert.error("ไม่สามารถเพิ่มต้นไม้ได้: " + (error.message || error));
@@ -103,7 +103,7 @@ export const onUpdateTree = createAsyncThunk(
         throw new Error("Missing tree id for update");
       }
       // ใช้ PUT /trees/:id ตามที่ต้องการ
-      const response = await service.api.put(`trees/${id}`, payload);
+      const response = await service.api.put(`api/trees/${id}`, payload);
       return response;
     } catch (error) {
       alert.error("Failed to update tree: " + error.message);
@@ -117,7 +117,7 @@ export const onUpdateTreeWithFormData = createAsyncThunk(
   "treeSlice/api/updateTreeWithFormData",
   async ({ id, formData }, { rejectWithValue }) => {
     try {
-      const response = await service.api.putFormData(`trees/${id}`, formData);
+      const response = await service.api.putFormData(`api/trees/${id}`, formData);
       return response;
     } catch (error) {
       alert.error("ไม่สามารถอัพเดทต้นไม้ได้: " + (error.message || error));

@@ -308,19 +308,39 @@
   justify-content: center;
   box-shadow: 0 4px 15px rgba(76, 175, 80, 0.3);
 
+  &,
+  svg {
+    color: #ffffff !important;
+  }
+
   &:hover {
-    background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+    background: linear-gradient(135deg, #31ff42 0%, #55ff74 100%);
+    color: #1e6a28 !important;
     transform: translateY(-2px);
-    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.4);
+    box-shadow:
+      0 0 12px rgba(49, 255, 66, 0.85),
+      0 0 28px rgba(49, 255, 66, 0.6),
+      0 0 48px rgba(49, 255, 66, 0.35),
+      0 8px 18px rgba(24, 142, 42, 0.35);
+
+    svg {
+      color: #1e6a28 !important;
+    }
   }
 
   &:active {
+    color: #1e6a28 !important;
     transform: translateY(0);
-    box-shadow: 0 2px 10px rgba(76, 175, 80, 0.3);
+    box-shadow:
+      0 0 10px rgba(49, 255, 66, 0.7),
+      0 0 22px rgba(49, 255, 66, 0.45);
   }
 
   &:focus {
-    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+    color: #ffffff !important;
+    box-shadow:
+      0 0 0 3px rgba(85, 255, 116, 0.22),
+      0 0 22px rgba(49, 255, 66, 0.38);
   }
 }
 

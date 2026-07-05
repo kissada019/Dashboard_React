@@ -31,13 +31,28 @@ import { store } from "./redux/store";
 
 
 import AdminLayout from "layouts/Admin.js";
+import userInfoStorage from "./storage/userInfoStorage";
+import { getUserRoles } from "./utils/authRole";
+
+function HomeRedirect() {
+  const userInfo = userInfoStorage.get() || {};
+  const roles = getUserRoles(userInfo);
+  const hasToken = Boolean(userInfo?.token);
+  const target = hasToken && roles.includes("superadmin")
+    ? "/admin/dashboard"
+    : hasToken
+      ? "/admin/shop"
+      : "/admin/login";
+
+  return <Redirect to={target} />;
+}
 
 ReactDOM.render(
   <Provider store={store}>
     <BrowserRouter>
       <Switch>
         <Route path="/admin" render={(props) => <AdminLayout {...props} />} />
-        <Redirect from="/" to="/admin/dashboard" />
+        <Route path="/" component={HomeRedirect} />
       </Switch>
     </BrowserRouter>
   </Provider>,

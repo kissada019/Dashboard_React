@@ -41,7 +41,7 @@ function Admin() {
           <Route
             path={prop.layout + prop.path}
             render={(props) => (
-              <RequireAuth>
+              <RequireAuth roles={prop.roles}>
                 <prop.component {...props} />
               </RequireAuth>
             )}
