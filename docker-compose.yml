@@ -1,0 +1,8 @@
+services:
+  frontend:
+    build: .
+    container_name: dashboard-react
+    ports:
+      - "4001:80"
+    restart: unless-stopped
+
