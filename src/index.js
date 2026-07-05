@@ -16,7 +16,8 @@
 
 */
 import React from "react";
-import ReactDOM from "react-dom/client";
+import ReactDOM from "react-dom";
+import { Provider } from "react-redux";
 
 import { BrowserRouter, Route, Switch, Redirect } from "react-router-dom";
 
@@ -26,15 +27,34 @@ import "./assets/scss/light-bootstrap-dashboard-react.scss?v=2.0.0";
 import "./assets/css/demo.css";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 
+import { store } from "./redux/store";
+
+
 import AdminLayout from "layouts/Admin.js";
+import userInfoStorage from "./storage/userInfoStorage";
+import { getUserRoles } from "./utils/authRole";
 
-const root = ReactDOM.createRoot(document.getElementById("root"));
+function HomeRedirect() {
+  const userInfo = userInfoStorage.get() || {};
+  const roles = getUserRoles(userInfo);
+  const hasToken = Boolean(userInfo?.token);
+  const target = hasToken && roles.includes("superadmin")
+    ? "/admin/dashboard"
+    : hasToken
+      ? "/admin/shop"
+      : "/admin/login";
 
-root.render(
-  <BrowserRouter>
-    <Switch>
-      <Route path="/admin" render={(props) => <AdminLayout {...props} />} />
-      <Redirect from="/" to="/admin/dashboard" />
-    </Switch>
-  </BrowserRouter>
+  return <Redirect to={target} />;
+}
+
+ReactDOM.render(
+  <Provider store={store}>
+    <BrowserRouter>
+      <Switch>
+        <Route path="/admin" render={(props) => <AdminLayout {...props} />} />
+        <Route path="/" component={HomeRedirect} />
+      </Switch>
+    </BrowserRouter>
+  </Provider>,
+  document.getElementById("root")
 );

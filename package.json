@@ -1,27 +1,42 @@
 {
   "name": "light-bootstrap-dashboard-react",
   "version": "2.0.1",
+  "proxy": "http://localhost:3000",
   "dependencies": {
     "@fortawesome/fontawesome-free": "5.15.2",
     "@lourenci/react-kanban": "^2.1.0",
+    "@reduxjs/toolkit": "^2.3.0",
     "ajv": "^8.16.0",
-    "bootstrap": "4.6.0",
-    "chartist": "0.11.4",
+    "axios": "^1.7.7",
+    "bootstrap": "^4.6.2",
+    "buffer": "^6.0.3",
+    "chartist": "0.10.1",
+    "constant-case": "^3.0.4",
+    "crypto-js": "^4.2.0",
     "formik": "^2.4.6",
     "gulp": "4.0.2",
     "gulp-append-prepend": "1.0.9",
-    "react": ">=16.8.0",
+    "highlight-words-core": "^1.2.3",
+    "lucide-react": "^0.475.0",
+    "moment": "^2.30.1",
+    "numeral": "^2.0.6",
+    "react": "17.0.2",
     "react-bootstrap": "2.4.0",
     "react-chartist": "0.14.4",
-    "react-dom": ">=16.8.0",
-    "react-kanban-board": "^1.0.17",
+    "react-dom": "17.0.2",
+    "react-helmet-async": "^2.0.5",
+    "html-react-parser": "^5.2.0",
+    "react-linkify": "^1.0.0-alpha",
     "react-notification-alert": "0.0.13",
+    "react-redux": "^8.1.3",
     "react-router": "5.2.0",
     "react-router-dom": "5.2.0",
     "react-scripts": "5.0.1",
     "reactstrap": "8.8.1",
     "recoil": "^0.7.7",
-    "sass": "1.53.0"
+    "sass": "1.53.0",
+    "sweetalert2": "^11.14.5",
+    "yup": "^1.5.0"
   },
   "optionalDependencies": {
     "jquery": "3.5.1",
@@ -55,5 +70,8 @@
   },
   "devDependencies": {
     "cross-env": "^7.0.3"
+  },
+  "overrides": {
+    "fsevents": "^2.3.2"
   }
 }
