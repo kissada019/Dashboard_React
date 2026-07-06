@@ -1,6 +1,6 @@
 // const env = "DEV";
-const env = "PRE";
-// const env = 'PRD';
+// const env = "PRE";
+const env = "PRD";
 
 /* app version */
 const versionDev = "0.1.0";
@@ -18,7 +18,7 @@ const dev = {
   SESSION_EXPIRED_MINUTES: 720 /* minutes */,
   // API_URL: "http://10.0.0.208/SRM/",
   API_URL: "https://localhost:7258/",
-  DEVELOPMENT_DOCUMENTS_URL: "http://10.0.0.202:8060/",
+  // DEVELOPMENT_DOCUMENTS_URL: "http://10.0.0.202:8060/",
 };
 
 const pre = {
@@ -31,26 +31,26 @@ const pre = {
   CONSOLE_LOG: true,
   SESSION_EXPIRED_MINUTES: 720 /* minutes */,
   API_URL: "http://localhost:3000/",
-  DEVELOPMENT_DOCUMENTS_URL: "http://10.0.0.202:8060/",
+  // DEVELOPMENT_DOCUMENTS_URL: "http://10.0.0.202:8060/",
 };
 
-// const prd = {
-//     APP_NAME: 'Software Request Management',
-//     APP_SHORT_NAME: 'SRM',
-//     APP_CODE: 'SRM',
-//     APP_VERSION: versionPrd,
-//     ENV: env,
-//     ENV_DESC: "",
-//     CONSOLE_LOG: false,
-//     SESSION_EXPIRED_MINUTES: 720, /* minutes */
-//     API_URL: "http://10.0.0.159/SRM/",
-//     DEVELOPMENT_DOCUMENTS_URL: 'http://10.0.0.202:8060/',
-// };
+const prd = {
+  APP_NAME: "Tree Tree System ",
+  APP_SHORT_NAME: "Tree",
+  APP_CODE: "Tree",
+  APP_VERSION: versionPrd,
+  ENV: env,
+  ENV_DESC: "",
+  CONSOLE_LOG: false,
+  SESSION_EXPIRED_MINUTES: 720 /* minutes */,
+  API_URL: "http://localhost:4000/",
+  // DEVELOPMENT_DOCUMENTS_URL: "http://10.0.0.202:8060/",
+};
 
 let exportConfig = {};
 
 if (env === "DEV") exportConfig = dev;
 if (env === "PRE") exportConfig = pre;
-// if (env === "PRD") exportConfig = prd;
+if (env === "PRD") exportConfig = prd;
 
 export default exportConfig;
