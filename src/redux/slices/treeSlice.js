@@ -20,20 +20,14 @@ const initialState = {
 };
 
 const _apiURL = appConst.ENV;
-console.log("_apiURL : ", _apiURL.ENV);
+console.log("_apiURL : ", _apiURL);
 
 /* Async Thunk: Fetch all trees */
 export const onGetAllTree = createAsyncThunk(
   "treeSlice/api/trees",
   async (_, { rejectWithValue }) => {
     try {
-      let response = null;
-      if (_apiURL === "DEV") {
-        response = await service.api.get("api/trees");
-        console.log("response : ", response);
-      } else if (_apiURL === "PRE") {
-        response = await service.api.get("api/trees");
-      }
+      const response = await service.api.get("api/trees");
       return response;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -45,12 +39,7 @@ export const onGetTreeById = createAsyncThunk(
   "treeSlice/api/treeById",
   async (id, { rejectWithValue }) => {
     try {
-      let response = null;
-      if (_apiURL === "DEV") {
-        response = await service.api.get(`api/trees/${id}`);
-      } else if (_apiURL === "PRE") {
-        response = await service.api.get(`api/trees/${id}`);
-      }
+      const response = await service.api.get(`api/trees/${id}`);
       return response;
     } catch (error) {
       return rejectWithValue(error.message);
@@ -63,15 +52,7 @@ export const onCreateTree = createAsyncThunk(
   "treeSlice/api/trees",
   async (treeData) => {
     try {
-      // console.log("treeData : ", treeData);
-
-      let response = null;
-      if (_apiURL === "DEV") {
-        // response = await service.api.get("api/Tree/GetAll");
-        response = await service.api.post("api/Tree/Create", treeData);
-      } else if (_apiURL === "PRE") {
-        response = await service.api.post("api/trees", treeData);
-      }
+      const response = await service.api.post("api/trees", treeData);
       return response;
     } catch (error) {
       alert.error("Failed to create tree: " + error.message);
@@ -130,13 +111,7 @@ export const onDeleteTree = createAsyncThunk(
   "treeSlice/api/trees",
   async (id) => {
     try {
-      let response = null;
-      if (_apiURL === "DEV") {
-        response = await service.api.deleted("api/Tree/Remove/" + id);
-      } else if (_apiURL === "PRE") {
-        response = await service.api.deleted("api/trees/" + id);
-      }
-
+      const response = await service.api.deleted("api/trees/" + id);
       return response;
     } catch (error) {
       alert.error("Failed to create tree: " + error.message);
