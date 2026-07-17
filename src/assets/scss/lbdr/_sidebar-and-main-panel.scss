@@ -6,6 +6,9 @@
       max-width: 40px;
       max-height: 40px;
     }
+    .sidebar-collapse-btn {
+      display: none;
+    }
 }
 
 @media (max-width: 991px){
@@ -13,8 +16,37 @@
     position: relative;
     bottom: unset;
   }
+
+  .sidebar .logo {
+    padding-right: 12px;
+  }
+
+  .sidebar .sidebar-collapse-btn {
+    align-items: center;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.34);
+    border-radius: 999px;
+    color: #fff;
+    cursor: pointer;
+    display: inline-flex;
+    flex-shrink: 0;
+    height: 34px;
+    justify-content: center;
+    padding: 0;
+    position: relative;
+    width: 34px;
+    z-index: 5;
+  }
+
+  .sidebar .sidebar-collapse-btn:hover,
+  .sidebar .sidebar-collapse-btn:focus {
+    background: rgba(255, 255, 255, 0.28);
+    outline: none;
+  }
 }
 
-#bodyClick {
-  position: absolute;
+@media (min-width: 992px){
+  #bodyClick {
+    position: absolute;
+  }
 }
